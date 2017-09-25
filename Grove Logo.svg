@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256px" height="256px" viewBox="0 0 256 256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <!-- Generator: Sketch 46.2 (44496) - http://www.bohemiancoding.com/sketch -->
+    <title>A</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="64 0 128 128 0 128"></polygon>
+        <polygon id="path-2" points="64 0 128 128 0 128"></polygon>
+        <polygon id="path-3" points="64 0 128 128 0 128"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="A">
+            <g id="Group">
+                <rect id="Rectangle" fill="#5A6378" x="48" y="128" width="32" height="48"></rect>
+                <g id="Triangle">
+                    <use fill="#7FD13B" fill-rule="evenodd" xlink:href="#path-1"></use>
+                    <path stroke="#FFFFFF" stroke-width="8" d="M64,-8.94427191 L134.472136,132 L-6.47213595,132 L64,-8.94427191 Z"></path>
+                </g>
+            </g>
+            <g id="Group-Copy" transform="translate(64.000000, 41.000000)">
+                <rect id="Rectangle" fill="#F0AD00" x="48" y="128" width="32" height="48"></rect>
+                <g id="Triangle">
+                    <use fill="#7FD13B" fill-rule="evenodd" xlink:href="#path-2"></use>
+                    <path stroke="#FFFFFF" stroke-width="8" d="M64,-8.94427191 L134.472136,132 L-6.47213595,132 L64,-8.94427191 Z"></path>
+                </g>
+            </g>
+            <g id="Group-Copy-2" transform="translate(128.000000, 82.000000)">
+                <rect id="Rectangle" fill="#60B5CC" x="48" y="128" width="32" height="48"></rect>
+                <g id="Triangle">
+                    <use fill="#7FD13B" fill-rule="evenodd" xlink:href="#path-3"></use>
+                    <path stroke="#FFFFFF" stroke-width="8" d="M64,-8.94427191 L134.472136,132 L-6.47213595,132 L64,-8.94427191 Z"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

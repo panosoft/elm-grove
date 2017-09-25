@@ -1,0 +1,57 @@
+{
+  "name": "@panosoft/elm-grove",
+  "version": "0.0.0",
+  "description": "Advanced Package Manager for Elm",
+  "scripts": {
+    "test": "./build.sh && node main"
+  },
+  "bin": {
+    "grove": "main.js"
+  },
+  "license": "Unlicense",
+  "dependencies": {
+    "@elm-node/core": "git+https://github.com/elm-node/core.git#semver:^2.2.0",
+    "check-node-version": "^2.1.0",
+    "command-line-args": "^4.0.6",
+    "command-line-commands": "^2.0.0",
+    "command-line-usage": "^4.0.0",
+    "cpr": "^2.0.2",
+    "glob": "^7.1.2",
+    "mkdirp": "^0.5.1",
+    "nodegit": "^0.18.3",
+    "prompt": "^1.0.0",
+    "rimraf": "^2.6.1"
+  },
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "node": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "no-console": 0,
+      "no-unused-vars": 0,
+      "no-useless-escape": 0,
+      "indent": [
+        "error",
+        "tab",
+        {
+          "SwitchCase": 1,
+          "MemberExpression": 0
+        }
+      ],
+      "linebreak-style": [
+        "error",
+        "unix"
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ]
+    }
+  }
+}

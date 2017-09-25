@@ -1,0 +1,23 @@
+{
+    "version": "0.0.0",
+    "summary": "Advanced Package Manager for Elm",
+    "repository": "https://github.com/panosoft/elm-grove.git",
+    "license": "Unlicense",
+    "source-directories": [
+        "src"
+    ],
+    "exposed-modules": [],
+    "native-modules": true,
+    "dependencies": {
+        "elm-community/list-extra": "6.0.0 <= v < 7.0.0",
+        "elm-lang/core": "5.1.1 <= v < 6.0.0",
+        "elm-node/core": "2.2.0 <= v < 3.0.0",
+        "panosoft/elm-parent-child-update": "2.0.0 <= v < 3.0.0",
+        "panosoft/elm-string-utils": "2.0.0 <= v < 3.0.0",
+        "panosoft/elm-utils": "2.0.0 <= v < 3.0.0"
+    },
+    "dependency-sources": {
+        "elm-node/core": "https://github.com/elm-node/core.git"
+    },
+    "elm-version": "0.18.0 <= v < 0.19.0"
+}

@@ -23,23 +23,14 @@ Make sure you have the following:
 - npm version 5.3.x+
 - node version 8.5.x+
 
-```bash
-npm install -g panosoft/elm-grove
-```
-
-## Installation Troubleshooting
-
-When installing Grove globally on OS X, if it fails with `Permission Denied`, then run the following commands:
+Due to npm 5.x.x bugs, installing grove globally will have to be done unconventionally.
 
 ```bash
-sudo chmod +a '<user> allow read,write,delete,add_file,add_subdirectory,file_inherit,directory_inherit' ~/.npm/_cacache/tmp
-sudo chmod +a '<user> allow read,write,delete,add_file,add_subdirectory,file_inherit,directory_inherit' ~/.npm/_locks
+cd ~
+git clone https://github.com/panosoft/elm-grove
+cd elm-grove
+sudo npm link
 ```
-
-where `<user>` is your username.
-
-And then try install again.
-
 
 ## Simple Example 1
 

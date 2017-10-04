@@ -15,3 +15,9 @@
 ##### Fixes
 * Init command adds `.git` to repository field in `elm-package.json`
 * Init will NOT run if `elm-package.json` already exists
+
+1.0.5 / 2017-10-04
+==================
+
+##### Fixes
+* Forgot the update instructions in the readme

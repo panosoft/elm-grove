@@ -28,13 +28,23 @@ Make sure you have the following:
 - Elm version 0.18.x
 - npm version 5.3.x+
 
-Due to npm 5.x.x bugs, installing grove globally will have to be done unconventionally.
+Due to npm 5.x.x bugs, installing AND updating grove globally will have to be done unconventionally.
+
+#### Installing grove
 
 ```bash
 cd ~
 git clone https://github.com/panosoft/elm-grove
 cd elm-grove
+npm install
 sudo npm link
+```
+#### Updating grove
+
+```bash
+cd ~/elm-grove
+git pull
+npm link
 ```
 
 ## Simple Example 1

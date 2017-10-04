@@ -270,7 +270,7 @@ type Msg
     | InstallMsg (Install.Msg Msg)
     | UninstallMsg (Uninstall.Msg Msg)
     | BumpMsg (Bump.Msg Msg)
-    | InitMsg Init.Msg
+    | InitMsg (Init.Msg Msg)
     | FinishUninstall Int
 
 

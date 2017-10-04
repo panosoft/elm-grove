@@ -5,6 +5,7 @@ import Dict
 import Task exposing (Task)
 import Json.Encode as JE
 import StringUtils exposing (..)
+import Node.FileSystem as FileSystem
 import Node.Error as Node
 import Utils.Ops exposing (..)
 import ElmJson exposing (..)
@@ -16,7 +17,7 @@ import Package exposing (..)
 
 type alias Config msg =
     { testing : Bool
-    , routeToMe : Msg -> msg
+    , routeToMe : Msg msg -> msg
     , operationComplete : Int -> msg
     , elmVersion : Int
     , cwd : String
@@ -39,16 +40,18 @@ init config initializedMsg =
       , license = Nothing
       , sourceDirectory = Nothing
       }
-    , Nothing
+    , FileSystem.exists elmJsonFilename
+        |> Task.attempt (config.routeToMe << FileExists initializedMsg)
+        |> Just
     )
 
 
-operationError : Model -> Task Never String -> ( ( Model, Cmd Msg ), List msg )
+operationError : Model -> Task Never String -> ( ( Model, Cmd (Msg msg) ), List msg )
 operationError model task =
     ( model ! [ Task.perform (\_ -> OperationComplete -1) task ], [] )
 
 
-operationSuccessful : Model -> Task Never String -> ( ( Model, Cmd Msg ), List msg )
+operationSuccessful : Model -> Task Never String -> ( ( Model, Cmd (Msg msg) ), List msg )
 operationSuccessful model task =
     ( model ! [ Task.perform (\_ -> OperationComplete 0) task ], [] )
 
@@ -58,18 +61,30 @@ pathJoin config pathParts =
     AppUtils.pathJoin config.pathSep config.cwd pathParts
 
 
-type Msg
+type Msg msg
     = OperationComplete Int
+    | FileExists msg (Result Node.Error Bool)
     | PromptResponse Int PromptAccessor (Result String String)
     | PromptsComplete
     | ElmJsonWritten (Result Node.Error ())
 
 
-update : Config msg -> Msg -> Model -> ( ( Model, Cmd Msg ), List msg )
+update : Config msg -> Msg msg -> Model -> ( ( Model, Cmd (Msg msg) ), List msg )
 update config msg model =
     case msg of
         OperationComplete exitCode ->
             ( model ! [], [ config.operationComplete exitCode ] )
+
+        FileExists _ (Err error) ->
+            errorLog ("Cannot check existence of:" +-+ elmJsonFilename +-+ "Error:" +-+ Node.message error)
+                |> operationError model
+
+        FileExists initializedMsg (Ok exists) ->
+            exists
+                ? ( errorLog (elmJsonFilename +-+ "already exists")
+                        |> operationError model
+                  , ( model ! [], [ initializedMsg ] )
+                  )
 
         PromptResponse _ _ (Err error) ->
             (error == "canceled")
@@ -86,7 +101,7 @@ update config msg model =
         PromptsComplete ->
             { version = "0.0.0"
             , summary = model.summary ?!= bugMissing "summary"
-            , repository = model.repository ?!= bugMissing "repository"
+            , repository = model.repository ?!= bugMissing "repository" ++ ".git"
             , license = model.license ?!= bugMissing "license"
             , sourceDirectories = [ model.sourceDirectory ?!= bugMissing "sourceDirectory" ]
             , exposedModules = []
@@ -149,7 +164,7 @@ prompts =
     ]
 
 
-nextPrompt : Config msg -> Model -> Int -> ( Model, Cmd Msg )
+nextPrompt : Config msg -> Model -> Int -> ( Model, Cmd (Msg msg) )
 nextPrompt config model promptIndex =
     (prompts
         |> Array.fromList

@@ -260,7 +260,7 @@ doBump config model =
                                                 , always [ elmJsonFilename ]
                                                 , always [ elmJsonFilename, npmJsonFilename ]
                                                 )
-                                            |> (\filesToAdd -> Git.commit repo filesToAdd "Added by 'grove bump'")
+                                            |> (\filesToAdd -> Git.commit repo filesToAdd ("Bumped version to" +-+ versionToString newVersion))
                                             |> Task.andThen (\_ -> Task.succeed repo)
                                     )
                        )

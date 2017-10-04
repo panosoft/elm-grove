@@ -888,8 +888,11 @@ update config msg model =
                 ( model ! [ FileSystem.readFileAsString npmJsonFilename Utf8 |> Task.attempt NpmPackageRead ], [] )
 
             NpmPackageRead (Err error) ->
-                warnLog ("\n\nSkipping Npm install since" +-+ npmJsonFilename +-+ "does not exist\n")
-                    |> operationSuccessful model
+                config.skipNpmInstall
+                    ? ( ( model ! [], [ config.operationComplete -1 ] )
+                      , warnLog ("\n\nSkipping Npm install since" +-+ npmJsonFilename +-+ "does not exist\n")
+                            |> operationSuccessful model
+                      )
 
             NpmPackageRead (Ok npmJsonStr) ->
                 model.elmJson

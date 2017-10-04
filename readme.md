@@ -4,9 +4,11 @@
 
 > **Installs any Elm package from any Git server including both Elm and NPM dependencies**
 
+# WARNING: This is NOT the official [Elm Package Manager](https://guide.elm-lang.org/install.html#elm-package). Grove can install official and non-official packages. If you use Grove to install non-official packages, realize that those packages offer NO GUARANTEES regarding RUNTIME ERRORS.
+
 ### Major features:
 - Written in Elm
-- Supports Official, Native and Effect Manager packages
+- Supports Official, Native and Effects Manager packages
 - Install from Github, Gitlab, private Git servers, etc.
 - Install local packages during development (via symbolic links)
 - Manage Elm and NPM dependencies (works without NPM as well)
@@ -14,6 +16,10 @@
 - Bump package version with validations (with git check in)
 - Initialize package (create `elm-package.json`)
 
+### Roadmap:
+- Automatic Documentation Generation
+- Semantic Version Protection
+- Warn user when installing non-official Elm packages
 
 ## Install
 
@@ -21,7 +27,6 @@ Make sure you have the following:
 
 - Elm version 0.18.x
 - npm version 5.3.x+
-- node version 8.5.x+
 
 Due to npm 5.x.x bugs, installing grove globally will have to be done unconventionally.
 

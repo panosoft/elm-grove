@@ -1,6 +1,6 @@
 {
   "name": "@panosoft/elm-grove",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Advanced Package Manager for Elm",
   "scripts": {
     "test": "./build.sh && node main"

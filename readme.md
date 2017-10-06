@@ -36,7 +36,6 @@ Due to npm 5.x.x bugs, installing AND updating grove globally will have to be do
 cd ~
 git clone https://github.com/panosoft/elm-grove
 cd elm-grove
-npm install
 sudo npm link
 ```
 #### Updating grove
@@ -44,7 +43,7 @@ sudo npm link
 ```bash
 cd ~/elm-grove
 git pull
-npm link
+sudo npm link
 ```
 
 ## Simple Example 1

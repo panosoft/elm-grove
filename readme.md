@@ -79,6 +79,14 @@ grove config --safe=none
 
 This will produce no messages regarding package statuses.
 
+### Remove SafeMode Configuration
+
+```bash
+grove config --safe=
+```
+
+This will REMOVE the safe mode option from Grove's configuration file, e.g. when you no longer want the local override (the above command would need the `--local` option in that particular case).
+
 ### Configuration Files
 
 Grove's global configuration file, `grove-config.json`, is in the user's home directory. Local configuration files are at the root of the repository.
@@ -181,6 +189,8 @@ grove version
 grove init
 ```
 
+##### elm-package.json
+
 This command will build a bare-bones `elm-package.json` file. In order to do this, it will prompt you for the following:
 
 - `Summary of package` - a general description of the package
@@ -198,9 +208,16 @@ The following are the values of items that are NOT prompted for and therefore ar
 - `Dependencies` - `elm-lang/core` is the one and only dependency, to add more use `grove install`
 - `Elm Version` - the current version supported to the next version
 
+##### package.json
+
+The `init` command will also prompt you to create a *minimal* `package.json`. If you respond with Yes, then the following keys will be created:
+
+- `Name` - set based on the `Repository name` prompt
+- `Version` - set to 0.0.0
+- `License` - set based on the `License` prompt
+
 
 ### Install packages
-
 
 #### Installing `elm-lang/html`
 

@@ -30,6 +30,7 @@ type alias Model =
     , repository : Maybe String
     , license : Maybe String
     , sourceDirectory : Maybe String
+    , createNpmJson : Maybe String
     }
 
 
@@ -39,6 +40,7 @@ init config initializedMsg =
       , repository = Nothing
       , license = Nothing
       , sourceDirectory = Nothing
+      , createNpmJson = Nothing
       }
     , FileSystem.exists elmJsonFilename
         |> Task.attempt (config.routeToMe << FileExists initializedMsg)
@@ -61,12 +63,33 @@ pathJoin config pathParts =
     AppUtils.pathJoin config.pathSep config.cwd pathParts
 
 
+type alias MinimalNpmJson =
+    { name : String
+    , version : String
+    , license : String
+    }
+
+
+minimalNpmJsonEncoder : MinimalNpmJson -> JE.Value
+minimalNpmJsonEncoder minimalNpmJson =
+    JE.object
+        [ ( "name", JE.string minimalNpmJson.name )
+        , ( "version", JE.string minimalNpmJson.version )
+        , ( "license", JE.string minimalNpmJson.license )
+        ]
+
+
+type FileWriteStepError
+    = ElmJsonWriteStepError Node.Error
+    | NpmJsonWriteStepError Node.Error
+
+
 type Msg msg
     = OperationComplete Int
     | FileExists msg (Result Node.Error Bool)
     | PromptResponse Int PromptAccessor (Result String String)
     | PromptsComplete
-    | ElmJsonWritten (Result Node.Error ())
+    | ElmJsonWritten (Result FileWriteStepError ())
 
 
 update : Config msg -> Msg msg -> Model -> ( ( Model, Cmd (Msg msg) ), List msg )
@@ -113,12 +136,39 @@ update config msg model =
                 |> elmJsonEncoder
                 |> JE.encode 4
                 |> writeFile (pathJoin config [ config.cwd, config.testing ? ( "test", "" ), elmJsonFilename ])
+                |> Task.mapError ElmJsonWriteStepError
+                |> Task.andThen
+                    (\result ->
+                        ((model.createNpmJson ?!= bugMissing "createNpmJson")
+                            |> String.toLower
+                            |> String.startsWith "y"
+                        )
+                            ? ( { name = "@" ++ model.repository ?!= bugMissing "repository"
+                                , version = "0.0.0"
+                                , license = model.license ?!= bugMissing "license"
+                                }
+                                    |> minimalNpmJsonEncoder
+                                    |> JE.encode 4
+                                    |> writeFile (pathJoin config [ config.cwd, config.testing ? ( "test", "" ), npmJsonFilename ])
+                                    |> Task.mapError NpmJsonWriteStepError
+                              , Task.succeed result
+                              )
+                    )
                 |> Task.attempt ElmJsonWritten
                 |> (\cmd -> ( model ! [ cmd ], [] ))
 
         ElmJsonWritten (Err error) ->
-            errorLog ("Unable to write" +-+ elmJsonFilename +-+ "Error:" +-+ (Node.message error))
-                |> operationError model
+            (case error of
+                ElmJsonWriteStepError error ->
+                    ( elmJsonFilename, error )
+
+                NpmJsonWriteStepError error ->
+                    ( npmJsonFilename, error )
+            )
+                |> (\( filename, error ) ->
+                        errorLog ("Unable to write" +-+ filename +-+ "Error:" +-+ (Node.message error))
+                            |> operationError model
+                   )
 
         ElmJsonWritten (Ok ()) ->
             ( model ! [], [ config.operationComplete 0 ] )
@@ -139,25 +189,34 @@ prompts =
     , ( \model value -> { model | repository = Just value }
       , { defaultPrompt
             | prompt = "Repository name"
-            , pattern = Just "^(?:[a-zA-Z](?:[-][a-zA-Z]+)*)+/(?:[a-zA-Z](?:[-_][a-zA-Z]+)*)+$"
+            , pattern = Just "^([a-zA-Z](?:[-][a-zA-Z]+)*)+/(?:[a-zA-Z](?:[-_][a-zA-Z]+)*)+$"
             , message = Just "Invalid repo name... must be like: your-user-name/your-repo-name"
         }
       )
     , ( \model value -> { model | license = Just value }
       , { defaultPrompt
-            | prompt = "License [BSD]"
+            | prompt = "License [BSD-3-Clause]"
             , pattern = Just "^[A-Za-z]+$"
             , message = Just "Invalid license name"
-            , default = Just "BSD"
+            , default = Just "BSD-3-Clause"
             , required = False
         }
       )
     , ( \model value -> { model | sourceDirectory = Just value }
       , { defaultPrompt
             | prompt = "Source directory [src]"
-            , pattern = Just "^(?:[.]|[.]{2}|/?[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*)$"
+            , pattern = Just "^([.]|[.]{2}|/?[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*)$"
             , message = Just "Invalid path"
             , default = Just "src"
+            , required = False
+        }
+      )
+    , ( \model value -> { model | createNpmJson = Just value }
+      , { defaultPrompt
+            | prompt = "Also create 'package.json' [Y/n]"
+            , pattern = Just "^(y(es)?|Y(es)?|n(o)|N(o))$"
+            , message = Just "Invalid yes/no answer"
+            , default = Just "y"
             , required = False
         }
       )

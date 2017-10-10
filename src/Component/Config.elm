@@ -1,0 +1,269 @@
+module Component.Config
+    exposing
+        ( ConfigFile
+        , SafeMode(..)
+        , Config
+        , Model
+        , Msg
+        , init
+        , update
+        , safeMode
+        , configure
+        )
+
+import Task exposing (Task)
+import Json.Decode as JD exposing (field)
+import Json.Encode as JE
+import AppUtils exposing (..)
+import Common exposing (..)
+import Console
+import Output exposing (..)
+import Node.FileSystem as FileSystem
+import Node.Encoding as Encoding exposing (Encoding(..))
+import Node.Error as Node exposing (Error(..), Code(..))
+import Env exposing (..)
+import Utils.Ops exposing (..)
+import Utils.Json exposing (..)
+import StringUtils exposing (..)
+
+
+type alias Config msg =
+    { testing : Bool
+    , routeToMe : Msg msg -> msg
+    , operationComplete : Int -> msg
+    , cwd : String
+    , pathSep : String
+    , configFilename : Filename
+    , local : Maybe Bool
+    , safe : Maybe String
+    }
+
+
+type alias Model =
+    { configFile : Maybe ConfigFile }
+
+
+type SafeMode
+    = SafeModeOn
+    | SafeModeOff
+    | SafeModeNone
+
+
+type alias ConfigFile =
+    { safeMode : Maybe SafeMode
+    }
+
+
+defaultConfigFile : ConfigFile
+defaultConfigFile =
+    { safeMode = Nothing
+    }
+
+
+defaultConfigFileString : String
+defaultConfigFileString =
+    defaultConfigFile
+        |> encoder
+        |> JE.encode 4
+
+
+decoder : JD.Decoder ConfigFile
+decoder =
+    JD.succeed ConfigFile
+        <|| (JD.maybe
+                (field "safeMode" <| JD.string)
+                |> JD.andThen
+                    (\maybeSafe ->
+                        JD.succeed <|
+                            (maybeSafe
+                                |?->
+                                    ( Nothing
+                                    , \safe ->
+                                        Just
+                                            (case String.toLower safe of
+                                                "on" ->
+                                                    SafeModeOn
+
+                                                "off" ->
+                                                    SafeModeOff
+
+                                                _ ->
+                                                    SafeModeNone
+                                            )
+                                    )
+                            )
+                    )
+            )
+
+
+encoder : ConfigFile -> JE.Value
+encoder configFile =
+    JE.object
+        (configFile.safeMode
+            |?->
+                ( []
+                , \safeMode ->
+                    [ ( "safeMode"
+                      , JE.string <|
+                            case safeMode of
+                                SafeModeOn ->
+                                    "on"
+
+                                SafeModeOff ->
+                                    "off"
+
+                                SafeModeNone ->
+                                    "none"
+                      )
+                    ]
+                )
+        )
+
+
+pathJoin : Config msg -> List String -> String
+pathJoin config pathParts =
+    AppUtils.pathJoin config.pathSep config.cwd pathParts
+
+
+operationError : Model -> Task Never String -> ( ( Model, Cmd (Msg msg) ), List msg )
+operationError model task =
+    ( model ! [ Task.perform (\_ -> OperationComplete -1) task ], [] )
+
+
+operationSuccessful : Model -> Task Never String -> ( ( Model, Cmd (Msg msg) ), List msg )
+operationSuccessful model task =
+    ( model ! [ Task.perform (\_ -> OperationComplete 0) task ], [] )
+
+
+localOrGlobalPath : Config msg -> Path
+localOrGlobalPath config =
+    config.local |?-> ( Env.homedir, flip (?) ( ".", Env.homedir ) )
+
+
+configPath : Config msg -> Path -> Path
+configPath config path =
+    pathJoin config [ config.testing ? ( "test", path ), config.configFilename ]
+
+
+init : Config msg -> msg -> ( Model, Maybe (Cmd msg) )
+init config initializedMsg =
+    ( { configFile = Nothing }
+    , Just <|
+        (( configPath config ".", configPath config Env.homedir )
+            |> (\( localPath, globalPath ) ->
+                    FileSystem.readFileAsString localPath Utf8
+                        |> Task.onError
+                            (\nodeError ->
+                                case nodeError of
+                                    SystemError code _ ->
+                                        (code == NoSuchFileOrDirectory) ? ( Task.succeed defaultConfigFileString, Task.fail ( nodeError, localPath ) )
+
+                                    _ ->
+                                        Task.fail ( nodeError, localPath )
+                            )
+                        |> Task.andThen
+                            (\localData ->
+                                FileSystem.readFileAsString globalPath Utf8
+                                    |> Task.andThen (\globalData -> Task.succeed ( localData, globalData ))
+                                    |> Task.onError
+                                        (\nodeError ->
+                                            case nodeError of
+                                                SystemError code _ ->
+                                                    (code == NoSuchFileOrDirectory) ? ( Task.succeed ( localData, defaultConfigFileString ), Task.fail ( nodeError, globalPath ) )
+
+                                                _ ->
+                                                    Task.fail ( nodeError, globalPath )
+                                        )
+                            )
+                        |> Task.andThen (\( localData, globalData ) -> Task.succeed ( ( localData, localPath ), ( globalData, globalPath ) ))
+                        |> Task.attempt (config.routeToMe << ConfigFileRead initializedMsg)
+               )
+        )
+    )
+
+
+type Msg msg
+    = OperationComplete Int
+    | ConfigFileRead msg (Result ( Node.Error, Path ) ( ( String, Path ), ( String, Path ) ))
+    | ConfigurationComplete (Result Node.Error ())
+
+
+update : Config msg -> Msg msg -> Model -> ( ( Model, Cmd (Msg msg) ), List msg )
+update config msg model =
+    case msg of
+        OperationComplete exitCode ->
+            ( model ! [], [ config.operationComplete exitCode ] )
+
+        ConfigFileRead _ (Err ( error, path )) ->
+            errorLog ("Unable to read:" +-+ path +-+ "Error:" +-+ error)
+                |> operationError model
+
+        ConfigFileRead initializedMsg (Ok ( ( localJson, localPath ), ( globalJson, globalPath ) )) ->
+            (\path error ->
+                errorLog ("Config file:" +-+ path +-+ "decoding error:" +-+ error)
+                    |> operationError model
+            )
+                |> (\decodingError ->
+                        ( JD.decodeString decoder localJson, JD.decodeString decoder globalJson )
+                            |??**>
+                                ( decodingError localPath
+                                , decodingError globalPath
+                                , \( localConfig, globalConfig ) ->
+                                    { safeMode = localConfig.safeMode |?-> ( globalConfig.safeMode, Just )
+                                    }
+                                        |> \configFile -> ( { model | configFile = Just configFile } ! [], [ initializedMsg ] )
+                                )
+                   )
+
+        ConfigurationComplete (Err error) ->
+            errorLog ("Unable to write:" +-+ configPath config +-+ "Error:" +-+ error)
+                |> operationError model
+
+        ConfigurationComplete (Ok ()) ->
+            Console.log ("Grove configuration updated")
+                |> operationSuccessful model
+
+
+safeMode : Config msg -> Model -> SafeMode
+safeMode config model =
+    model.configFile |?-> ( SafeModeNone, \configFile -> configFile.safeMode ?= SafeModeNone )
+
+
+configure : Config msg -> Model -> ( Model, Cmd msg )
+configure config model =
+    (model.configFile ?!= bugMissing "configFile")
+        |> (\configFile ->
+                config.safe
+                    |?->
+                        ( configFile
+                        , \safe ->
+                            (case safe of
+                                "on" ->
+                                    Just SafeModeOn
+
+                                "off" ->
+                                    Just SafeModeOff
+
+                                "none" ->
+                                    Just SafeModeNone
+
+                                "" ->
+                                    Nothing
+
+                                _ ->
+                                    bug "Should never get here" <| always Nothing
+                            )
+                                |> (\safeMode -> { configFile | safeMode = safeMode })
+                        )
+           )
+        |> (\configFile ->
+                ((config.local ?= False)
+                    ? ( config.configFilename, (configPath config <| localOrGlobalPath config) )
+                )
+                    |> (\path ->
+                            { model | configFile = Just configFile }
+                                ! [ (writeFile path <| JE.encode 2 (encoder configFile))
+                                        |> Task.attempt (config.routeToMe << ConfigurationComplete)
+                                  ]
+                       )
+           )

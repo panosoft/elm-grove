@@ -6,6 +6,9 @@
 
 # WARNING: This is NOT the official [Elm Package Manager](https://guide.elm-lang.org/install.html#elm-package). Grove can install official and non-official packages. If you use Grove to install non-official packages, realize that those packages offer NO GUARANTEES regarding RUNTIME ERRORS.
 
+## Using Grove Safely
+You can, however, benefit from all of the advanced Grove features AND all the runtime safety of the Official Elm Packages by configuring Grove to operate in safe mode ([see Configure Grove for Safety](#configure-grove-for-safety)).
+
 ### Major features:
 - Written in Elm
 - Supports Official, Native and Effects Manager packages
@@ -22,29 +25,63 @@
 - Warn user when installing non-official Elm packages
 
 ## Install
-
 Make sure you have the following:
 
 - Elm version 0.18.x
 - npm version 5.3.x+
 
-Due to npm 5.x.x bugs, installing AND updating grove globally will have to be done unconventionally.
+**Due to npm 5.x.x bugs, installing AND updating grove globally will have to be done unconventionally, for now.**
 
 #### Installing grove
-
 ```bash
 cd ~
 git clone https://github.com/panosoft/elm-grove
 cd elm-grove
 sudo npm link
 ```
-#### Updating grove
 
+#### Updating grove
 ```bash
 cd ~/elm-grove
 git pull
 sudo npm link
 ```
+
+## Configure Grove For Safety
+
+### Global/Local Safety
+
+You can configure Grove either Globally or Locally. There is a command line option, `--local` that can be used on the `grove config` command to configure local safety only.
+
+Local configuration overrides Global. So you can set Global as `--safe=on` and then set a particular repository's Local as `--local --safe=none`.
+
+### SafeMode On
+```bash
+grove config --safe=on
+```
+This will DISALLOW Non-official Elm Packages from being installed.
+
+NOTE: This check is NOT performed when you link to local packages since it is assumed that these packages are part of your codebase.
+
+### SafeMode Off
+```bash
+grove config --safe=off
+```
+
+This will ALLOW Non-official Elm Packages from being installed, but will display a WARNING to remind you of the risks.
+
+NOTE: This check is NOT performed when you link to local packages since it is assumed that these packages are part of your codebase.
+
+### SafeMode None
+```bash
+grove config --safe=none
+```
+
+This will produce no messages regarding package statuses.
+
+### Configuration Files
+
+Grove's global configuration file, `grove-config.json`, is in the user's home directory. Local configuration files are at the root of the repository.
 
 ## Simple Example 1
 
@@ -52,7 +89,7 @@ Assuming you're starting a new project that needs the following:
 
 - `elm-lang/core`
 
-```
+```bash
 grove init
 grove install
 ```
@@ -68,7 +105,7 @@ Assuming you're starting a new project that needs the following:
 - `panosoft/elm-utils`
 - `group/repo` (from Gitlab at `gitlab.private.com`)
 
-```
+```bash
 grove init
 grove install elm-lang/html panosoft/elm-utils git@gitlab.private.com:group/repo
 ```

@@ -1,6 +1,7 @@
 module Env
     exposing
         ( env
+        , homedir
         )
 
 import Dict exposing (Dict)
@@ -13,3 +14,8 @@ env : Dict String String
 env =
     JD.decodeString (JD.dict JD.string) Native.Env.env
         ??= (\_ -> Debug.crash "BUG: Cannot decode env")
+
+
+homedir : String
+homedir =
+    Native.Env.homedir

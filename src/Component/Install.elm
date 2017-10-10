@@ -36,6 +36,8 @@ import Spawn
 import AppUtils exposing (..)
 import Common exposing (..)
 import Component.Rewriter as Rewriter
+import Http
+import Component.Config exposing (..)
 
 
 type alias Config msg =
@@ -53,6 +55,7 @@ type alias Config msg =
     , pathSep : String
     , packages : Maybe (List PackageName)
     , sources : Dict PackageName PackageSource
+    , safeMode : SafeMode
     }
 
 
@@ -109,6 +112,7 @@ type alias Model =
     , finalCheckoutCount : Int
     , rewriterModel : Rewriter.Model
     , elmJsonIndent : Maybe Int
+    , officialElmPackages : Set PackageName
     }
 
 
@@ -121,6 +125,26 @@ rewriterConfig config linkedRepos =
     , cwd = config.cwd
     , pathSep = config.pathSep
     }
+
+
+officialElmPackagesUrl : String
+officialElmPackagesUrl =
+    "http://package.elm-lang.org/all-packages"
+
+
+decodeOfficialPackageList : JD.Decoder (List PackageName)
+decodeOfficialPackageList =
+    JD.list (field "name" JD.string)
+
+
+retrieveOfficialElmPackageList : Config msg -> msg -> Cmd (Msg msg)
+retrieveOfficialElmPackageList config initializedMsg =
+    (config.safeMode == SafeModeNone)
+        ? ( msgToCmd <| SkipOfficialListRetrieval initializedMsg
+          , Http.get officialElmPackagesUrl decodeOfficialPackageList
+                |> Http.toTask
+                |> Task.attempt (OfficialListRetrieved initializedMsg)
+          )
 
 
 init : Config msg -> msg -> String -> ( Model, Maybe (Cmd msg) )
@@ -141,10 +165,14 @@ init config initializedMsg linkedReposFilename =
       , finalCheckoutCount = 0
       , rewriterModel = Rewriter.initModel (rewriterConfig config Set.empty)
       , elmJsonIndent = Nothing
+      , officialElmPackages = Set.empty
       }
     , config.linking
-        ? ( Just (Task.attempt (config.routeToMe << LinkedReposRead initializedMsg linkedReposFilename) <| FileSystem.readFileAsString linkedReposFilename Utf8)
-          , Nothing
+        ? ( Just
+                (FileSystem.readFileAsString linkedReposFilename Utf8
+                    |> Task.attempt (config.routeToMe << LinkedReposRead initializedMsg linkedReposFilename)
+                )
+          , Just <| Cmd.map config.routeToMe (retrieveOfficialElmPackageList config initializedMsg)
           )
     )
 
@@ -366,8 +394,33 @@ installOrLink config model =
             (\( packageName, checkedOutPackage ) cmds ->
                 pathJoin config [ elmPackagesRoot config.testing config.pathSep, packageName, checkedOutPackage.versionStr ]
                     |> (\installPath ->
-                            ((Console.log ("Installing:" +-+ colorize green packageName +-+ parens checkedOutPackage.versionStr)
-                                |> Task.mapError (always "Should never happen")
+                            ((packageName
+                                |> flip Set.member model.officialElmPackages
+                                |> not
+                                |> (\isOfficial ->
+                                        case config.safeMode of
+                                            SafeModeOn ->
+                                                isOfficial
+                                                    ? ( Task.fail "Non-Official Elm Package (SafeMode: ON)"
+                                                      , Task.succeed ""
+                                                      )
+
+                                            SafeModeOff ->
+                                                isOfficial
+                                                    ? ( warnLog ("Package:" +-+ packageName +-+ "is not an Official Elm Package (SafeMode: OFF)")
+                                                            |> Task.mapError (always "Should never happen")
+                                                            |> Task.andThen (\_ -> Task.succeed "")
+                                                      , Task.succeed ""
+                                                      )
+
+                                            SafeModeNone ->
+                                                Task.succeed ""
+                                   )
+                                |> Task.andThen
+                                    (\_ ->
+                                        Console.log ("Installing:" +-+ colorize green packageName +-+ parens checkedOutPackage.versionStr)
+                                            |> Task.mapError (always "Should never happen")
+                                    )
                                 |> Task.andThen
                                     (\_ ->
                                         (FileSystem.remove <| pathJoin config [ elmPackagesRoot config.testing config.pathSep, packageName ])
@@ -464,6 +517,7 @@ processElmJson config model packageName parentPath readOccurence elmJson =
                             )
                             |> operationError model
                       , ( Dict.union config.sources (elmJson.dependencySources ?= Dict.empty)
+                            |> Dict.filter (\_ -> not << String.contains "github.com")
                             |> (\sources -> (sources == Dict.empty) ? ( Nothing, Just sources ))
                         , (readOccurence == Initial)
                             ? ( (config.packages ?= []), [] )
@@ -542,6 +596,8 @@ type alias ParentPath =
 type Msg msg
     = OutputComplete String
     | OperationComplete Int
+    | SkipOfficialListRetrieval msg
+    | OfficialListRetrieved msg (Result Http.Error (List PackageName))
     | LinkedReposRead msg String (Result Node.Error String)
     | ElmJsonFileRead PackageName Path ParentPath Occurence (Maybe ( InstallState, Path )) (Result Node.Error String)
     | LinkPrepareComplete (Maybe Range) (Result ( DependsOn, Git.Error ) InstallState)
@@ -581,6 +637,16 @@ update config msg model =
             OperationComplete exitCode ->
                 ( model ! [], [ config.operationComplete exitCode ] )
 
+            OfficialListRetrieved initializedMsg (Err error) ->
+                errorLog ("Unable to retrieve Official Elm Packages from:" +-+ officialElmPackagesUrl +-+ "Error:" +-+ error)
+                    |> operationError model
+
+            OfficialListRetrieved initializedMsg (Ok officialElmPackages) ->
+                ( { model | officialElmPackages = Set.fromList officialElmPackages } ! [], [ initializedMsg ] )
+
+            SkipOfficialListRetrieval initializedMsg ->
+                ( model ! [], [ initializedMsg ] )
+
             LinkedReposRead initializedMsg linkedReposFilename result ->
                 ( \msg error ->
                     errorLog (msg +-+ "Error:" +-+ error)
@@ -616,7 +682,13 @@ update config msg model =
                                 |??>
                                     (\contents ->
                                         (JD.decodeString (JD.dict JD.string) contents)
-                                            |??> (\repoLocation -> ( { model | linkedRepos = createLinkedRepoWithReplacedEnvVars repoLocation } ! [], [ initializedMsg ] ))
+                                            |??>
+                                                (\repoLocation ->
+                                                    ( { model | linkedRepos = createLinkedRepoWithReplacedEnvVars repoLocation }
+                                                        ! [ retrieveOfficialElmPackageList config initializedMsg ]
+                                                    , []
+                                                    )
+                                                )
                                             ??= exitApp ("Unable to decode JSON" +-+ linkedReposFilename)
                                     )
                                 ??= (exitApp ("Unable to read" +-+ linkedReposFilename) << Node.message)
@@ -1030,7 +1102,9 @@ update config msg model =
 install : Config msg -> Model -> ( Model, Cmd msg )
 install config model =
     { model | readingElmJson = Set.insert "" model.readingElmJson }
-        ! [ Task.attempt (config.routeToMe << ElmJsonFileRead "" config.cwd "" Initial Nothing) <| FileSystem.readFileAsString elmJsonFilename Utf8 ]
+        ! [ FileSystem.readFileAsString elmJsonFilename Utf8
+                |> Task.attempt (config.routeToMe << ElmJsonFileRead "" config.cwd "" Initial Nothing)
+          ]
 
 
 getNpmPackages : Model -> List PackageName

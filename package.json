@@ -10,7 +10,7 @@
   },
   "license": "Unlicense",
   "dependencies": {
-    "@elm-node/core": "git+https://github.com/elm-node/core.git#semver:^2.2.0",
+    "@elm-node/core": "git+https://github.com/elm-node/core.git#semver:^2.2.1",
     "check-node-version": "^2.1.0",
     "command-line-args": "^4.0.6",
     "command-line-commands": "^2.0.0",
@@ -20,7 +20,8 @@
     "mkdirp": "^0.5.1",
     "nodegit": "^0.20.2",
     "prompt": "^1.0.0",
-    "rimraf": "^2.6.1"
+    "rimraf": "^2.6.1",
+    "xhr2": "^0.1.4"
   },
   "eslintConfig": {
     "env": {

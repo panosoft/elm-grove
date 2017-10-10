@@ -7,6 +7,7 @@ import Regex
 import StringUtils exposing (..)
 import AppUtils exposing (..)
 import ParentChildUpdate exposing (..)
+import Component.Config as Config exposing (..)
 import Component.Install as Install exposing (..)
 import Component.Uninstall as Uninstall exposing (..)
 import Component.Bump as Bump exposing (..)
@@ -31,6 +32,8 @@ type alias Options =
     , allowUncommitted : Bool
     , allowOldDependencies : Bool
     , noRewrite : Bool
+    , local : Maybe Bool
+    , safe : Maybe String
     }
 
 
@@ -52,6 +55,7 @@ type alias PackageSourceDict =
 type alias Model =
     { flags : Flags
     , packageSourceDict : PackageSourceDict
+    , configModel : Maybe Config.Model
     , installModel : Maybe Install.Model
     , uninstallModel : Maybe Uninstall.Model
     , bumpModel : Maybe Bump.Model
@@ -71,6 +75,11 @@ main =
 linkedReposFilename : String
 linkedReposFilename =
     "grove-links.json"
+
+
+configFilename : String
+configFilename =
+    "grove-config.json"
 
 
 parsePackages : List PackageName -> Result (List String) PackageSourceDict
@@ -114,28 +123,49 @@ parsePackages packages =
            )
 
 
-installConfig : Flags -> PackageSourceDict -> Install.Config Msg
-installConfig flags packageSourceDict =
+configConfig : Flags -> Config.Config Msg
+configConfig flags =
     { testing = flags.testing
-    , linking = flags.options.link
-    , dryRun = flags.options.dryRun
-    , npmProduction = flags.options.npmProduction
-    , npmSilent = flags.options.npmSilent
-    , noRewrite = flags.options.noRewrite
-    , skipNpmInstall = (flags.command == "install") ? ( False, True )
-    , routeToMe = InstallMsg
-    , operationComplete = (flags.command == "install") ? ( ExitApp, FinishUninstall )
-    , elmVersion = flags.elmVersion
+    , routeToMe = ConfigMsg
+    , operationComplete = ExitApp
     , cwd = flags.cwd
     , pathSep = flags.pathSep
-    , packages = (flags.command == "install") ? ( Just <| Dict.keys packageSourceDict, Nothing )
-    , sources = packageSourceDict
+    , configFilename = configFilename
+    , local = flags.options.local
+    , safe = flags.options.safe |?> String.toLower
     }
+
+
+configCfg : Model -> Config.Config Msg
+configCfg model =
+    configConfig model.flags
+
+
+installConfig : Model -> Flags -> PackageSourceDict -> Install.Config Msg
+installConfig model flags packageSourceDict =
+    configConfig flags
+        |> \configCfg ->
+            { testing = flags.testing
+            , linking = flags.options.link
+            , dryRun = flags.options.dryRun
+            , npmProduction = flags.options.npmProduction
+            , npmSilent = flags.options.npmSilent
+            , noRewrite = flags.options.noRewrite
+            , skipNpmInstall = (flags.command == "install") ? ( False, True )
+            , routeToMe = InstallMsg
+            , operationComplete = (flags.command == "install") ? ( ExitApp, FinishUninstall )
+            , elmVersion = flags.elmVersion
+            , cwd = flags.cwd
+            , pathSep = flags.pathSep
+            , packages = (flags.command == "install") ? ( Just <| Dict.keys packageSourceDict, Nothing )
+            , sources = packageSourceDict
+            , safeMode = Config.safeMode configCfg (model.configModel ?!= bugMissing "configModel")
+            }
 
 
 installCfg : Model -> Install.Config Msg
 installCfg model =
-    installConfig model.flags model.packageSourceDict
+    installConfig model model.flags model.packageSourceDict
 
 
 uninstallConfig : Flags -> PackageSourceDict -> Uninstall.Config Msg
@@ -196,13 +226,25 @@ initCfg model =
     initConfig model.flags
 
 
+initConfigModule : String -> Model -> ( Model, Cmd Msg )
+initConfigModule command model =
+    Config.init (configConfig model.flags) (ConfigInitialized command)
+        |> (\( configModel, maybeConfigCmd ) ->
+                { model | configModel = Just configModel }
+                    ! [ maybeConfigCmd ?= msgToCmd (ConfigInitialized command) ]
+           )
+
+
 initCommand : String -> Model -> ( Model, Cmd Msg )
 initCommand command model =
     model.flags
         |> (\flags ->
                 case command of
+                    "config" ->
+                        bug "Should never get here" |> always (model ! [])
+
                     "install" ->
-                        Install.init (installConfig flags model.packageSourceDict) InstallInitialized linkedReposFilename
+                        Install.init (installConfig model flags model.packageSourceDict) InstallInitialized linkedReposFilename
                             |> (\( installModel, maybeInstallCmd ) ->
                                     { model | installModel = Just installModel }
                                         ! [ maybeInstallCmd ?= msgToCmd InstallInitialized ]
@@ -219,7 +261,7 @@ initCommand command model =
                         Bump.init (bumpConfig flags) BumpInitialized
                             |> (\( bumpModel, maybeBumpCmd ) ->
                                     { model | bumpModel = Just bumpModel }
-                                        ! [ maybeBumpCmd ?= msgToCmd UninstallInitialized ]
+                                        ! [ maybeBumpCmd ?= msgToCmd BumpInitialized ]
                                )
 
                     "init" ->
@@ -238,6 +280,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     { flags = flags
     , packageSourceDict = Dict.empty
+    , configModel = Nothing
     , installModel = Nothing
     , uninstallModel = Nothing
     , bumpModel = Nothing
@@ -253,7 +296,7 @@ init flags =
                                   ]
                         , \packageSourceDict ->
                             { model | packageSourceDict = packageSourceDict }
-                                |> initCommand flags.command
+                                |> initConfigModule flags.command
                         )
            )
 
@@ -261,12 +304,14 @@ init flags =
 type Msg
     = Nop
     | DoCmd (Cmd Msg)
+    | ConfigInitialized String
     | InstallInitialized
     | UninstallInitialized
     | BumpInitialized
     | InitInitialized
     | InstallForUninstall
     | ExitApp Int
+    | ConfigMsg (Config.Msg Msg)
     | InstallMsg (Install.Msg Msg)
     | UninstallMsg (Uninstall.Msg Msg)
     | BumpMsg (Bump.Msg Msg)
@@ -276,13 +321,17 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( (\model -> model.installModel ?!= bugMissing "install model")
+    ( (\model -> model.configModel ?!= bugMissing "config model")
+    , (\model -> model.installModel ?!= bugMissing "install model")
     , (\model -> model.uninstallModel ?!= bugMissing "uninstall model")
     , (\model -> model.bumpModel ?!= bugMissing "bump model")
     , (\model -> model.initModel ?!= bugMissing "init model")
     )
-        |> (\( getInstallModel, getUninstallModel, getBumpModel, getInitModel ) ->
+        |> (\( getConfigModel, getInstallModel, getUninstallModel, getBumpModel, getInitModel ) ->
                 let
+                    updateConfig =
+                        updateChildApp (Config.update <| configCfg model) update getConfigModel ConfigMsg (\model configModel -> { model | configModel = Just configModel })
+
                     updateInstall =
                         updateChildApp (Install.update <| installCfg model) update getInstallModel InstallMsg (\model installModel -> { model | installModel = Just installModel })
 
@@ -301,6 +350,13 @@ update msg model =
 
                         DoCmd cmd ->
                             model ! [ cmd ]
+
+                        ConfigInitialized command ->
+                            (command == "config")
+                                ? ( Config.configure (configCfg model) (getConfigModel model)
+                                        |> (\( configModel, cmd ) -> { model | configModel = Just configModel } ! [ cmd ])
+                                  , initCommand command model
+                                  )
 
                         InstallInitialized ->
                             Install.install (installCfg model) (getInstallModel model)
@@ -334,6 +390,9 @@ update msg model =
 
                         ExitApp exitCode ->
                             model ! [ exitApp exitCode ]
+
+                        ConfigMsg msg ->
+                            updateConfig msg model
 
                         InstallMsg msg ->
                             updateInstall msg model

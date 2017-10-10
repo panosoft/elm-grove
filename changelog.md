@@ -21,3 +21,17 @@
 
 ##### Fixes
 * Forgot the update instructions in the readme
+
+1.0.6 / 2017-10-10
+==================
+
+##### Features
+* Configuration command to run in safe mode to only install Official Elm Packages (local and global configurations)
+* Init command prompts to create minimal `package.json`
+
+##### Features
+* Changed default license for Init command from `BSD` to `BSD-3-Clause`
+
+##### Fixes
+* Github sources were being added to `dependency-sources`
+* Fixed install/update instructions in the readme

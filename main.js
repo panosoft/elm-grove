@@ -5,6 +5,8 @@ const elm = require('./elm.js');
 
 const elmVersion = 18;
 
+global.XMLHttpRequest = require('xhr2');
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const process = require('process');
 const Commands = require('command-line-commands');
@@ -19,6 +21,7 @@ const usage = _ => {
 				content: [
 					'$ grove [bold]{version}',
 					'$ grove [bold]{init}',
+					'$ grove [bold]{config} [<options>]',
 					'$ grove [bold]{install} [<options>] [<package> <package> ...]',
 					'$ grove [bold]{uninstall} [<options>] <package> [<package> ...]',
 					'$ grove [bold]{bump} [<options>]'
@@ -36,6 +39,13 @@ const usage = _ => {
 				]
 			},
 			{
+				header: 'CONFIG options',
+				content: [
+					{ name: '--local', summary: 'Configure into the current directory instead of the home directory'},
+					{ name: '--safe=[on|off|none]', summary: 'Set or Remove Safe Mode\non = error when attempting to install non-official Elm Packages\noff = warn when installing non-official Elm Packages\nnone = no safety check\n<blank> = remove from configuration'}
+				]
+			},
+			{
 				header: 'INSTALL options',
 				content: [
 					{ name: '[<package> <package> ...]', summary: 'One or more packages MAY be specified'},
@@ -43,7 +53,7 @@ const usage = _ => {
 					{ name: '--link', summary: 'Link to local repositories instead of remote by looking to `grove-links.json` for repository locations'},
 					{ name: '--npm-production', summary: 'Used to pass to NPM during the installation to not include `dev-dependencies`'},
 					{ name: '--npm-silent', summary: 'Used to silence the output of the `npm install`'},
-					{ name: '--no-rewrite', summary: 'Skip rewriting Node `require` statements for hoisted Elm packages'},
+					{ name: '--no-rewrite', summary: 'Skip rewriting Node `require` statements for hoisted Elm packages'}
 				]
 			},
 			{
@@ -52,7 +62,7 @@ const usage = _ => {
 					{ name: '<package> [<package> ...]', summary: 'At least 1 package MUST be specified'},
 					{ name: '--npm-production', summary: 'Used to pass to NPM during the uninstallation to not include `dev-dependencies`'},
 					{ name: '--npm-silent', summary: 'Used to silence the output of the `npm uninstall`'},
-					{ name: '--no-rewrite', summary: 'Skip rewriting Node `require` statements for hoisted Elm packages'},
+					{ name: '--no-rewrite', summary: 'Skip rewriting Node `require` statements for hoisted Elm packages'}
 				]
 			},
 			{
@@ -69,17 +79,21 @@ const usage = _ => {
 		]
 	));
 };
+const configOptionsDef = [
+	{ name: 'local', type: Boolean },
+	{ name: 'safe', type: String }
+];
 const installOptionsDef = [
 	{ name: 'dry-run', type: Boolean },
 	{ name: 'link', type: Boolean },
 	{ name: 'npm-production', type: Boolean },
 	{ name: 'npm-silent', type: Boolean },
-	{ name: 'no-rewrite', type: Boolean },
+	{ name: 'no-rewrite', type: Boolean }
 ];
 const uninstallOptionsDef = [
 	{ name: 'npm-production', type: Boolean },
 	{ name: 'npm-silent', type: Boolean },
-	{ name: 'no-rewrite', type: Boolean },
+	{ name: 'no-rewrite', type: Boolean }
 ];
 const bumpOptionsDef = [
 	{ name: 'dry-run', type: Boolean },
@@ -90,6 +104,8 @@ const bumpOptionsDef = [
 	{ name: 'allow-old-dependencies', type: Boolean }
 ];
 const defaultOptions = {
+	local: null,
+	safe: null,
 	dryRun: false,
 	link: false,
 	npmProduction: false,
@@ -105,7 +121,7 @@ const defaultOptions = {
 
 const parse = _ => {
 	try {
-		const { command, argv } = Commands([ null, 'help', 'version', 'init', 'install', 'uninstall', 'bump' ]);
+		const { command, argv } = Commands([ null, 'help', 'version', 'init', 'config', 'install', 'uninstall', 'bump' ]);
 		if (command == null || command == 'help') {
 			usage();
 			process.exit(0);
@@ -121,6 +137,11 @@ const parse = _ => {
 			case 'init':
 				options = Args([]);
 				break;
+			case 'config':
+				options = Args(configOptionsDef, {partial: true});
+				if (!['on', 'off', 'none', ''].includes((options.safe || '').toLowerCase()))
+					throw Error ('Safe must be either "on", "off", "none" or blank to remove');
+				break;
 			case 'install':
 				options = Args(installOptionsDef, {partial: true});
 				break;
@@ -130,23 +151,23 @@ const parse = _ => {
 			case 'bump':
 				options = Args(bumpOptionsDef, {partial: true});
 				if (!options.major && ! options.minor && !options.patch)
-					throw (Error ('You must specify one of the following: --major, --minor, --patch'));
+					throw Error ('You must specify one of the following: --major, --minor, --patch');
 				else if (options.major && options.minor || options.minor && options.patch || options.patch && options.major)
-					throw (Error ('You may only specify one of the following: --major, --minor, --patch'));
+					throw Error ('You may only specify one of the following: --major, --minor, --patch');
 				break;
 			default:
-				throw (Error ('BUG: command: ' + command + ' not handled'));
+				throw Error ('BUG: command: ' + command + ' not handled');
 		}
 		if (options._unknown) {
 			options._unknown.slice(1).forEach(option => {
 				if (option[0] == option[1] && option[0] == '-') {
-					throw (Error ('Invalid option: ' + option));
+					throw Error ('Invalid option: ' + option);
 				}
 			});
 		}
 		const packages = options._unknown ? options._unknown.slice(1) : [];
-		if (command == 'bump' && packages.length)
-			throw (Error ('Specifying packages is INVALID for `bump` command'));
+		if (['config', 'bump'].includes(command) && packages.length)
+			throw Error ('Specifying packages is INVALID for "' + command + '" command');
 		delete options._unknown;
 		return {command, options, packages};
 	}

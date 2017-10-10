@@ -466,17 +466,17 @@ Your Elm Program (root)
 |
 +--- node_modules
      |
-	 +--- @gitUser
-	 |    |
-	 |    +--- elm-pack-a (Elm Package A)
-	 |    |
-	 |    +--- elm-pack-b (Elm Package B)
-	 |         |
-	 |         +--- node_modules
-	 |              |
-	 |              +--- libx (Library X v2)
-	 |
-	 +--- libx (Library X v3)
+     +--- @gitUser
+     |    |
+     |    +--- elm-pack-a (Elm Package A)
+     |    |
+     |    +--- elm-pack-b (Elm Package B)
+     |         |
+     |         +--- node_modules
+     |              |
+     |              +--- libx (Library X v2)
+     |
+     +--- libx (Library X v3)
 ```
 
 Native code in `Elm Package A` and `Elm Package B` will be `hoisted` to `Your Elm Program` directory by the compiler. So the `require` statements in those packages will load Javascript libraries from `Your Elm Program/node_modules` which is fine for `Elm Package A` since ***version 3*** of `Library X` happens to be there.

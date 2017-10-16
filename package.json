@@ -11,7 +11,7 @@
   "license": "Unlicense",
   "dependencies": {
     "@elm-node/core": "git+https://github.com/elm-node/core.git#semver:^2.2.1",
-    "@panosoft/elm-docs": "git+file:///Users/charles/Documents/workspace/elm/panosoft/elm-docs",
+    "@panosoft/elm-docs": "git+https://github.com/panosoft/elm-docs.git#semver:^2.0.1",
     "check-node-version": "^2.1.0",
     "command-line-args": "^4.0.6",
     "command-line-commands": "^2.0.0",

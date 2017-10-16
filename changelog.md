@@ -36,7 +36,7 @@
 * Github sources were being added to `dependency-sources`
 * Fixed install/update instructions in the readme
 
-1.0.7 / 2017-10-16
+1.1.0 / 2017-10-16
 ==================
 
 ##### Features

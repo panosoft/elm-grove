@@ -6,6 +6,7 @@ import Dict exposing (Dict)
 import Regex
 import StringUtils exposing (..)
 import AppUtils exposing (..)
+import Node.Error as Node exposing (Error(..), Code(..))
 import ParentChildUpdate exposing (..)
 import Component.Config as Config exposing (..)
 import Component.Install as Install exposing (..)
@@ -16,6 +17,7 @@ import Utils.Ops exposing (..)
 import Package exposing (..)
 import Console
 import Output exposing (..)
+import DocGenerator exposing (..)
 
 
 port exitApp : Int -> Cmd msg
@@ -34,6 +36,7 @@ type alias Options =
     , noRewrite : Bool
     , local : Maybe Bool
     , safe : Maybe String
+    , docs : Maybe String
     }
 
 
@@ -133,6 +136,7 @@ configConfig flags =
     , configFilename = configFilename
     , local = flags.options.local
     , safe = flags.options.safe |?> String.toLower
+    , docs = flags.options.docs |?> String.toLower
     }
 
 
@@ -188,26 +192,29 @@ uninstallCfg model =
     uninstallConfig model.flags model.packageSourceDict
 
 
-bumpConfig : Flags -> Bump.Config Msg
-bumpConfig flags =
-    { testing = flags.testing
-    , dryRun = flags.options.dryRun
-    , major = flags.options.major
-    , minor = flags.options.minor
-    , patch = flags.options.patch
-    , allowUncommitted = flags.options.allowUncommitted
-    , allowOldDependencies = flags.options.allowOldDependencies
-    , routeToMe = BumpMsg
-    , operationComplete = ExitApp
-    , elmVersion = flags.elmVersion
-    , cwd = flags.cwd
-    , pathSep = flags.pathSep
-    }
+bumpConfig : Model -> Flags -> Bump.Config Msg
+bumpConfig model flags =
+    configConfig flags
+        |> \configCfg ->
+            { testing = flags.testing
+            , dryRun = flags.options.dryRun
+            , major = flags.options.major
+            , minor = flags.options.minor
+            , patch = flags.options.patch
+            , allowUncommitted = flags.options.allowUncommitted
+            , allowOldDependencies = flags.options.allowOldDependencies
+            , routeToMe = BumpMsg
+            , operationComplete = ExitApp
+            , elmVersion = flags.elmVersion
+            , cwd = flags.cwd
+            , pathSep = flags.pathSep
+            , generateDocs = Config.generateDocs configCfg (model.configModel ?!= bugMissing "configModel")
+            }
 
 
 bumpCfg : Model -> Bump.Config Msg
 bumpCfg model =
-    bumpConfig model.flags
+    bumpConfig model model.flags
 
 
 initConfig : Flags -> Init.Config Msg
@@ -258,7 +265,7 @@ initCommand command model =
                                )
 
                     "bump" ->
-                        Bump.init (bumpConfig flags) BumpInitialized
+                        Bump.init (bumpConfig model flags) BumpInitialized
                             |> (\( bumpModel, maybeBumpCmd ) ->
                                     { model | bumpModel = Just bumpModel }
                                         ! [ maybeBumpCmd ?= msgToCmd BumpInitialized ]
@@ -270,6 +277,15 @@ initCommand command model =
                                     { model | initModel = Just initModel }
                                         ! [ maybeInitCmd ?= msgToCmd InitInitialized ]
                                )
+
+                    "docs" ->
+                        DocGenerator.generateDocs
+                            { testing = flags.testing
+                            , cwd = flags.cwd
+                            , pathSep = flags.pathSep
+                            , generateDocs = GenerateDocsOn
+                            }
+                            |> (\task -> model ! [ Task.attempt DocsGenerated task ])
 
                     _ ->
                         Debug.crash ("BUG: Unsupported command:" +-+ flags.command)
@@ -309,6 +325,7 @@ type Msg
     | UninstallInitialized
     | BumpInitialized
     | InitInitialized
+    | DocsGenerated (Result Node.Error ())
     | InstallForUninstall
     | ExitApp Int
     | ConfigMsg (Config.Msg Msg)
@@ -374,8 +391,19 @@ update msg model =
                             Init.initialize (initCfg model) (getInitModel model)
                                 |> (\( initModel, cmd ) -> { model | initModel = Just initModel } ! [ cmd ])
 
+                        DocsGenerated (Err error) ->
+                            errorLog ("Failed to create Elm Docs Error:" +-+ (Node.message error))
+                                |> Task.perform (\_ -> ExitApp -1)
+                                |> (\cmd -> model ! [ cmd ])
+
+                        DocsGenerated (Ok ()) ->
+                            Console.log "Elm Docs created"
+                                |> Task.perform (\_ -> ExitApp 0)
+                                |> (\cmd -> model ! [ cmd ])
+
                         InstallForUninstall ->
-                            (Task.perform (\_ -> Nop) <| Console.log "***** Reinstalling remaining packages *****\n")
+                            Console.log "***** Reinstalling remaining packages *****\n"
+                                |> Task.perform (\_ -> Nop)
                                 |> (\cmd ->
                                         initCommand "install" model
                                             |> (\( model, initCmd ) -> model ! [ cmd, initCmd ])

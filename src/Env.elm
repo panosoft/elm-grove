@@ -2,6 +2,7 @@ module Env
     exposing
         ( env
         , homedir
+        , tmpdir
         )
 
 import Dict exposing (Dict)
@@ -19,3 +20,8 @@ env =
 homedir : String
 homedir =
     Native.Env.homedir
+
+
+tmpdir : String
+tmpdir =
+    Native.Env.tmpdir

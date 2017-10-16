@@ -121,16 +121,47 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 		.catch(fail);
 	});
 
-	const commit = (Repo, filesToAdd, message) => nativeBinding(callback => {
+	const commit = (Repo, filesToAdd, filesToDelete, message) => nativeBinding(callback => {
 		const fail = failure(callback, 'Unable commit to repo: ' + Repo.url);
 		try {
-			Repo.repo.createCommitOnHead(toArray(filesToAdd), git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message)
-			.then(oid => callback(succeed(oid.tostrS())))
+			let _index;
+			Repo.repo.refreshIndex()
+			.then (index => _index = index)
+			.then (_ => toArray(filesToAdd).reduce( (lastFilePromise, path) => lastFilePromise .then(_ => _index.addByPath(path)), Promise.resolve()))
+			.then (_ => toArray(filesToDelete).reduce( (lastFilePromise, path) => lastFilePromise .then(_ => _index.removeByPath(path)), Promise.resolve()))
+			.then (_ => _index.write())
+			.then (_ => _index.writeTree())
+			.then(treeOid =>
+				Repo.repo.getHeadCommit()
+				.then (parent =>
+					Repo.repo.createCommit('HEAD', git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message, treeOid, parent ? [parent] : parent)
+					.then(oid => callback(succeed(oid.tostrS())))
+				)
+			)
 			.catch(fail);
 		}
 		catch (error) { fail(error); }
 	});
 
+	// const commit = (Repo, filesToAdd, filesToDelete, message) => nativeBinding(callback => {
+	// 	const fail = failure(callback, 'Unable commit to repo: ' + Repo.url);
+	// 	try {
+	// 		Repo.repo.refreshIndex()
+	// 		.then (index =>
+	// 			toArray(filesToDelete).reduce( (lastFilePromise, path) => lastFilePromise
+	// 			.then(_ => index.removeByPath(path)), Promise.resolve())
+	// 			.then (_ => index.write())
+	// 			.then (_ => index.writeTree())
+	// 		)
+	// 		.then(_ =>
+	// 			Repo.repo.createCommitOnHead(toArray(filesToAdd), git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message)
+	// 			.then(oid => callback(succeed(oid.tostrS())))
+	// 		)
+	// 		.catch(fail);
+	// 	}
+	// 	catch (error) { fail(error); }
+	// });
+	//
 	const checkout = (Repo, tag, targetDirectory) => nativeBinding(callback => {
 		const fail = failure(callback, 'Unable check out tag: "' + tag + '" for repo: '+ Repo.url);
 		try {
@@ -156,7 +187,7 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 		catch (error) { fail(error); }
 	});
 	///////////////////////////////////////////////////////////////////////////////////////////////////
-	/* global F2:false, F3:false */
+	/* global F2:false, F3:false, F4:false */
 	return {
 		clone,
 		initRepo,
@@ -165,7 +196,7 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 		createAnnotatedTag: F3(createAnnotatedTag),
 		getTags,
 		getFileStatuses,
-		commit: F3(commit),
+		commit: F4(commit),
 		checkout: F3(checkout)
 	};
 })();

@@ -20,15 +20,13 @@ You can, however, benefit from all of the advanced Grove features AND all the ru
 - Initialize package (create `elm-package.json`)
 
 ### Roadmap:
-- Automatic Documentation Generation
 - Semantic Version Protection
-- Warn user when installing non-official Elm packages
 
 ## Install
 Make sure you have the following:
 
 - Elm version 0.18.x
-- npm version 5.3.x+
+- npm version 5.5.x+
 
 **Due to npm 5.x.x bugs, installing AND updating grove globally will have to be done unconventionally, for now.**
 
@@ -302,6 +300,35 @@ where:
 While the other formats are supported, it's easiest to just use the `<repo>`.
 
 ## Advanced Usage
+
+### Creating documentation
+
+Both Module and Function Comments, which are just markdown, will be used to create documentation in a directory called `elm-docs`. Grove uses the `panosoft/elm-docs` package to generate documentation.
+
+Please see [panosoft/elm-docs](https://github.com/panosoft/elm-docs) for documentation on how to comment your code for documentation generation.
+
+#### Configuring Grove for AUTOMATIC documentation creation
+
+During a `bump` command, you can configure Grove to automatically generate documentation.
+
+```bash
+grove config --local --docs=on
+```
+
+Typically, documentation configuration will be locally configured, but it can also be set globally by omitting the `--local` option.
+
+When `--docs=on`, then the `bump` command will generate documentation.
+
+You can disable documentation generation by using `docs=off` or remove it completely from the configuration by using `docs=`.
+
+#### Using Grove to MANUALLY generate documentation
+
+This gives you a chance to debug your documentation before you release your package.
+
+```bash
+grove docs
+```
+
 
 ### Installing a local package
 

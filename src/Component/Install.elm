@@ -888,7 +888,7 @@ update config msg model =
             InstallOrLinkComplete packageName versionStr repoLocation (Ok ()) ->
                 (\packageName repoLocation model ->
                     Dict.get packageName model.linkedRepos
-                        |?> always "file://"
+                        |?> always "git+file://"
                         ?= ((find (AtMost 1) (regex "^[A-Za-z_]+@") repoLocation == [])
                                 ? ( "git+", "git+ssh://" )
                            )
@@ -998,9 +998,8 @@ update config msg model =
                                                                                         , (\( url, _, versionStr ) ->
                                                                                             Just
                                                                                                 ( "@" ++ packageName
-                                                                                                , url ++ "#semver:^" ++ versionStr
-                                                                                                  -- , String.join config.pathSep [ grovePackagesRoot config.testing config.pathSep, packageName, groveInstalledDir ]
-                                                                                                  -- |> ((config.pathSep == "\\") ? ( replaceAll "/" "\\", identity ))
+                                                                                                , url
+                                                                                                    ++ (Dict.get packageName model.linkedRepos |?-> ( "#semver:^" ++ versionStr, always "" ))
                                                                                                 )
                                                                                           )
                                                                                         )

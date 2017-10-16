@@ -8,6 +8,7 @@ const elmVersion = 18;
 global.XMLHttpRequest = require('xhr2');
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const path = require('path');
 const process = require('process');
 const Commands = require('command-line-commands');
 const Args = require('command-line-args');
@@ -24,7 +25,8 @@ const usage = _ => {
 					'$ grove [bold]{config} [<options>]',
 					'$ grove [bold]{install} [<options>] [<package> <package> ...]',
 					'$ grove [bold]{uninstall} [<options>] <package> [<package> ...]',
-					'$ grove [bold]{bump} [<options>]'
+					'$ grove [bold]{bump} [<options>]',
+					'$ grove [bold]{docs}'
 				]
 			},
 			{
@@ -35,14 +37,16 @@ const usage = _ => {
 					{ name: 'init', summary: 'Create initial elm-package.json' },
 					{ name: 'install', summary: 'Installs latest specified package(s) or the most recent allowed for all packages in elm-package.json' },
 					{ name: 'uninstall', summary: 'Uninstalls specified package(s)' },
-					{ name: 'bump', summary: 'Bump version number of package, either major, minor or patch' }
+					{ name: 'bump', summary: 'Bump version number of package, either major, minor or patch' },
+					{ name: 'docs', summary: 'Generate Elm Docs from codebase into "elm-docs" directory' }
 				]
 			},
 			{
 				header: 'CONFIG options',
 				content: [
 					{ name: '--local', summary: 'Configure into the current directory instead of the home directory'},
-					{ name: '--safe=[on|off|none]', summary: 'Set or Remove Safe Mode\non = error when attempting to install non-official Elm Packages\noff = warn when installing non-official Elm Packages\nnone = no safety check\n<blank> = remove from configuration'}
+					{ name: '--safe=[on|off|none]', summary: 'Set or Remove Safe Mode\non = error when attempting to install non-official Elm Packages\noff = warn when installing non-official Elm Packages\nnone = no safety check\n<blank> = remove from configuration'},
+					{ name: '--docs=[on|off]', summary: 'Generate docs into "elm-docs" directory when version is bumped\non = generate docs\noff = do not generate docs'}
 				]
 			},
 			{
@@ -60,6 +64,7 @@ const usage = _ => {
 				header: 'UNINSTALL options',
 				content: [
 					{ name: '<package> [<package> ...]', summary: 'At least 1 package MUST be specified'},
+					{ name: '--link', summary: 'Link to local repositories instead of remote by looking to `grove-links.json` for repository locations'},
 					{ name: '--npm-production', summary: 'Used to pass to NPM during the uninstallation to not include `dev-dependencies`'},
 					{ name: '--npm-silent', summary: 'Used to silence the output of the `npm uninstall`'},
 					{ name: '--no-rewrite', summary: 'Skip rewriting Node `require` statements for hoisted Elm packages'}
@@ -81,7 +86,8 @@ const usage = _ => {
 };
 const configOptionsDef = [
 	{ name: 'local', type: Boolean },
-	{ name: 'safe', type: String }
+	{ name: 'safe', type: String },
+	{ name: 'docs', type: String }
 ];
 const installOptionsDef = [
 	{ name: 'dry-run', type: Boolean },
@@ -91,6 +97,7 @@ const installOptionsDef = [
 	{ name: 'no-rewrite', type: Boolean }
 ];
 const uninstallOptionsDef = [
+	{ name: 'link', type: Boolean },
 	{ name: 'npm-production', type: Boolean },
 	{ name: 'npm-silent', type: Boolean },
 	{ name: 'no-rewrite', type: Boolean }
@@ -106,6 +113,7 @@ const bumpOptionsDef = [
 const defaultOptions = {
 	local: null,
 	safe: null,
+	docs: null,
 	dryRun: false,
 	link: false,
 	npmProduction: false,
@@ -121,14 +129,14 @@ const defaultOptions = {
 
 const parse = _ => {
 	try {
-		const { command, argv } = Commands([ null, 'help', 'version', 'init', 'config', 'install', 'uninstall', 'bump' ]);
+		const { command, argv } = Commands([ null, 'help', 'version', 'init', 'config', 'install', 'uninstall', 'bump', 'docs' ]);
 		if (command == null || command == 'help') {
 			usage();
 			process.exit(0);
 		}
 		if (command == 'version') {
 			const fs = require('fs');
-			const version = JSON.parse(fs.readFileSync('elm-package.json')).version;
+			const version = JSON.parse(fs.readFileSync(path.join(__dirname, 'elm-package.json'))).version;
 			console.log('Grove version: ' + version + ' (Elm version: 0.' + elmVersion + '.x)');
 			process.exit(0);
 		}
@@ -141,6 +149,8 @@ const parse = _ => {
 				options = Args(configOptionsDef, {partial: true});
 				if (!['on', 'off', 'none', ''].includes((options.safe || '').toLowerCase()))
 					throw Error ('Safe must be either "on", "off", "none" or blank to remove');
+				if (!['on', 'off', ''].includes((options.docs || '').toLowerCase()))
+					throw Error ('Safe must be either "on", "off", or blank to remove');
 				break;
 			case 'install':
 				options = Args(installOptionsDef, {partial: true});
@@ -154,6 +164,9 @@ const parse = _ => {
 					throw Error ('You must specify one of the following: --major, --minor, --patch');
 				else if (options.major && options.minor || options.minor && options.patch || options.patch && options.major)
 					throw Error ('You may only specify one of the following: --major, --minor, --patch');
+				break;
+			case 'docs':
+				options = Args(bumpOptionsDef, {partial: true});
 				break;
 			default:
 				throw Error ('BUG: command: ' + command + ' not handled');

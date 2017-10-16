@@ -29,9 +29,24 @@
 * Configuration command to run in safe mode to only install Official Elm Packages (local and global configurations)
 * Init command prompts to create minimal `package.json`
 
-##### Features
+##### Changes
 * Changed default license for Init command from `BSD` to `BSD-3-Clause`
 
 ##### Fixes
 * Github sources were being added to `dependency-sources`
 * Fixed install/update instructions in the readme
+
+1.0.7 / 2017-10-16
+==================
+
+##### Features
+* Config command now supports `--docs`
+* New command `docs` will generate Elm docs
+* If configured, the `bump` command will generate Elm docs into `elm-docs`
+* Added `--link` to the `uninstall` command since uninstall does a reinstall and the reinstall will use this flag
+
+##### Fixes
+* `version` command was reading from the current directory not the Grove directory
+* Added missing documentation for 1.0.6 features
+* Changed `file:\\` to `git+file:\\` for npm dependencies that are locally linked so npm will install from the directory instead of just linking to it
+* Don't add semver to linked npm dependencies

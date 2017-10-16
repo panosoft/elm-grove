@@ -2,12 +2,14 @@ module Component.Config
     exposing
         ( ConfigFile
         , SafeMode(..)
+        , GenerateDocs(..)
         , Config
         , Model
         , Msg
         , init
         , update
         , safeMode
+        , generateDocs
         , configure
         )
 
@@ -36,6 +38,7 @@ type alias Config msg =
     , configFilename : Filename
     , local : Maybe Bool
     , safe : Maybe String
+    , docs : Maybe String
     }
 
 
@@ -49,14 +52,21 @@ type SafeMode
     | SafeModeNone
 
 
+type GenerateDocs
+    = GenerateDocsOn
+    | GenerateDocsOff
+
+
 type alias ConfigFile =
     { safeMode : Maybe SafeMode
+    , generateDocs : Maybe GenerateDocs
     }
 
 
 defaultConfigFile : ConfigFile
 defaultConfigFile =
     { safeMode = Nothing
+    , generateDocs = Nothing
     }
 
 
@@ -94,30 +104,69 @@ decoder =
                             )
                     )
             )
+        <|| (JD.maybe
+                (field "generateDocs" <| JD.string)
+                |> JD.andThen
+                    (\maybeGenerateDocs ->
+                        JD.succeed <|
+                            (maybeGenerateDocs
+                                |?->
+                                    ( Nothing
+                                    , \generateDocs ->
+                                        Just
+                                            (case String.toLower generateDocs of
+                                                "on" ->
+                                                    GenerateDocsOn
+
+                                                _ ->
+                                                    GenerateDocsOff
+                                            )
+                                    )
+                            )
+                    )
+            )
 
 
 encoder : ConfigFile -> JE.Value
 encoder configFile =
-    JE.object
-        (configFile.safeMode
-            |?->
-                ( []
-                , \safeMode ->
-                    [ ( "safeMode"
-                      , JE.string <|
-                            case safeMode of
-                                SafeModeOn ->
-                                    "on"
+    [ (configFile.safeMode
+        |?->
+            ( []
+            , \safeMode ->
+                [ ( "safeMode"
+                  , JE.string <|
+                        case safeMode of
+                            SafeModeOn ->
+                                "on"
 
-                                SafeModeOff ->
-                                    "off"
+                            SafeModeOff ->
+                                "off"
 
-                                SafeModeNone ->
-                                    "none"
-                      )
-                    ]
-                )
-        )
+                            SafeModeNone ->
+                                "none"
+                  )
+                ]
+            )
+      )
+    , (configFile.generateDocs
+        |?->
+            ( []
+            , \generateDocs ->
+                [ ( "generateDocs"
+                  , JE.string <|
+                        case generateDocs of
+                            GenerateDocsOn ->
+                                "on"
+
+                            GenerateDocsOff ->
+                                "off"
+                  )
+                ]
+            )
+      )
+    ]
+        |> List.concat
+        |> JE.object
 
 
 pathJoin : Config msg -> List String -> String
@@ -210,6 +259,7 @@ update config msg model =
                                 , decodingError globalPath
                                 , \( localConfig, globalConfig ) ->
                                     { safeMode = localConfig.safeMode |?-> ( globalConfig.safeMode, Just )
+                                    , generateDocs = localConfig.generateDocs |?-> ( globalConfig.generateDocs, Just )
                                     }
                                         |> \configFile -> ( { model | configFile = Just configFile } ! [], [ initializedMsg ] )
                                 )
@@ -227,6 +277,11 @@ update config msg model =
 safeMode : Config msg -> Model -> SafeMode
 safeMode config model =
     model.configFile |?-> ( SafeModeNone, \configFile -> configFile.safeMode ?= SafeModeNone )
+
+
+generateDocs : Config msg -> Model -> GenerateDocs
+generateDocs config model =
+    model.configFile |?-> ( GenerateDocsOff, \configFile -> configFile.generateDocs ?= GenerateDocsOff )
 
 
 configure : Config msg -> Model -> ( Model, Cmd msg )
@@ -254,6 +309,27 @@ configure config model =
                                     bug "Should never get here" <| always Nothing
                             )
                                 |> (\safeMode -> { configFile | safeMode = safeMode })
+                        )
+           )
+        |> (\configFile ->
+                config.docs
+                    |?->
+                        ( configFile
+                        , \docs ->
+                            (case docs of
+                                "on" ->
+                                    Just GenerateDocsOn
+
+                                "off" ->
+                                    Just GenerateDocsOff
+
+                                "" ->
+                                    Nothing
+
+                                _ ->
+                                    bug "Should never get here" <| always Nothing
+                            )
+                                |> (\generateDocs -> { configFile | generateDocs = generateDocs })
                         )
            )
         |> (\configFile ->

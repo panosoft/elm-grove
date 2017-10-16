@@ -118,7 +118,7 @@ getFileStatuses =
     Native.Git.getFileStatuses
 
 
-commit : Repo -> List Path -> String -> Task Error OidStr
+commit : Repo -> List Path -> List Path -> String -> Task Error OidStr
 commit =
     Native.Git.commit
 

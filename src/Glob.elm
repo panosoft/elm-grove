@@ -9,7 +9,7 @@ import Utils.Func exposing (..)
 import Native.Glob
 
 
-find : String -> Maybe String -> Bool -> Task Error (List (String))
+find : String -> Maybe String -> Bool -> Task Error (List String)
 find =
     Native.Glob.find
         |> compose3 (Task.mapError Error.fromValue)

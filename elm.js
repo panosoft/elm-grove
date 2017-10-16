@@ -7741,6 +7741,185 @@ var _elm_community$list_extra$List_Extra$init = function () {
 var _elm_community$list_extra$List_Extra$last = _elm_community$list_extra$List_Extra$foldl1(
 	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
 
+var _elm_community$maybe_extra$Maybe_Extra$foldrValues = F2(
+	function (item, list) {
+		var _p0 = item;
+		if (_p0.ctor === 'Nothing') {
+			return list;
+		} else {
+			return {ctor: '::', _0: _p0._0, _1: list};
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$values = A2(
+	_elm_lang$core$List$foldr,
+	_elm_community$maybe_extra$Maybe_Extra$foldrValues,
+	{ctor: '[]'});
+var _elm_community$maybe_extra$Maybe_Extra$filter = F2(
+	function (f, m) {
+		var _p1 = A2(_elm_lang$core$Maybe$map, f, m);
+		if ((_p1.ctor === 'Just') && (_p1._0 === true)) {
+			return m;
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$traverseArray = function (f) {
+	var step = F2(
+		function (e, acc) {
+			var _p2 = f(e);
+			if (_p2.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return A2(
+					_elm_lang$core$Maybe$map,
+					_elm_lang$core$Array$push(_p2._0),
+					acc);
+			}
+		});
+	return A2(
+		_elm_lang$core$Array$foldl,
+		step,
+		_elm_lang$core$Maybe$Just(_elm_lang$core$Array$empty));
+};
+var _elm_community$maybe_extra$Maybe_Extra$combineArray = _elm_community$maybe_extra$Maybe_Extra$traverseArray(_elm_lang$core$Basics$identity);
+var _elm_community$maybe_extra$Maybe_Extra$traverse = function (f) {
+	var step = F2(
+		function (e, acc) {
+			var _p3 = f(e);
+			if (_p3.ctor === 'Nothing') {
+				return _elm_lang$core$Maybe$Nothing;
+			} else {
+				return A2(
+					_elm_lang$core$Maybe$map,
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						})(_p3._0),
+					acc);
+			}
+		});
+	return A2(
+		_elm_lang$core$List$foldr,
+		step,
+		_elm_lang$core$Maybe$Just(
+			{ctor: '[]'}));
+};
+var _elm_community$maybe_extra$Maybe_Extra$combine = _elm_community$maybe_extra$Maybe_Extra$traverse(_elm_lang$core$Basics$identity);
+var _elm_community$maybe_extra$Maybe_Extra$toArray = function (m) {
+	var _p4 = m;
+	if (_p4.ctor === 'Nothing') {
+		return _elm_lang$core$Array$empty;
+	} else {
+		return A2(_elm_lang$core$Array$repeat, 1, _p4._0);
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$toList = function (m) {
+	var _p5 = m;
+	if (_p5.ctor === 'Nothing') {
+		return {ctor: '[]'};
+	} else {
+		return {
+			ctor: '::',
+			_0: _p5._0,
+			_1: {ctor: '[]'}
+		};
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$orElse = F2(
+	function (ma, mb) {
+		var _p6 = mb;
+		if (_p6.ctor === 'Nothing') {
+			return ma;
+		} else {
+			return mb;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$orElseLazy = F2(
+	function (fma, mb) {
+		var _p7 = mb;
+		if (_p7.ctor === 'Nothing') {
+			return fma(
+				{ctor: '_Tuple0'});
+		} else {
+			return mb;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$orLazy = F2(
+	function (ma, fmb) {
+		var _p8 = ma;
+		if (_p8.ctor === 'Nothing') {
+			return fmb(
+				{ctor: '_Tuple0'});
+		} else {
+			return ma;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$or = F2(
+	function (ma, mb) {
+		var _p9 = ma;
+		if (_p9.ctor === 'Nothing') {
+			return mb;
+		} else {
+			return ma;
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$prev = _elm_lang$core$Maybe$map2(_elm_lang$core$Basics$always);
+var _elm_community$maybe_extra$Maybe_Extra$next = _elm_lang$core$Maybe$map2(
+	_elm_lang$core$Basics$flip(_elm_lang$core$Basics$always));
+var _elm_community$maybe_extra$Maybe_Extra$andMap = _elm_lang$core$Maybe$map2(
+	F2(
+		function (x, y) {
+			return y(x);
+		}));
+var _elm_community$maybe_extra$Maybe_Extra$unpack = F3(
+	function (d, f, m) {
+		var _p10 = m;
+		if (_p10.ctor === 'Nothing') {
+			return d(
+				{ctor: '_Tuple0'});
+		} else {
+			return f(_p10._0);
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$unwrap = F3(
+	function (d, f, m) {
+		var _p11 = m;
+		if (_p11.ctor === 'Nothing') {
+			return d;
+		} else {
+			return f(_p11._0);
+		}
+	});
+var _elm_community$maybe_extra$Maybe_Extra$isJust = function (m) {
+	var _p12 = m;
+	if (_p12.ctor === 'Nothing') {
+		return false;
+	} else {
+		return true;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$isNothing = function (m) {
+	var _p13 = m;
+	if (_p13.ctor === 'Nothing') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra$join = function (mx) {
+	var _p14 = mx;
+	if (_p14.ctor === 'Just') {
+		return _p14._0;
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _elm_community$maybe_extra$Maybe_Extra_ops = _elm_community$maybe_extra$Maybe_Extra_ops || {};
+_elm_community$maybe_extra$Maybe_Extra_ops['?'] = F2(
+	function (mx, x) {
+		return A2(_elm_lang$core$Maybe$withDefault, x, mx);
+	});
+
 var _elm_community$result_extra$Result_Extra$merge = function (r) {
 	var _p0 = r;
 	if (_p0.ctor === 'Ok') {
@@ -10444,30 +10623,93 @@ var _panosoft$elm_string_utils$StringUtils$concatWithSpaces = F3(
 	});
 
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
+_panosoft$elm_utils$Utils_Ops_ops['|??****>'] = F2(
+	function (_p1, _p0) {
+		var _p2 = _p1;
+		var _p3 = _p0;
+		var _p4 = {ctor: '_Tuple4', _0: _p2._0, _1: _p2._1, _2: _p2._2, _3: _p2._3};
+		if (_p4._0.ctor === 'Ok') {
+			if (_p4._1.ctor === 'Ok') {
+				if (_p4._2.ctor === 'Ok') {
+					if (_p4._3.ctor === 'Ok') {
+						return _p3._4(
+							{ctor: '_Tuple4', _0: _p4._0._0, _1: _p4._1._0, _2: _p4._2._0, _3: _p4._3._0});
+					} else {
+						return _p3._3(_p4._3._0);
+					}
+				} else {
+					return _p3._2(_p4._2._0);
+				}
+			} else {
+				return _p3._1(_p4._1._0);
+			}
+		} else {
+			return _p3._0(_p4._0._0);
+		}
+	});
+var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
+_panosoft$elm_utils$Utils_Ops_ops['|??***>'] = F2(
+	function (_p6, _p5) {
+		var _p7 = _p6;
+		var _p8 = _p5;
+		var _p9 = {ctor: '_Tuple3', _0: _p7._0, _1: _p7._1, _2: _p7._2};
+		if (_p9._0.ctor === 'Ok') {
+			if (_p9._1.ctor === 'Ok') {
+				if (_p9._2.ctor === 'Ok') {
+					return _p8._3(
+						{ctor: '_Tuple3', _0: _p9._0._0, _1: _p9._1._0, _2: _p9._2._0});
+				} else {
+					return _p8._2(_p9._2._0);
+				}
+			} else {
+				return _p8._1(_p9._1._0);
+			}
+		} else {
+			return _p8._0(_p9._0._0);
+		}
+	});
+var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
+_panosoft$elm_utils$Utils_Ops_ops['|??**>'] = F2(
+	function (_p11, _p10) {
+		var _p12 = _p11;
+		var _p13 = _p10;
+		var _p14 = {ctor: '_Tuple2', _0: _p12._0, _1: _p12._1};
+		if (_p14._0.ctor === 'Ok') {
+			if (_p14._1.ctor === 'Ok') {
+				return _p13._2(
+					{ctor: '_Tuple2', _0: _p14._0._0, _1: _p14._1._0});
+			} else {
+				return _p13._1(_p14._1._0);
+			}
+		} else {
+			return _p13._0(_p14._0._0);
+		}
+	});
+var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['??='] = F2(
 	function (result, f) {
-		var _p0 = result;
-		if (_p0.ctor === 'Ok') {
-			return _p0._0;
+		var _p15 = result;
+		if (_p15.ctor === 'Ok') {
+			return _p15._0;
 		} else {
-			return f(_p0._0);
+			return f(_p15._0);
 		}
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|??>'] = _elm_lang$core$Basics$flip(_elm_lang$core$Result$map);
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|??->'] = F2(
-	function (r, _p1) {
-		var _p2 = _p1;
+	function (r, _p16) {
+		var _p17 = _p16;
 		return A2(
 			_panosoft$elm_utils$Utils_Ops_ops['??='],
-			A2(_panosoft$elm_utils$Utils_Ops_ops['|??>'], r, _p2._1),
-			_p2._0);
+			A2(_panosoft$elm_utils$Utils_Ops_ops['|??>'], r, _p17._1),
+			_p17._0);
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|??-->'] = F2(
-	function (rr, _p3) {
-		var _p4 = _p3;
+	function (rr, _p18) {
+		var _p19 = _p18;
 		return A2(
 			_panosoft$elm_utils$Utils_Ops_ops['??='],
 			A2(
@@ -10477,143 +10719,143 @@ _panosoft$elm_utils$Utils_Ops_ops['|??-->'] = F2(
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['|??->'],
 						r,
-						{ctor: '_Tuple2', _0: _p4._1, _1: _p4._2});
+						{ctor: '_Tuple2', _0: _p19._1, _1: _p19._2});
 				}),
-			_p4._0);
+			_p19._0);
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?!****>'] = F2(
-	function (_p6, _p5) {
-		var _p7 = _p6;
-		var _p8 = _p5;
-		var _p9 = {ctor: '_Tuple4', _0: _p7._0, _1: _p7._1, _2: _p7._2, _3: _p7._3};
-		if (_p9._0.ctor === 'Just') {
-			if (_p9._1.ctor === 'Just') {
-				if (_p9._2.ctor === 'Just') {
-					if (_p9._3.ctor === 'Just') {
-						return _p8._4(
-							{ctor: '_Tuple4', _0: _p9._0._0, _1: _p9._1._0, _2: _p9._2._0, _3: _p9._3._0});
+	function (_p21, _p20) {
+		var _p22 = _p21;
+		var _p23 = _p20;
+		var _p24 = {ctor: '_Tuple4', _0: _p22._0, _1: _p22._1, _2: _p22._2, _3: _p22._3};
+		if (_p24._0.ctor === 'Just') {
+			if (_p24._1.ctor === 'Just') {
+				if (_p24._2.ctor === 'Just') {
+					if (_p24._3.ctor === 'Just') {
+						return _p23._4(
+							{ctor: '_Tuple4', _0: _p24._0._0, _1: _p24._1._0, _2: _p24._2._0, _3: _p24._3._0});
 					} else {
-						return _p8._3(
+						return _p23._3(
 							{ctor: '_Tuple0'});
 					}
 				} else {
-					return _p8._2(
+					return _p23._2(
 						{ctor: '_Tuple0'});
 				}
 			} else {
-				return _p8._1(
+				return _p23._1(
 					{ctor: '_Tuple0'});
 			}
 		} else {
-			return _p8._0(
+			return _p23._0(
 				{ctor: '_Tuple0'});
 		}
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?****>'] = F2(
-	function (_p11, _p10) {
-		var _p12 = _p11;
-		var _p13 = _p10;
-		var _p14 = {ctor: '_Tuple4', _0: _p12._0, _1: _p12._1, _2: _p12._2, _3: _p12._3};
-		if (_p14._0.ctor === 'Just') {
-			if (_p14._1.ctor === 'Just') {
-				if (_p14._2.ctor === 'Just') {
-					if (_p14._3.ctor === 'Just') {
-						return _p13._4(
-							{ctor: '_Tuple4', _0: _p14._0._0, _1: _p14._1._0, _2: _p14._2._0, _3: _p14._3._0});
+	function (_p26, _p25) {
+		var _p27 = _p26;
+		var _p28 = _p25;
+		var _p29 = {ctor: '_Tuple4', _0: _p27._0, _1: _p27._1, _2: _p27._2, _3: _p27._3};
+		if (_p29._0.ctor === 'Just') {
+			if (_p29._1.ctor === 'Just') {
+				if (_p29._2.ctor === 'Just') {
+					if (_p29._3.ctor === 'Just') {
+						return _p28._4(
+							{ctor: '_Tuple4', _0: _p29._0._0, _1: _p29._1._0, _2: _p29._2._0, _3: _p29._3._0});
 					} else {
-						return _p13._3;
+						return _p28._3;
 					}
 				} else {
-					return _p13._2;
+					return _p28._2;
 				}
 			} else {
-				return _p13._1;
+				return _p28._1;
 			}
 		} else {
-			return _p13._0;
+			return _p28._0;
 		}
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?!***>'] = F2(
-	function (_p16, _p15) {
-		var _p17 = _p16;
-		var _p18 = _p15;
-		var _p19 = {ctor: '_Tuple3', _0: _p17._0, _1: _p17._1, _2: _p17._2};
-		if (_p19._0.ctor === 'Just') {
-			if (_p19._1.ctor === 'Just') {
-				if (_p19._2.ctor === 'Just') {
-					return _p18._3(
-						{ctor: '_Tuple3', _0: _p19._0._0, _1: _p19._1._0, _2: _p19._2._0});
+	function (_p31, _p30) {
+		var _p32 = _p31;
+		var _p33 = _p30;
+		var _p34 = {ctor: '_Tuple3', _0: _p32._0, _1: _p32._1, _2: _p32._2};
+		if (_p34._0.ctor === 'Just') {
+			if (_p34._1.ctor === 'Just') {
+				if (_p34._2.ctor === 'Just') {
+					return _p33._3(
+						{ctor: '_Tuple3', _0: _p34._0._0, _1: _p34._1._0, _2: _p34._2._0});
 				} else {
-					return _p18._2(
+					return _p33._2(
 						{ctor: '_Tuple0'});
 				}
 			} else {
-				return _p18._1(
+				return _p33._1(
 					{ctor: '_Tuple0'});
 			}
 		} else {
-			return _p18._0(
+			return _p33._0(
 				{ctor: '_Tuple0'});
 		}
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?***>'] = F2(
-	function (_p21, _p20) {
-		var _p22 = _p21;
-		var _p23 = _p20;
-		var _p24 = {ctor: '_Tuple3', _0: _p22._0, _1: _p22._1, _2: _p22._2};
-		if (_p24._0.ctor === 'Just') {
-			if (_p24._1.ctor === 'Just') {
-				if (_p24._2.ctor === 'Just') {
-					return _p23._3(
-						{ctor: '_Tuple3', _0: _p24._0._0, _1: _p24._1._0, _2: _p24._2._0});
+	function (_p36, _p35) {
+		var _p37 = _p36;
+		var _p38 = _p35;
+		var _p39 = {ctor: '_Tuple3', _0: _p37._0, _1: _p37._1, _2: _p37._2};
+		if (_p39._0.ctor === 'Just') {
+			if (_p39._1.ctor === 'Just') {
+				if (_p39._2.ctor === 'Just') {
+					return _p38._3(
+						{ctor: '_Tuple3', _0: _p39._0._0, _1: _p39._1._0, _2: _p39._2._0});
 				} else {
-					return _p23._2;
+					return _p38._2;
 				}
 			} else {
-				return _p23._1;
+				return _p38._1;
 			}
 		} else {
-			return _p23._0;
+			return _p38._0;
 		}
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?!**>'] = F2(
-	function (_p26, _p25) {
-		var _p27 = _p26;
-		var _p28 = _p25;
-		var _p29 = {ctor: '_Tuple2', _0: _p27._0, _1: _p27._1};
-		if (_p29._0.ctor === 'Just') {
-			if (_p29._1.ctor === 'Just') {
-				return _p28._2(
-					{ctor: '_Tuple2', _0: _p29._0._0, _1: _p29._1._0});
+	function (_p41, _p40) {
+		var _p42 = _p41;
+		var _p43 = _p40;
+		var _p44 = {ctor: '_Tuple2', _0: _p42._0, _1: _p42._1};
+		if (_p44._0.ctor === 'Just') {
+			if (_p44._1.ctor === 'Just') {
+				return _p43._2(
+					{ctor: '_Tuple2', _0: _p44._0._0, _1: _p44._1._0});
 			} else {
-				return _p28._1(
+				return _p43._1(
 					{ctor: '_Tuple0'});
 			}
 		} else {
-			return _p28._0(
+			return _p43._0(
 				{ctor: '_Tuple0'});
 		}
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?**>'] = F2(
-	function (_p31, _p30) {
-		var _p32 = _p31;
-		var _p33 = _p30;
-		var _p34 = {ctor: '_Tuple2', _0: _p32._0, _1: _p32._1};
-		if (_p34._0.ctor === 'Just') {
-			if (_p34._1.ctor === 'Just') {
-				return _p33._2(
-					{ctor: '_Tuple2', _0: _p34._0._0, _1: _p34._1._0});
+	function (_p46, _p45) {
+		var _p47 = _p46;
+		var _p48 = _p45;
+		var _p49 = {ctor: '_Tuple2', _0: _p47._0, _1: _p47._1};
+		if (_p49._0.ctor === 'Just') {
+			if (_p49._1.ctor === 'Just') {
+				return _p48._2(
+					{ctor: '_Tuple2', _0: _p49._0._0, _1: _p49._1._0});
 			} else {
-				return _p33._1;
+				return _p48._1;
 			}
 		} else {
-			return _p33._0;
+			return _p48._0;
 		}
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
@@ -10621,9 +10863,9 @@ _panosoft$elm_utils$Utils_Ops_ops['|?>'] = _elm_lang$core$Basics$flip(_elm_lang$
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['?!='] = F2(
 	function (maybe, lazy) {
-		var _p35 = maybe;
-		if (_p35.ctor === 'Just') {
-			return _p35._0;
+		var _p50 = maybe;
+		if (_p50.ctor === 'Just') {
+			return _p50._0;
 		} else {
 			return lazy(
 				{ctor: '_Tuple0'});
@@ -10631,18 +10873,18 @@ _panosoft$elm_utils$Utils_Ops_ops['?!='] = F2(
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?!->'] = F2(
-	function (ma, _p36) {
-		var _p37 = _p36;
+	function (ma, _p51) {
+		var _p52 = _p51;
 		return A2(
 			_panosoft$elm_utils$Utils_Ops_ops['?!='],
-			A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], ma, _p37._1),
-			_p37._0);
+			A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], ma, _p52._1),
+			_p52._0);
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?!-->'] = F2(
-	function (mma, _p38) {
-		var _p39 = _p38;
-		var _p40 = _p39._0;
+	function (mma, _p53) {
+		var _p54 = _p53;
+		var _p55 = _p54._0;
 		return A2(
 			_panosoft$elm_utils$Utils_Ops_ops['?!='],
 			A2(
@@ -10651,16 +10893,16 @@ _panosoft$elm_utils$Utils_Ops_ops['|?!-->'] = F2(
 				function (ma) {
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['?!='],
-						A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], ma, _p39._1),
-						_p40);
+						A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], ma, _p54._1),
+						_p55);
 				}),
-			_p40);
+			_p55);
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?!--->'] = F2(
-	function (mmma, _p41) {
-		var _p42 = _p41;
-		var _p43 = _p42._0;
+	function (mmma, _p56) {
+		var _p57 = _p56;
+		var _p58 = _p57._0;
 		return A2(
 			_panosoft$elm_utils$Utils_Ops_ops['?!='],
 			A2(
@@ -10670,26 +10912,26 @@ _panosoft$elm_utils$Utils_Ops_ops['|?!--->'] = F2(
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['|?!-->'],
 						mma,
-						{ctor: '_Tuple2', _0: _p43, _1: _p42._1});
+						{ctor: '_Tuple2', _0: _p58, _1: _p57._1});
 				}),
-			_p43);
+			_p58);
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['?='] = _elm_lang$core$Basics$flip(_elm_lang$core$Maybe$withDefault);
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?->'] = F2(
-	function (ma, _p44) {
-		var _p45 = _p44;
+	function (ma, _p59) {
+		var _p60 = _p59;
 		return A2(
 			_panosoft$elm_utils$Utils_Ops_ops['?='],
-			A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], ma, _p45._1),
-			_p45._0);
+			A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], ma, _p60._1),
+			_p60._0);
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?-->'] = F2(
-	function (mma, _p46) {
-		var _p47 = _p46;
-		var _p48 = _p47._0;
+	function (mma, _p61) {
+		var _p62 = _p61;
+		var _p63 = _p62._0;
 		return A2(
 			_panosoft$elm_utils$Utils_Ops_ops['?='],
 			A2(
@@ -10698,16 +10940,16 @@ _panosoft$elm_utils$Utils_Ops_ops['|?-->'] = F2(
 				function (ma) {
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['?='],
-						A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], ma, _p47._1),
-						_p48);
+						A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], ma, _p62._1),
+						_p63);
 				}),
-			_p48);
+			_p63);
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['|?--->'] = F2(
-	function (mmma, _p49) {
-		var _p50 = _p49;
-		var _p51 = _p50._0;
+	function (mmma, _p64) {
+		var _p65 = _p64;
+		var _p66 = _p65._0;
 		return A2(
 			_panosoft$elm_utils$Utils_Ops_ops['?='],
 			A2(
@@ -10717,23 +10959,23 @@ _panosoft$elm_utils$Utils_Ops_ops['|?--->'] = F2(
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['|?-->'],
 						mma,
-						{ctor: '_Tuple2', _0: _p51, _1: _p50._1});
+						{ctor: '_Tuple2', _0: _p66, _1: _p65._1});
 				}),
-			_p51);
+			_p66);
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['?!'] = F2(
-	function (bool, _p52) {
-		var _p53 = _p52;
-		return bool ? _p53._0(
-			{ctor: '_Tuple0'}) : _p53._1(
+	function (bool, _p67) {
+		var _p68 = _p67;
+		return bool ? _p68._0(
+			{ctor: '_Tuple0'}) : _p68._1(
 			{ctor: '_Tuple0'});
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['?'] = F2(
-	function (bool, _p54) {
-		var _p55 = _p54;
-		return bool ? _p55._0 : _p55._1;
+	function (bool, _p69) {
+		var _p70 = _p69;
+		return bool ? _p70._0 : _p70._1;
 	});
 var _panosoft$elm_utils$Utils_Ops_ops = _panosoft$elm_utils$Utils_Ops_ops || {};
 _panosoft$elm_utils$Utils_Ops_ops['!!'] = F2(
@@ -10750,6 +10992,65 @@ _panosoft$elm_utils$Utils_Ops_ops['!!'] = F2(
 					A2(_elm_lang$core$List$drop, index, list))
 			});
 	});
+
+var _panosoft$elm_utils$Utils_Dict$zip = F2(
+	function (keys, values) {
+		var toList = F3(
+			function (keys, values, list) {
+				toList:
+				while (true) {
+					var _p0 = keys;
+					if (_p0.ctor === '[]') {
+						return list;
+					} else {
+						var _p1 = values;
+						if (_p1.ctor === '[]') {
+							return list;
+						} else {
+							var _v2 = _p0._1,
+								_v3 = _p1._1,
+								_v4 = {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: _p0._0, _1: _p1._0},
+								_1: list
+							};
+							keys = _v2;
+							values = _v3;
+							list = _v4;
+							continue toList;
+						}
+					}
+				}
+			});
+		return _elm_lang$core$Dict$fromList(
+			A3(
+				toList,
+				keys,
+				values,
+				{ctor: '[]'}));
+	});
+var _panosoft$elm_utils$Utils_Dict$swap = function (dict) {
+	return function (newDict) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['?'],
+			_elm_lang$core$Native_Utils.eq(
+				_elm_lang$core$Dict$size(newDict),
+				_elm_lang$core$Dict$size(dict)),
+			{
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Result$Ok(newDict),
+				_1: _elm_lang$core$Result$Err('Values are not unique')
+			});
+	}(
+		_elm_lang$core$Dict$fromList(
+			A2(
+				_elm_lang$core$List$map,
+				function (_p2) {
+					var _p3 = _p2;
+					return {ctor: '_Tuple2', _0: _p3._1, _1: _p3._0};
+				},
+				_elm_lang$core$Dict$toList(dict))));
+};
 
 var _panosoft$elm_utils$Utils_Regex$parametricReplacer = function ($new) {
 	var asStrings = _elm_lang$core$List$map(
@@ -11050,6 +11351,827 @@ var _panosoft$elm_utils$Utils_Match$getSubmatches1 = function (match) {
 		});
 };
 
+var _panosoft$elm_docs$Docs_Generator$space = function (number) {
+	return A2(
+		_elm_lang$core$String$join,
+		'',
+		A2(_elm_lang$core$List$repeat, number, ' '));
+};
+var _panosoft$elm_docs$Docs_Generator$tab = _panosoft$elm_docs$Docs_Generator$space(4);
+var _panosoft$elm_docs$Docs_Generator$newLine = '  \n';
+var _panosoft$elm_docs$Docs_Generator$caseToMarkdown = function (tag) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Tuple$first(tag),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			' ',
+			A2(
+				_elm_lang$core$String$join,
+				' ',
+				_elm_lang$core$Tuple$second(tag))));
+};
+var _panosoft$elm_docs$Docs_Generator$caseDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (name, args) {
+			return {ctor: '_Tuple2', _0: name, _1: args};
+		}),
+	A2(_elm_lang$core$Json_Decode$index, 0, _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_lang$core$Json_Decode$index,
+		1,
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
+var _panosoft$elm_docs$Docs_Generator$docsRegex = _elm_lang$core$Regex$regex('\\@docs (.*)?,?');
+var _panosoft$elm_docs$Docs_Generator$makeLink = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'- [',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_p1._1,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				']',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'(#',
+					A2(_elm_lang$core$Basics_ops['++'], _p1._0, ')')))));
+};
+var _panosoft$elm_docs$Docs_Generator$makeTableOfContents = F2(
+	function (dict, names) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+			_panosoft$elm_utils$Utils_Dict$swap(dict),
+			{
+				ctor: '_Tuple2',
+				_0: function (_p2) {
+					return _elm_lang$core$Native_Utils.crash(
+						'Docs.Generator',
+						{
+							start: {line: 165, column: 21},
+							end: {line: 165, column: 32}
+						})('BUG: non-unique name');
+				},
+				_1: function (dict) {
+					return A3(
+						_elm_lang$core$Basics$flip,
+						F2(
+							function (x, y) {
+								return A2(_elm_lang$core$Basics_ops['++'], x, y);
+							}),
+						'\n\n',
+						A2(
+							_elm_lang$core$String$join,
+							'\n',
+							A2(
+								_elm_lang$core$List$map,
+								_panosoft$elm_docs$Docs_Generator$makeLink,
+								A2(
+									_elm_lang$core$List$filterMap,
+									function (name) {
+										return A2(
+											_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+											A2(_elm_lang$core$Dict$get, name, dict),
+											{
+												ctor: '_Tuple2',
+												_0: _elm_lang$core$Maybe$Nothing,
+												_1: function (link) {
+													return _elm_lang$core$Maybe$Just(
+														{ctor: '_Tuple2', _0: link, _1: name});
+												}
+											});
+									},
+									names))));
+				}
+			});
+	});
+var _panosoft$elm_docs$Docs_Generator$makeUnique = F3(
+	function (dict, index, name) {
+		return function (newName) {
+			return A2(
+				_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+				A3(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, dict, newName),
+				{
+					ctor: '_Tuple2',
+					_0: newName,
+					_1: function (_p3) {
+						return A3(_panosoft$elm_docs$Docs_Generator$makeUnique, dict, index + 1, name);
+					}
+				});
+		}(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				name,
+				A2(_panosoft$elm_string_utils$StringUtils_ops['+++'], '-', index)));
+	});
+var _panosoft$elm_docs$Docs_Generator$makeLinkName = F2(
+	function (dict, name) {
+		return function (linkName) {
+			return A2(
+				_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+				A3(_elm_lang$core$Basics$flip, _elm_lang$core$Dict$get, dict, linkName),
+				{
+					ctor: '_Tuple2',
+					_0: linkName,
+					_1: function (_p4) {
+						return A3(_panosoft$elm_docs$Docs_Generator$makeUnique, dict, 1, linkName);
+					}
+				});
+		}(
+			A3(
+				_panosoft$elm_utils$Utils_Regex$replaceAll,
+				'[^a-zA-Z0-9- ]',
+				'',
+				_elm_lang$core$String$toLower(name)));
+	});
+var _panosoft$elm_docs$Docs_Generator$removeRedundantTypes = function (code) {
+	return A4(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('(\\b\\w+\\b)\\.(\\b\\w+\\b)'),
+		function (match) {
+			return function (_p5) {
+				var _p6 = _p5;
+				var _p8 = _p6._1;
+				var _p7 = _p6._0;
+				return A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?'],
+					_elm_lang$core$Native_Utils.eq(_p7, _p8),
+					{
+						ctor: '_Tuple2',
+						_0: _p7,
+						_1: A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p7,
+							A2(_elm_lang$core$Basics_ops['++'], '.', _p8))
+					});
+			}(
+				_panosoft$elm_utils$Utils_Match$getSubmatches2(match));
+		},
+		code);
+};
+var _panosoft$elm_docs$Docs_Generator$operatorize = function (name) {
+	return A2(
+		_panosoft$elm_utils$Utils_Ops_ops['?'],
+		A2(
+			_elm_lang$core$Regex$contains,
+			_elm_lang$core$Regex$regex('[a-z_A-Z]'),
+			name),
+		{
+			ctor: '_Tuple2',
+			_0: name,
+			_1: A2(
+				_elm_lang$core$Basics_ops['++'],
+				'(',
+				A2(_elm_lang$core$Basics_ops['++'], name, ')'))
+		});
+};
+var _panosoft$elm_docs$Docs_Generator$elmCode = function (s) {
+	return _panosoft$elm_docs$Docs_Generator$removeRedundantTypes(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'```elm\n',
+			A2(_elm_lang$core$Basics_ops['++'], s, '\n```')));
+};
+var _panosoft$elm_docs$Docs_Generator$definitionHeader = function (s) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'### ',
+		A2(_elm_lang$core$Basics_ops['++'], s, '\n'));
+};
+var _panosoft$elm_docs$Docs_Generator$bold = function (s) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'**',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\*', '\\*', s),
+			'**'));
+};
+var _panosoft$elm_docs$Docs_Generator$aliasSignature = function (alias_) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		function (_p9) {
+			return _panosoft$elm_docs$Docs_Generator$definitionHeader(
+				_panosoft$elm_docs$Docs_Generator$bold(_p9));
+		}(
+			A2(_elm_lang$core$Basics_ops['++'], 'type alias ', alias_.name)),
+		_panosoft$elm_docs$Docs_Generator$elmCode(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'type alias ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						alias_.name,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' ',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								A2(_elm_lang$core$String$join, ' ', alias_.args),
+								A2(_elm_lang$core$Basics_ops['++'], ' =', _panosoft$elm_docs$Docs_Generator$newLine))))),
+				A2(_elm_lang$core$Basics_ops['++'], _panosoft$elm_docs$Docs_Generator$tab, alias_.type_))));
+};
+var _panosoft$elm_docs$Docs_Generator$aliasToMarkdown = function (alias_) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_panosoft$elm_docs$Docs_Generator$aliasSignature(alias_),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'\n\n',
+			_elm_lang$core$String$trim(alias_.comment)));
+};
+var _panosoft$elm_docs$Docs_Generator$unionSignature = function (union) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		function (_p10) {
+			return _panosoft$elm_docs$Docs_Generator$definitionHeader(
+				_panosoft$elm_docs$Docs_Generator$bold(_p10));
+		}(
+			A2(_elm_lang$core$Basics_ops['++'], 'type ', union.name)),
+		_panosoft$elm_docs$Docs_Generator$elmCode(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'type ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						union.name,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' ',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								A2(_elm_lang$core$String$join, ' ', union.args),
+								_panosoft$elm_docs$Docs_Generator$newLine)))),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_panosoft$elm_docs$Docs_Generator$tab,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'= ',
+						A2(
+							_elm_lang$core$String$join,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_panosoft$elm_docs$Docs_Generator$newLine,
+								A2(_elm_lang$core$Basics_ops['++'], _panosoft$elm_docs$Docs_Generator$tab, '| ')),
+							A2(_elm_lang$core$List$map, _panosoft$elm_docs$Docs_Generator$caseToMarkdown, union.tags)))))));
+};
+var _panosoft$elm_docs$Docs_Generator$unionToMarkdown = function (union) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_panosoft$elm_docs$Docs_Generator$unionSignature(union),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'\n\n',
+			_elm_lang$core$String$trim(union.comment)));
+};
+var _panosoft$elm_docs$Docs_Generator$valueSignature = function (value) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		function (_p11) {
+			return _panosoft$elm_docs$Docs_Generator$definitionHeader(
+				_panosoft$elm_docs$Docs_Generator$bold(_p11));
+		}(
+			_panosoft$elm_docs$Docs_Generator$operatorize(value.name)),
+		_panosoft$elm_docs$Docs_Generator$elmCode(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_panosoft$elm_docs$Docs_Generator$operatorize(value.name),
+				A2(_elm_lang$core$Basics_ops['++'], ' : ', value.type_))));
+};
+var _panosoft$elm_docs$Docs_Generator$valueToMarkdown = function (value) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_panosoft$elm_docs$Docs_Generator$valueSignature(value),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'\n\n',
+			_elm_lang$core$String$trim(value.comment)));
+};
+var _panosoft$elm_docs$Docs_Generator$processComments = function (_p12) {
+	var _p13 = _p12;
+	var _p19 = _p13.comment;
+	return function (pageDict) {
+		return A4(
+			_elm_lang$core$Regex$replace,
+			_elm_lang$core$Regex$All,
+			_panosoft$elm_docs$Docs_Generator$docsRegex,
+			function (_p14) {
+				return function (names) {
+					return function (tableOfContents) {
+						return A2(
+							_elm_lang$core$Basics_ops['++'],
+							tableOfContents,
+							A2(
+								_elm_lang$core$String$join,
+								'\n\n---\n\n',
+								A2(
+									_elm_lang$core$List$map,
+									function (name) {
+										return function (name) {
+											return A2(
+												_elm_lang$core$Maybe$withDefault,
+												A2(_elm_lang$core$Basics_ops['++'], name, ' : Not Found!!!'),
+												_elm_lang$core$List$head(
+													_elm_community$maybe_extra$Maybe_Extra$values(
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$core$Maybe$map,
+																_panosoft$elm_docs$Docs_Generator$aliasToMarkdown,
+																A2(
+																	_elm_community$list_extra$List_Extra$find,
+																	function (_p15) {
+																		return A2(
+																			F2(
+																				function (x, y) {
+																					return _elm_lang$core$Native_Utils.eq(x, y);
+																				}),
+																			name,
+																			function (_) {
+																				return _.name;
+																			}(_p15));
+																	},
+																	_p13.aliases)),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$core$Maybe$map,
+																	_panosoft$elm_docs$Docs_Generator$unionToMarkdown,
+																	A2(
+																		_elm_community$list_extra$List_Extra$find,
+																		function (_p16) {
+																			return A2(
+																				F2(
+																					function (x, y) {
+																						return _elm_lang$core$Native_Utils.eq(x, y);
+																					}),
+																				name,
+																				function (_) {
+																					return _.name;
+																				}(_p16));
+																		},
+																		_p13.unions)),
+																_1: {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$core$Maybe$map,
+																		_panosoft$elm_docs$Docs_Generator$valueToMarkdown,
+																		A2(
+																			_elm_community$list_extra$List_Extra$find,
+																			function (_p17) {
+																				return A2(
+																					F2(
+																						function (x, y) {
+																							return _elm_lang$core$Native_Utils.eq(x, y);
+																						}),
+																					name,
+																					function (_) {
+																						return _.name;
+																					}(_p17));
+																			},
+																			_p13.values)),
+																	_1: {ctor: '[]'}
+																}
+															}
+														})));
+										}(
+											A3(
+												_panosoft$elm_utils$Utils_Regex$replaceFirst,
+												'\\)$',
+												'',
+												A3(_panosoft$elm_utils$Utils_Regex$replaceFirst, '^\\(', '', name)));
+									},
+									names)));
+					}(
+						A2(_panosoft$elm_docs$Docs_Generator$makeTableOfContents, pageDict, names));
+				}(
+					_elm_community$list_extra$List_Extra$unique(
+						A3(
+							_elm_lang$core$Regex$split,
+							_elm_lang$core$Regex$All,
+							_elm_lang$core$Regex$regex('\\s*,\\s*'),
+							A4(
+								_elm_lang$core$Regex$replace,
+								_elm_lang$core$Regex$All,
+								_elm_lang$core$Regex$regex('\\@docs\\s*'),
+								_elm_lang$core$Basics$always(''),
+								function (_) {
+									return _.match;
+								}(_p14)))));
+			},
+			_elm_lang$core$String$trim(_p19));
+	}(
+		A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (match, dict) {
+					return A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+						_panosoft$elm_utils$Utils_Match$extract1(match),
+						{
+							ctor: '_Tuple2',
+							_0: function (_p18) {
+								return _elm_lang$core$Native_Utils.crash(
+									'Docs.Generator',
+									{
+										start: {line: 191, column: 33},
+										end: {line: 191, column: 44}
+									})('BUG: bad regex');
+							},
+							_1: A2(
+								_elm_lang$core$Basics$flip,
+								F2(
+									function (x, y) {
+										return A2(_panosoft$elm_utils$Utils_Ops_ops['|?->'], x, y);
+									}),
+								{
+									ctor: '_Tuple2',
+									_0: dict,
+									_1: function (match) {
+										return A3(
+											_elm_lang$core$List$foldl,
+											F2(
+												function (name, dict) {
+													return A3(
+														_elm_lang$core$Dict$insert,
+														A2(_panosoft$elm_docs$Docs_Generator$makeLinkName, dict, name),
+														name,
+														dict);
+												}),
+											dict,
+											_elm_community$list_extra$List_Extra$unique(
+												A3(
+													_elm_lang$core$Regex$split,
+													_elm_lang$core$Regex$All,
+													_elm_lang$core$Regex$regex('\\s*,\\s*'),
+													A4(
+														_elm_lang$core$Regex$replace,
+														_elm_lang$core$Regex$All,
+														_elm_lang$core$Regex$regex('\\@docs\\s*'),
+														_elm_lang$core$Basics$always(''),
+														match))));
+									}
+								})
+						});
+				}),
+			_elm_lang$core$Dict$empty,
+			A3(
+				_elm_lang$core$Regex$find,
+				_elm_lang$core$Regex$All,
+				_panosoft$elm_docs$Docs_Generator$docsRegex,
+				_elm_lang$core$String$trim(_p19))));
+};
+var _panosoft$elm_docs$Docs_Generator$moduleToMarkdown = function (module_) {
+	return {
+		ctor: '_Tuple2',
+		_0: module_.name,
+		_1: A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'# ',
+				A2(_elm_lang$core$Basics_ops['++'], module_.name, '\n\n')),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_panosoft$elm_docs$Docs_Generator$processComments(module_),
+				'\n\n'))
+	};
+};
+var _panosoft$elm_docs$Docs_Generator$Alias = F4(
+	function (a, b, c, d) {
+		return {name: a, comment: b, args: c, type_: d};
+	});
+var _panosoft$elm_docs$Docs_Generator$Union = F4(
+	function (a, b, c, d) {
+		return {name: a, comment: b, args: c, tags: d};
+	});
+var _panosoft$elm_docs$Docs_Generator$Value = F3(
+	function (a, b, c) {
+		return {name: a, comment: b, type_: c};
+	});
+var _panosoft$elm_docs$Docs_Generator$Module = F5(
+	function (a, b, c, d, e) {
+		return {name: a, comment: b, aliases: c, unions: d, values: e};
+	});
+var _panosoft$elm_docs$Docs_Generator$EditCodeBlockState = F3(
+	function (a, b, c) {
+		return {inBlock: a, comment: b, trailingBlankLineCount: c};
+	});
+var _panosoft$elm_docs$Docs_Generator$fixCodeBlocks = function (comment) {
+	return function (_p20) {
+		var _p21 = _p20;
+		var _p25 = _p21._5;
+		var _p24 = _p21._1;
+		var _p23 = _p21._4;
+		var _p22 = _p21._3;
+		return A2(
+			_elm_lang$core$String$join,
+			'\n',
+			_elm_lang$core$List$reverse(
+				function (_) {
+					return _.comment;
+				}(
+					A3(
+						_elm_lang$core$List$foldl,
+						F2(
+							function (line, state) {
+								return A2(
+									_panosoft$elm_utils$Utils_Ops_ops['?'],
+									_p21._2(line),
+									{
+										ctor: '_Tuple2',
+										_0: A2(
+											_panosoft$elm_utils$Utils_Ops_ops['?'],
+											state.inBlock,
+											{
+												ctor: '_Tuple2',
+												_0: _p22(
+													_p23(state)),
+												_1: state
+											}),
+										_1: A2(
+											_panosoft$elm_utils$Utils_Ops_ops['?'],
+											state.inBlock,
+											{
+												ctor: '_Tuple2',
+												_0: A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													_p21._0(line),
+													{
+														ctor: '_Tuple2',
+														_0: _elm_lang$core$Native_Utils.update(
+															state,
+															{trailingBlankLineCount: state.trailingBlankLineCount + 1}),
+														_1: A2(
+															_panosoft$elm_utils$Utils_Ops_ops['?'],
+															_p24(line),
+															{
+																ctor: '_Tuple2',
+																_0: function (state) {
+																	return _elm_lang$core$Native_Utils.update(
+																		state,
+																		{
+																			comment: {
+																				ctor: '::',
+																				_0: _p25(line),
+																				_1: state.comment
+																			}
+																		});
+																}(
+																	_p22(state)),
+																_1: function (state) {
+																	return _elm_lang$core$Native_Utils.update(
+																		state,
+																		{
+																			comment: {ctor: '::', _0: line, _1: state.comment}
+																		});
+																}(
+																	_p23(
+																		_p22(state)))
+															})
+													}),
+												_1: A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													_p24(line),
+													{
+														ctor: '_Tuple2',
+														_0: _elm_lang$core$Native_Utils.update(
+															state,
+															{
+																inBlock: true,
+																comment: {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		'```elm\n',
+																		_p25(line)),
+																	_1: state.comment
+																},
+																trailingBlankLineCount: 0
+															}),
+														_1: _elm_lang$core$Native_Utils.update(
+															state,
+															{
+																comment: {ctor: '::', _0: line, _1: state.comment}
+															})
+													})
+											})
+									});
+							}),
+						A3(
+							_panosoft$elm_docs$Docs_Generator$EditCodeBlockState,
+							false,
+							{ctor: '[]'},
+							0),
+						A3(
+							_elm_lang$core$Basics$flip,
+							_elm_lang$core$List$append,
+							{
+								ctor: '::',
+								_0: '†',
+								_1: {ctor: '[]'}
+							},
+							A2(_elm_lang$core$String$split, '\n', comment))))));
+	}(
+		{
+			ctor: '_Tuple6',
+			_0: function (_p26) {
+				return A2(
+					F2(
+						function (x, y) {
+							return _elm_lang$core$Native_Utils.eq(x, y);
+						}),
+					0,
+					_elm_lang$core$String$length(_p26));
+			},
+			_1: _elm_lang$core$String$startsWith('    '),
+			_2: F2(
+				function (x, y) {
+					return _elm_lang$core$Native_Utils.eq(x, y);
+				})('†'),
+			_3: function (state) {
+				return _elm_lang$core$Native_Utils.update(
+					state,
+					{
+						comment: A2(
+							_elm_lang$core$List$append,
+							A2(_elm_lang$core$List$repeat, state.trailingBlankLineCount, ''),
+							state.comment),
+						trailingBlankLineCount: 0
+					});
+			},
+			_4: function (state) {
+				return _elm_lang$core$Native_Utils.update(
+					state,
+					{
+						inBlock: false,
+						comment: {ctor: '::', _0: '```\n', _1: state.comment}
+					});
+			},
+			_5: _elm_lang$core$String$dropLeft(4)
+		});
+};
+var _panosoft$elm_docs$Docs_Generator$aliasDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra$andMap,
+	A2(_elm_lang$core$Json_Decode$field, 'type', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra$andMap,
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'args',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra$andMap,
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p27) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_panosoft$elm_docs$Docs_Generator$fixCodeBlocks(_p27));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'comment', _elm_lang$core$Json_Decode$string)),
+			A2(
+				_elm_community$json_extra$Json_Decode_Extra$andMap,
+				A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
+				_elm_lang$core$Json_Decode$succeed(_panosoft$elm_docs$Docs_Generator$Alias)))));
+var _panosoft$elm_docs$Docs_Generator$unionDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra$andMap,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'cases',
+		_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$caseDecoder)),
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra$andMap,
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'args',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)),
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra$andMap,
+			A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p28) {
+					return _elm_lang$core$Json_Decode$succeed(
+						_panosoft$elm_docs$Docs_Generator$fixCodeBlocks(_p28));
+				},
+				A2(_elm_lang$core$Json_Decode$field, 'comment', _elm_lang$core$Json_Decode$string)),
+			A2(
+				_elm_community$json_extra$Json_Decode_Extra$andMap,
+				A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
+				_elm_lang$core$Json_Decode$succeed(_panosoft$elm_docs$Docs_Generator$Union)))));
+var _panosoft$elm_docs$Docs_Generator$valueDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra$andMap,
+	A2(_elm_lang$core$Json_Decode$field, 'type', _elm_lang$core$Json_Decode$string),
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra$andMap,
+		A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (_p29) {
+				return _elm_lang$core$Json_Decode$succeed(
+					_panosoft$elm_docs$Docs_Generator$fixCodeBlocks(_p29));
+			},
+			A2(_elm_lang$core$Json_Decode$field, 'comment', _elm_lang$core$Json_Decode$string)),
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra$andMap,
+			A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
+			_elm_lang$core$Json_Decode$succeed(_panosoft$elm_docs$Docs_Generator$Value))));
+var _panosoft$elm_docs$Docs_Generator$moduleDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra$andMap,
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'values',
+		_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$valueDecoder)),
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra$andMap,
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'types',
+			_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$unionDecoder)),
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra$andMap,
+			A2(
+				_elm_lang$core$Json_Decode$field,
+				'aliases',
+				_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$aliasDecoder)),
+			A2(
+				_elm_community$json_extra$Json_Decode_Extra$andMap,
+				A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (_p30) {
+						return _elm_lang$core$Json_Decode$succeed(
+							_panosoft$elm_docs$Docs_Generator$fixCodeBlocks(_p30));
+					},
+					A2(_elm_lang$core$Json_Decode$field, 'comment', _elm_lang$core$Json_Decode$string)),
+				A2(
+					_elm_community$json_extra$Json_Decode_Extra$andMap,
+					A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string),
+					_elm_lang$core$Json_Decode$succeed(_panosoft$elm_docs$Docs_Generator$Module))))));
+var _panosoft$elm_docs$Docs_Generator$generate = F3(
+	function (pathSep, source, destination) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (files) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (_p31) {
+						return _elm_lang$core$Task$succeed(
+							{ctor: '_Tuple0'});
+					},
+					_elm_lang$core$Task$sequence(
+						A2(
+							_elm_lang$core$List$map,
+							function (file) {
+								return A2(
+									_elm_lang$core$Task$mapError,
+									function (_p32) {
+										return 'File write error';
+									},
+									A4(
+										_elm_node$core$Node_FileSystem$writeFileFromString,
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											destination,
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												pathSep,
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Tuple$first(file),
+													'.md'))),
+										_elm_node$core$Node_FileSystem$defaultMode,
+										_elm_node$core$Node_FileSystem$defaultEncoding,
+										_elm_lang$core$Tuple$second(file)));
+							},
+							files)));
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				function (content) {
+					return A3(
+						_elm_community$result_extra$Result_Extra$unpack,
+						_elm_lang$core$Task$fail,
+						_elm_lang$core$Task$succeed,
+						A2(
+							_elm_lang$core$Result$map,
+							_elm_lang$core$List$map(_panosoft$elm_docs$Docs_Generator$moduleToMarkdown),
+							A2(
+								_elm_lang$core$Json_Decode$decodeString,
+								_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$moduleDecoder),
+								content)));
+				},
+				A2(
+					_elm_lang$core$Task$mapError,
+					_elm_node$core$Node_Error$message,
+					A2(_elm_node$core$Node_FileSystem$readFileAsString, source, _elm_node$core$Node_Encoding$Utf8))));
+	});
+
 
 const _panosoft$elm_grove$Native_Git = (_ => {
 	const os = require('os');
@@ -11174,16 +12296,47 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 		.catch(fail);
 	});
 
-	const commit = (Repo, filesToAdd, message) => nativeBinding(callback => {
+	const commit = (Repo, filesToAdd, filesToDelete, message) => nativeBinding(callback => {
 		const fail = failure(callback, 'Unable commit to repo: ' + Repo.url);
 		try {
-			Repo.repo.createCommitOnHead(toArray(filesToAdd), git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message)
-			.then(oid => callback(succeed(oid.tostrS())))
+			let _index;
+			Repo.repo.refreshIndex()
+			.then (index => _index = index)
+			.then (_ => toArray(filesToAdd).reduce( (lastFilePromise, path) => lastFilePromise .then(_ => _index.addByPath(path)), Promise.resolve()))
+			.then (_ => toArray(filesToDelete).reduce( (lastFilePromise, path) => lastFilePromise .then(_ => _index.removeByPath(path)), Promise.resolve()))
+			.then (_ => _index.write())
+			.then (_ => _index.writeTree())
+			.then(treeOid =>
+				Repo.repo.getHeadCommit()
+				.then (parent =>
+					Repo.repo.createCommit('HEAD', git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message, treeOid, parent ? [parent] : parent)
+					.then(oid => callback(succeed(oid.tostrS())))
+				)
+			)
 			.catch(fail);
 		}
 		catch (error) { fail(error); }
 	});
 
+	// const commit = (Repo, filesToAdd, filesToDelete, message) => nativeBinding(callback => {
+	// 	const fail = failure(callback, 'Unable commit to repo: ' + Repo.url);
+	// 	try {
+	// 		Repo.repo.refreshIndex()
+	// 		.then (index =>
+	// 			toArray(filesToDelete).reduce( (lastFilePromise, path) => lastFilePromise
+	// 			.then(_ => index.removeByPath(path)), Promise.resolve())
+	// 			.then (_ => index.write())
+	// 			.then (_ => index.writeTree())
+	// 		)
+	// 		.then(_ =>
+	// 			Repo.repo.createCommitOnHead(toArray(filesToAdd), git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message)
+	// 			.then(oid => callback(succeed(oid.tostrS())))
+	// 		)
+	// 		.catch(fail);
+	// 	}
+	// 	catch (error) { fail(error); }
+	// });
+	//
 	const checkout = (Repo, tag, targetDirectory) => nativeBinding(callback => {
 		const fail = failure(callback, 'Unable check out tag: "' + tag + '" for repo: '+ Repo.url);
 		try {
@@ -11209,7 +12362,7 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 		catch (error) { fail(error); }
 	});
 	///////////////////////////////////////////////////////////////////////////////////////////////////
-	/* global F2:false, F3:false */
+	/* global F2:false, F3:false, F4:false */
 	return {
 		clone,
 		initRepo,
@@ -11218,7 +12371,7 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 		createAnnotatedTag: F3(createAnnotatedTag),
 		getTags,
 		getFileStatuses,
-		commit: F3(commit),
+		commit: F4(commit),
 		checkout: F3(checkout)
 	};
 })();
@@ -12704,6 +13857,777 @@ var _panosoft$elm_grove$NpmJson$replaceVersion = F2(
 				singleLineJson));
 	});
 
+const _panosoft$elm_grove$Native_Env = (_ => {
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	const env = JSON.stringify(process.env);
+	const homedir = require('os').homedir();
+	const tmpdir = require('os').tmpdir();
+
+	return {
+		env,
+		homedir,
+		tmpdir
+	};
+})();
+
+var _panosoft$elm_grove$Env$tmpdir = _panosoft$elm_grove$Native_Env.tmpdir;
+var _panosoft$elm_grove$Env$homedir = _panosoft$elm_grove$Native_Env.homedir;
+var _panosoft$elm_grove$Env$env = A2(
+	_panosoft$elm_utils$Utils_Ops_ops['??='],
+	A2(
+		_elm_lang$core$Json_Decode$decodeString,
+		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string),
+		_panosoft$elm_grove$Native_Env.env),
+	function (_p0) {
+		return _elm_lang$core$Native_Utils.crash(
+			'Env',
+			{
+				start: {line: 17, column: 20},
+				end: {line: 17, column: 31}
+			})('BUG: Cannot decode env');
+	});
+
+var _panosoft$elm_grove$Component_Config$localOrGlobalPath = function (config) {
+	return A2(
+		_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+		config.local,
+		{
+			ctor: '_Tuple2',
+			_0: _panosoft$elm_grove$Env$homedir,
+			_1: A2(
+				_elm_lang$core$Basics$flip,
+				F2(
+					function (x, y) {
+						return A2(_panosoft$elm_utils$Utils_Ops_ops['?'], x, y);
+					}),
+				{ctor: '_Tuple2', _0: '.', _1: _panosoft$elm_grove$Env$homedir})
+		});
+};
+var _panosoft$elm_grove$Component_Config$pathJoin = F2(
+	function (config, pathParts) {
+		return A3(_panosoft$elm_grove$AppUtils$pathJoin, config.pathSep, config.cwd, pathParts);
+	});
+var _panosoft$elm_grove$Component_Config$configPath = F2(
+	function (config, path) {
+		return A2(
+			_panosoft$elm_grove$Component_Config$pathJoin,
+			config,
+			{
+				ctor: '::',
+				_0: A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?'],
+					config.testing,
+					{ctor: '_Tuple2', _0: 'test', _1: path}),
+				_1: {
+					ctor: '::',
+					_0: config.configFilename,
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _panosoft$elm_grove$Component_Config$encoder = function (configFile) {
+	return _elm_lang$core$Json_Encode$object(
+		_elm_lang$core$List$concat(
+			{
+				ctor: '::',
+				_0: A2(
+					_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+					configFile.safeMode,
+					{
+						ctor: '_Tuple2',
+						_0: {ctor: '[]'},
+						_1: function (safeMode) {
+							return {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'safeMode',
+									_1: _elm_lang$core$Json_Encode$string(
+										function () {
+											var _p0 = safeMode;
+											switch (_p0.ctor) {
+												case 'SafeModeOn':
+													return 'on';
+												case 'SafeModeOff':
+													return 'off';
+												default:
+													return 'none';
+											}
+										}())
+								},
+								_1: {ctor: '[]'}
+							};
+						}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+						configFile.generateDocs,
+						{
+							ctor: '_Tuple2',
+							_0: {ctor: '[]'},
+							_1: function (generateDocs) {
+								return {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'generateDocs',
+										_1: _elm_lang$core$Json_Encode$string(
+											function () {
+												var _p1 = generateDocs;
+												if (_p1.ctor === 'GenerateDocsOn') {
+													return 'on';
+												} else {
+													return 'off';
+												}
+											}())
+									},
+									_1: {ctor: '[]'}
+								};
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}));
+};
+var _panosoft$elm_grove$Component_Config$defaultConfigFile = {safeMode: _elm_lang$core$Maybe$Nothing, generateDocs: _elm_lang$core$Maybe$Nothing};
+var _panosoft$elm_grove$Component_Config$defaultConfigFileString = A2(
+	_elm_lang$core$Json_Encode$encode,
+	4,
+	_panosoft$elm_grove$Component_Config$encoder(_panosoft$elm_grove$Component_Config$defaultConfigFile));
+var _panosoft$elm_grove$Component_Config$Config = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {testing: a, routeToMe: b, operationComplete: c, cwd: d, pathSep: e, configFilename: f, local: g, safe: h, docs: i};
+	});
+var _panosoft$elm_grove$Component_Config$Model = function (a) {
+	return {configFile: a};
+};
+var _panosoft$elm_grove$Component_Config$ConfigFile = F2(
+	function (a, b) {
+		return {safeMode: a, generateDocs: b};
+	});
+var _panosoft$elm_grove$Component_Config$SafeModeNone = {ctor: 'SafeModeNone'};
+var _panosoft$elm_grove$Component_Config$safeMode = F2(
+	function (config, model) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+			model.configFile,
+			{
+				ctor: '_Tuple2',
+				_0: _panosoft$elm_grove$Component_Config$SafeModeNone,
+				_1: function (configFile) {
+					return A2(_panosoft$elm_utils$Utils_Ops_ops['?='], configFile.safeMode, _panosoft$elm_grove$Component_Config$SafeModeNone);
+				}
+			});
+	});
+var _panosoft$elm_grove$Component_Config$SafeModeOff = {ctor: 'SafeModeOff'};
+var _panosoft$elm_grove$Component_Config$SafeModeOn = {ctor: 'SafeModeOn'};
+var _panosoft$elm_grove$Component_Config$GenerateDocsOff = {ctor: 'GenerateDocsOff'};
+var _panosoft$elm_grove$Component_Config$generateDocs = F2(
+	function (config, model) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+			model.configFile,
+			{
+				ctor: '_Tuple2',
+				_0: _panosoft$elm_grove$Component_Config$GenerateDocsOff,
+				_1: function (configFile) {
+					return A2(_panosoft$elm_utils$Utils_Ops_ops['?='], configFile.generateDocs, _panosoft$elm_grove$Component_Config$GenerateDocsOff);
+				}
+			});
+	});
+var _panosoft$elm_grove$Component_Config$GenerateDocsOn = {ctor: 'GenerateDocsOn'};
+var _panosoft$elm_grove$Component_Config$decoder = A2(
+	_panosoft$elm_utils$Utils_Json_ops['<||'],
+	A2(
+		_panosoft$elm_utils$Utils_Json_ops['<||'],
+		_elm_lang$core$Json_Decode$succeed(_panosoft$elm_grove$Component_Config$ConfigFile),
+		A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (maybeSafe) {
+				return _elm_lang$core$Json_Decode$succeed(
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+						maybeSafe,
+						{
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Maybe$Nothing,
+							_1: function (safe) {
+								return _elm_lang$core$Maybe$Just(
+									function () {
+										var _p2 = _elm_lang$core$String$toLower(safe);
+										switch (_p2) {
+											case 'on':
+												return _panosoft$elm_grove$Component_Config$SafeModeOn;
+											case 'off':
+												return _panosoft$elm_grove$Component_Config$SafeModeOff;
+											default:
+												return _panosoft$elm_grove$Component_Config$SafeModeNone;
+										}
+									}());
+							}
+						}));
+			},
+			_elm_lang$core$Json_Decode$maybe(
+				A2(_elm_lang$core$Json_Decode$field, 'safeMode', _elm_lang$core$Json_Decode$string)))),
+	A2(
+		_elm_lang$core$Json_Decode$andThen,
+		function (maybeGenerateDocs) {
+			return _elm_lang$core$Json_Decode$succeed(
+				A2(
+					_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+					maybeGenerateDocs,
+					{
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Maybe$Nothing,
+						_1: function (generateDocs) {
+							return _elm_lang$core$Maybe$Just(
+								function () {
+									var _p3 = _elm_lang$core$String$toLower(generateDocs);
+									if (_p3 === 'on') {
+										return _panosoft$elm_grove$Component_Config$GenerateDocsOn;
+									} else {
+										return _panosoft$elm_grove$Component_Config$GenerateDocsOff;
+									}
+								}());
+						}
+					}));
+		},
+		_elm_lang$core$Json_Decode$maybe(
+			A2(_elm_lang$core$Json_Decode$field, 'generateDocs', _elm_lang$core$Json_Decode$string))));
+var _panosoft$elm_grove$Component_Config$ConfigurationComplete = function (a) {
+	return {ctor: 'ConfigurationComplete', _0: a};
+};
+var _panosoft$elm_grove$Component_Config$configure = F2(
+	function (config, model) {
+		return function (configFile) {
+			return function (path) {
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							configFile: _elm_lang$core$Maybe$Just(configFile)
+						}),
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$core$Task$attempt,
+							function (_p4) {
+								return config.routeToMe(
+									_panosoft$elm_grove$Component_Config$ConfigurationComplete(_p4));
+							},
+							A2(
+								_panosoft$elm_grove$AppUtils$writeFile,
+								path,
+								A2(
+									_elm_lang$core$Json_Encode$encode,
+									2,
+									_panosoft$elm_grove$Component_Config$encoder(configFile)))),
+						_1: {ctor: '[]'}
+					});
+			}(
+				A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?'],
+					A2(_panosoft$elm_utils$Utils_Ops_ops['?='], config.local, false),
+					{
+						ctor: '_Tuple2',
+						_0: config.configFilename,
+						_1: A2(
+							_panosoft$elm_grove$Component_Config$configPath,
+							config,
+							_panosoft$elm_grove$Component_Config$localOrGlobalPath(config))
+					}));
+		}(
+			function (configFile) {
+				return A2(
+					_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+					config.docs,
+					{
+						ctor: '_Tuple2',
+						_0: configFile,
+						_1: function (docs) {
+							return function (generateDocs) {
+								return _elm_lang$core$Native_Utils.update(
+									configFile,
+									{generateDocs: generateDocs});
+							}(
+								function () {
+									var _p5 = docs;
+									switch (_p5) {
+										case 'on':
+											return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$GenerateDocsOn);
+										case 'off':
+											return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$GenerateDocsOff);
+										case '':
+											return _elm_lang$core$Maybe$Nothing;
+										default:
+											return A2(
+												_panosoft$elm_grove$AppUtils$bug,
+												'Should never get here',
+												_elm_lang$core$Basics$always(_elm_lang$core$Maybe$Nothing));
+									}
+								}());
+						}
+					});
+			}(
+				function (configFile) {
+					return A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+						config.safe,
+						{
+							ctor: '_Tuple2',
+							_0: configFile,
+							_1: function (safe) {
+								return function (safeMode) {
+									return _elm_lang$core$Native_Utils.update(
+										configFile,
+										{safeMode: safeMode});
+								}(
+									function () {
+										var _p6 = safe;
+										switch (_p6) {
+											case 'on':
+												return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$SafeModeOn);
+											case 'off':
+												return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$SafeModeOff);
+											case 'none':
+												return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$SafeModeNone);
+											case '':
+												return _elm_lang$core$Maybe$Nothing;
+											default:
+												return A2(
+													_panosoft$elm_grove$AppUtils$bug,
+													'Should never get here',
+													_elm_lang$core$Basics$always(_elm_lang$core$Maybe$Nothing));
+										}
+									}());
+							}
+						});
+				}(
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?!='],
+						model.configFile,
+						_panosoft$elm_grove$AppUtils$bugMissing('configFile')))));
+	});
+var _panosoft$elm_grove$Component_Config$ConfigFileRead = F2(
+	function (a, b) {
+		return {ctor: 'ConfigFileRead', _0: a, _1: b};
+	});
+var _panosoft$elm_grove$Component_Config$init = F2(
+	function (config, initializedMsg) {
+		return {
+			ctor: '_Tuple2',
+			_0: {configFile: _elm_lang$core$Maybe$Nothing},
+			_1: _elm_lang$core$Maybe$Just(
+				function (_p7) {
+					var _p8 = _p7;
+					var _p15 = _p8._0;
+					var _p14 = _p8._1;
+					return A2(
+						_elm_lang$core$Task$attempt,
+						function (_p9) {
+							return config.routeToMe(
+								A2(_panosoft$elm_grove$Component_Config$ConfigFileRead, initializedMsg, _p9));
+						},
+						A2(
+							_elm_lang$core$Task$andThen,
+							function (_p10) {
+								var _p11 = _p10;
+								return _elm_lang$core$Task$succeed(
+									{
+										ctor: '_Tuple2',
+										_0: {ctor: '_Tuple2', _0: _p11._0, _1: _p15},
+										_1: {ctor: '_Tuple2', _0: _p11._1, _1: _p14}
+									});
+							},
+							A2(
+								_elm_lang$core$Task$andThen,
+								function (localData) {
+									return A2(
+										_elm_lang$core$Task$onError,
+										function (nodeError) {
+											var _p12 = nodeError;
+											if (_p12.ctor === 'SystemError') {
+												return A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													_elm_lang$core$Native_Utils.eq(_p12._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
+													{
+														ctor: '_Tuple2',
+														_0: _elm_lang$core$Task$succeed(
+															{ctor: '_Tuple2', _0: localData, _1: _panosoft$elm_grove$Component_Config$defaultConfigFileString}),
+														_1: _elm_lang$core$Task$fail(
+															{ctor: '_Tuple2', _0: nodeError, _1: _p14})
+													});
+											} else {
+												return _elm_lang$core$Task$fail(
+													{ctor: '_Tuple2', _0: nodeError, _1: _p14});
+											}
+										},
+										A2(
+											_elm_lang$core$Task$andThen,
+											function (globalData) {
+												return _elm_lang$core$Task$succeed(
+													{ctor: '_Tuple2', _0: localData, _1: globalData});
+											},
+											A2(_elm_node$core$Node_FileSystem$readFileAsString, _p14, _elm_node$core$Node_Encoding$Utf8)));
+								},
+								A2(
+									_elm_lang$core$Task$onError,
+									function (nodeError) {
+										var _p13 = nodeError;
+										if (_p13.ctor === 'SystemError') {
+											return A2(
+												_panosoft$elm_utils$Utils_Ops_ops['?'],
+												_elm_lang$core$Native_Utils.eq(_p13._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
+												{
+													ctor: '_Tuple2',
+													_0: _elm_lang$core$Task$succeed(_panosoft$elm_grove$Component_Config$defaultConfigFileString),
+													_1: _elm_lang$core$Task$fail(
+														{ctor: '_Tuple2', _0: nodeError, _1: _p15})
+												});
+										} else {
+											return _elm_lang$core$Task$fail(
+												{ctor: '_Tuple2', _0: nodeError, _1: _p15});
+										}
+									},
+									A2(_elm_node$core$Node_FileSystem$readFileAsString, _p15, _elm_node$core$Node_Encoding$Utf8)))));
+				}(
+					{
+						ctor: '_Tuple2',
+						_0: A2(_panosoft$elm_grove$Component_Config$configPath, config, '.'),
+						_1: A2(_panosoft$elm_grove$Component_Config$configPath, config, _panosoft$elm_grove$Env$homedir)
+					}))
+		};
+	});
+var _panosoft$elm_grove$Component_Config$OperationComplete = function (a) {
+	return {ctor: 'OperationComplete', _0: a};
+};
+var _panosoft$elm_grove$Component_Config$operationError = F2(
+	function (model, task) {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				model,
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$Task$perform,
+						function (_p16) {
+							return _panosoft$elm_grove$Component_Config$OperationComplete(-1);
+						},
+						task),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		};
+	});
+var _panosoft$elm_grove$Component_Config$operationSuccessful = F2(
+	function (model, task) {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				model,
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$Task$perform,
+						function (_p17) {
+							return _panosoft$elm_grove$Component_Config$OperationComplete(0);
+						},
+						task),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		};
+	});
+var _panosoft$elm_grove$Component_Config$update = F3(
+	function (config, msg, model) {
+		var _p18 = msg;
+		switch (_p18.ctor) {
+			case 'OperationComplete':
+				return {
+					ctor: '_Tuple2',
+					_0: A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: config.operationComplete(_p18._0),
+						_1: {ctor: '[]'}
+					}
+				};
+			case 'ConfigFileRead':
+				if (_p18._1.ctor === 'Err') {
+					return A2(
+						_panosoft$elm_grove$Component_Config$operationError,
+						model,
+						_panosoft$elm_grove$Output$errorLog(
+							A2(
+								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+								A2(
+									_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+									A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to read:', _p18._1._0._1),
+									'Error:'),
+								_p18._1._0._0)));
+				} else {
+					return function (decodingError) {
+						return A2(
+							_panosoft$elm_utils$Utils_Ops_ops['|??**>'],
+							{
+								ctor: '_Tuple2',
+								_0: A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$Component_Config$decoder, _p18._1._0._0._0),
+								_1: A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$Component_Config$decoder, _p18._1._0._1._0)
+							},
+							{
+								ctor: '_Tuple3',
+								_0: decodingError(_p18._1._0._0._1),
+								_1: decodingError(_p18._1._0._1._1),
+								_2: function (_p19) {
+									var _p20 = _p19;
+									var _p22 = _p20._0;
+									var _p21 = _p20._1;
+									return function (configFile) {
+										return {
+											ctor: '_Tuple2',
+											_0: A2(
+												_elm_lang$core$Platform_Cmd_ops['!'],
+												_elm_lang$core$Native_Utils.update(
+													model,
+													{
+														configFile: _elm_lang$core$Maybe$Just(configFile)
+													}),
+												{ctor: '[]'}),
+											_1: {
+												ctor: '::',
+												_0: _p18._0,
+												_1: {ctor: '[]'}
+											}
+										};
+									}(
+										{
+											safeMode: A2(
+												_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+												_p22.safeMode,
+												{ctor: '_Tuple2', _0: _p21.safeMode, _1: _elm_lang$core$Maybe$Just}),
+											generateDocs: A2(
+												_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+												_p22.generateDocs,
+												{ctor: '_Tuple2', _0: _p21.generateDocs, _1: _elm_lang$core$Maybe$Just})
+										});
+								}
+							});
+					}(
+						F2(
+							function (path, error) {
+								return A2(
+									_panosoft$elm_grove$Component_Config$operationError,
+									model,
+									_panosoft$elm_grove$Output$errorLog(
+										A2(
+											_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+											A2(
+												_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Config file:', path),
+												'decoding error:'),
+											error)));
+							}));
+				}
+			default:
+				if (_p18._0.ctor === 'Err') {
+					return A2(
+						_panosoft$elm_grove$Component_Config$operationError,
+						model,
+						_panosoft$elm_grove$Output$errorLog(
+							A2(
+								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+								A2(
+									_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+									A2(
+										_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+										'Unable to write:',
+										_panosoft$elm_grove$Component_Config$configPath(config)),
+									'Error:'),
+								_p18._0._0)));
+				} else {
+					return A2(
+						_panosoft$elm_grove$Component_Config$operationSuccessful,
+						model,
+						_panosoft$elm_grove$Console$log('Grove configuration updated'));
+				}
+		}
+	});
+
+const _panosoft$elm_grove$Native_Spawn = (_ => {
+	const { spawn } = require('child_process');
+	/* global _elm_lang$core$Native_Scheduler:false _elm_lang$core$Native_List:false */
+	const { nativeBinding, succeed, fail } = _elm_lang$core$Native_Scheduler;
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	const exec = (cmdLine, successExitCode, silent) => nativeBinding(callback => {
+		try {
+			const cmdLineParts = cmdLine.split(' ');
+			const cmd = spawn(cmdLineParts[0], cmdLineParts.slice(1, cmdLineParts.length));
+			if (!silent) {
+				cmd.stdout.on('data', data => process.stdout.write(data.toString()));
+				cmd.stderr.on('data', data => process.stderr.write(data.toString()));
+			}
+			cmd.on('exit', exitCode => callback(exitCode == successExitCode ? succeed() : fail(Error(`Exited with error code: ${exitCode}`))));
+		}
+		catch (error) {callback(fail(error));}
+	});
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	/* global F3:false */
+	return {
+		exec: F3(exec)
+	};
+})();
+
+var _panosoft$elm_grove$Spawn$exec = A2(
+	_panosoft$elm_utils$Utils_Func$compose3,
+	_elm_lang$core$Task$mapError(_elm_node$core$Node_Error$fromValue),
+	_panosoft$elm_grove$Native_Spawn.exec);
+
+var _panosoft$elm_grove$DocGenerator$pathJoin = F2(
+	function (config, pathParts) {
+		return A3(_panosoft$elm_grove$AppUtils$pathJoin, config.pathSep, config.cwd, pathParts);
+	});
+var _panosoft$elm_grove$DocGenerator$docsJsonFilename = 'documentation.json';
+var _panosoft$elm_grove$DocGenerator$elmDocsPath = 'elm-docs';
+var _panosoft$elm_grove$DocGenerator$generateDocs = function (config) {
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p0) {
+			return A2(
+				_panosoft$elm_utils$Utils_Ops_ops['?'],
+				_elm_lang$core$Native_Utils.eq(config.generateDocs, _panosoft$elm_grove$Component_Config$GenerateDocsOn),
+				{
+					ctor: '_Tuple2',
+					_0: function (docsJsonFilename) {
+						return A2(
+							_elm_lang$core$Task$mapError,
+							function (error) {
+								return A2(_elm_node$core$Node_Error$Error, error, '');
+							},
+							A2(
+								_elm_lang$core$Task$andThen,
+								function (_p1) {
+									return A3(
+										_panosoft$elm_docs$Docs_Generator$generate,
+										config.pathSep,
+										docsJsonFilename,
+										A2(
+											_panosoft$elm_grove$DocGenerator$pathJoin,
+											config,
+											{
+												ctor: '::',
+												_0: '.',
+												_1: {
+													ctor: '::',
+													_0: _panosoft$elm_grove$DocGenerator$elmDocsPath,
+													_1: {ctor: '[]'}
+												}
+											}));
+								},
+								A2(
+									_elm_lang$core$Task$onError,
+									function (error) {
+										return A2(
+											_elm_lang$core$Task$onError,
+											function (_p2) {
+												return _elm_lang$core$Task$fail(error);
+											},
+											A3(
+												_panosoft$elm_grove$Spawn$exec,
+												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'elm-make --docs', docsJsonFilename),
+												0,
+												false));
+									},
+									A2(
+										_elm_lang$core$Task$mapError,
+										function (error) {
+											return A2(
+												_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+												'Elm compilation failure:',
+												_elm_node$core$Node_Error$message(error));
+										},
+										A3(
+											_panosoft$elm_grove$Spawn$exec,
+											A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'elm-make --docs', docsJsonFilename),
+											0,
+											true)))));
+					}(
+						A2(
+							_panosoft$elm_grove$DocGenerator$pathJoin,
+							config,
+							{
+								ctor: '::',
+								_0: _panosoft$elm_grove$Env$tmpdir,
+								_1: {
+									ctor: '::',
+									_0: _panosoft$elm_grove$DocGenerator$docsJsonFilename,
+									_1: {ctor: '[]'}
+								}
+							})),
+					_1: _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple0'})
+				});
+		},
+		_elm_node$core$Node_FileSystem$remove(
+			A2(
+				_panosoft$elm_grove$DocGenerator$pathJoin,
+				config,
+				{
+					ctor: '::',
+					_0: config.cwd,
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_panosoft$elm_utils$Utils_Ops_ops['?'],
+							config.testing,
+							{ctor: '_Tuple2', _0: 'test', _1: ''}),
+						_1: {
+							ctor: '::',
+							_0: _panosoft$elm_grove$DocGenerator$elmDocsPath,
+							_1: {ctor: '[]'}
+						}
+					}
+				})));
+};
+var _panosoft$elm_grove$DocGenerator$Config = F4(
+	function (a, b, c, d) {
+		return {testing: a, cwd: b, pathSep: c, generateDocs: d};
+	});
+
+const _panosoft$elm_grove$Native_Glob = (_ => {
+	const glob = require('glob');
+	/* global _elm_lang$core$Native_Scheduler:false _elm_lang$core$Native_List:false */
+	const { nativeBinding, succeed, fail } = _elm_lang$core$Native_Scheduler;
+	const { fromArray } = _elm_lang$core$Native_List;
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	const isNothing = (v => v.ctor == 'Nothing');
+	const find = (pattern, ignore, follow) => nativeBinding(callback => {
+		try {
+			ignore =isNothing(ignore) ? null : ignore._0;
+			glob(pattern, {ignore, follow}, (err, matches) => callback(err ? fail(err) : succeed(fromArray(matches))));
+		}
+		catch (error) { fail(error); }
+	});
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	/* global F3:false */
+	return {
+		find: F3(find)
+	};
+})();
+
+var _panosoft$elm_grove$Glob$find = A2(
+	_panosoft$elm_utils$Utils_Func$compose3,
+	_elm_lang$core$Task$mapError(_elm_node$core$Node_Error$fromValue),
+	_panosoft$elm_grove$Native_Glob.find);
+
 var _panosoft$elm_grove$Component_Bump$delayUpdateMsg = F2(
 	function (msg, delay) {
 		return A2(
@@ -12757,7 +14681,9 @@ var _panosoft$elm_grove$Component_Bump$Config = function (a) {
 									return function (j) {
 										return function (k) {
 											return function (l) {
-												return {testing: a, dryRun: b, major: c, minor: d, patch: e, allowUncommitted: f, allowOldDependencies: g, routeToMe: h, operationComplete: i, elmVersion: j, cwd: k, pathSep: l};
+												return function (m) {
+													return {testing: a, dryRun: b, major: c, minor: d, patch: e, allowUncommitted: f, allowOldDependencies: g, routeToMe: h, operationComplete: i, elmVersion: j, cwd: k, pathSep: l, generateDocs: m};
+												};
 											};
 										};
 									};
@@ -12829,14 +14755,14 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 			}(
 				function (_p6) {
 					var _p7 = _p6;
-					var _p17 = _p7._0;
-					var _p16 = _p7._2;
+					var _p19 = _p7._0;
+					var _p18 = _p7._2;
 					return A3(
 						F3(
 							function (v0, v1, v2) {
 								return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
 							}),
-						_p17,
+						_p19,
 						_p7._1,
 						function (_p8) {
 							var _p9 = _p8;
@@ -12849,14 +14775,67 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 											return _elm_lang$core$Task$succeed(repo);
 										},
 										function (filesToAdd) {
-											return A3(
-												_panosoft$elm_grove$Git$commit,
-												repo,
-												filesToAdd,
+											return A2(
+												_elm_lang$core$Task$andThen,
+												function (docFiles) {
+													return function (docFiles) {
+														return A2(
+															_elm_lang$core$Task$andThen,
+															function (_p11) {
+																var _p12 = _p11;
+																return A4(
+																	_panosoft$elm_grove$Git$commit,
+																	repo,
+																	_elm_lang$core$List$concat(
+																		{
+																			ctor: '::',
+																			_0: docFiles,
+																			_1: {
+																				ctor: '::',
+																				_0: filesToAdd,
+																				_1: {ctor: '[]'}
+																			}
+																		}),
+																	_p12.deleted,
+																	A2(
+																		_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																		'Bumped version to',
+																		_panosoft$elm_grove$Version$versionToString(_p19)));
+															},
+															_panosoft$elm_grove$Git$getFileStatuses(repo));
+													}(
+														A2(
+															_elm_lang$core$List$map,
+															A2(
+																_panosoft$elm_utils$Utils_Regex$replaceFirst,
+																_elm_lang$core$Regex$escape(
+																	A2(_elm_lang$core$Basics_ops['++'], config.cwd, config.pathSep)),
+																''),
+															docFiles));
+												},
 												A2(
-													_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-													'Bumped version to',
-													_panosoft$elm_grove$Version$versionToString(_p17)));
+													_elm_lang$core$Task$mapError,
+													_elm_node$core$Node_Error$message,
+													A3(
+														_panosoft$elm_grove$Glob$find,
+														A2(
+															_panosoft$elm_grove$Component_Bump$pathJoin,
+															config,
+															{
+																ctor: '::',
+																_0: _panosoft$elm_grove$DocGenerator$elmDocsPath,
+																_1: {
+																	ctor: '::',
+																	_0: '**',
+																	_1: {
+																		ctor: '::',
+																		_0: '*',
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}),
+														_elm_lang$core$Maybe$Nothing,
+														false)));
 										}(
 											A2(
 												_panosoft$elm_utils$Utils_Ops_ops['|?!**>'],
@@ -12884,7 +14863,7 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 								},
 								A2(
 									_elm_lang$core$Task$andThen,
-									function (_p11) {
+									function (_p13) {
 										return _panosoft$elm_grove$Git$getRepo(_p9._0);
 									},
 									_p9._1));
@@ -12910,13 +14889,13 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 											}),
 										_1: A2(
 											_elm_lang$core$Task$andThen,
-											function (_p12) {
+											function (_p14) {
 												return _elm_lang$core$Task$succeed(
 													{ctor: '_Tuple0'});
 											},
 											A2(
 												_elm_lang$core$Task$andThen,
-												function (_p13) {
+												function (_p15) {
 													return _panosoft$elm_grove$Git$initRepo(
 														A2(
 															_panosoft$elm_grove$Component_Bump$pathJoin,
@@ -12940,7 +14919,7 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 													_elm_node$core$Node_Error$message,
 													A2(
 														_elm_lang$core$Task$andThen,
-														function (_p14) {
+														function (_p16) {
 															return _elm_node$core$Node_FileSystem$remove(
 																A2(
 																	_panosoft$elm_grove$Component_Bump$pathJoin,
@@ -12959,34 +14938,34 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 																		}
 																	}));
 														},
-														_p16))))
+														_p18))))
 									},
 									_1: {
 										ctor: '_Tuple2',
 										_0: config.cwd,
 										_1: A2(
 											_elm_lang$core$Task$andThen,
-											function (_p15) {
+											function (_p17) {
 												return _elm_lang$core$Task$succeed(
 													{ctor: '_Tuple0'});
 											},
-											A2(_elm_lang$core$Task$mapError, _elm_node$core$Node_Error$message, _p16))
+											A2(_elm_lang$core$Task$mapError, _elm_node$core$Node_Error$message, _p18))
 									}
 								})));
 				}(
-					function (_p18) {
-						var _p19 = _p18;
-						var _p21 = _p19._0;
+					function (_p20) {
+						var _p21 = _p20;
+						var _p23 = _p21._0;
 						return A3(
 							F3(
 								function (v0, v1, v2) {
 									return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
 								}),
-							_p21,
-							_p19._1,
+							_p23,
+							_p21._1,
 							A2(
 								_elm_lang$core$Task$andThen,
-								function (_p20) {
+								function (_p22) {
 									return A2(
 										_panosoft$elm_utils$Utils_Ops_ops['|?->'],
 										model.npmJsonStr,
@@ -13019,112 +14998,138 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 													A3(
 														_elm_lang$core$Basics$flip,
 														_panosoft$elm_grove$NpmJson$replaceVersion,
-														_panosoft$elm_grove$Version$versionToString(_p21),
+														_panosoft$elm_grove$Version$versionToString(_p23),
 														npmJsonStr));
 											}
 										});
 								},
-								_p19._2));
+								_p21._2));
 					}(
-						A2(
-							_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-							model.elmJson,
-							{
-								ctor: '_Tuple2',
-								_0: _panosoft$elm_grove$AppUtils$bugMissing('elmJson'),
-								_1: function (elmJson) {
-									return A2(
-										_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-										_panosoft$elm_grove$Version$versionFromString(elmJson.version),
-										{
-											ctor: '_Tuple2',
-											_0: _panosoft$elm_grove$AppUtils$bug(
-												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'bad version in elmJson:', elmJson.version)),
-											_1: function (oldVersion) {
-												return A2(
-													_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-													_elm_lang$core$List$head(
-														A2(
-															_elm_lang$core$List$map,
-															_elm_lang$core$Tuple$second,
+						function (bumpTask) {
+							return A2(
+								_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+								model.elmJson,
+								{
+									ctor: '_Tuple2',
+									_0: _panosoft$elm_grove$AppUtils$bugMissing('elmJson'),
+									_1: function (elmJson) {
+										return A2(
+											_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+											_panosoft$elm_grove$Version$versionFromString(elmJson.version),
+											{
+												ctor: '_Tuple2',
+												_0: _panosoft$elm_grove$AppUtils$bug(
+													A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'bad version in elmJson:', elmJson.version)),
+												_1: function (oldVersion) {
+													return A2(
+														_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+														_elm_lang$core$List$head(
 															A2(
-																_elm_lang$core$List$filter,
-																_elm_lang$core$Tuple$first,
-																{
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: config.major,
-																		_1: _panosoft$elm_grove$Version$nextMajor(oldVersion)
-																	},
-																	_1: {
+																_elm_lang$core$List$map,
+																_elm_lang$core$Tuple$second,
+																A2(
+																	_elm_lang$core$List$filter,
+																	_elm_lang$core$Tuple$first,
+																	{
 																		ctor: '::',
 																		_0: {
 																			ctor: '_Tuple2',
-																			_0: config.minor,
-																			_1: _panosoft$elm_grove$Version$nextMinor(oldVersion)
+																			_0: config.major,
+																			_1: _panosoft$elm_grove$Version$nextMajor(oldVersion)
 																		},
 																		_1: {
 																			ctor: '::',
 																			_0: {
 																				ctor: '_Tuple2',
-																				_0: config.patch,
-																				_1: _panosoft$elm_grove$Version$nextPatch(oldVersion)
+																				_0: config.minor,
+																				_1: _panosoft$elm_grove$Version$nextMinor(oldVersion)
 																			},
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																}))),
-													{
-														ctor: '_Tuple2',
-														_0: _panosoft$elm_grove$AppUtils$bug('major/minor/patch are all False'),
-														_1: function (newVersion) {
-															return A3(
-																F3(
-																	function (v0, v1, v2) {
-																		return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
-																	}),
-																newVersion,
-																A2(_panosoft$elm_grove$Component_Bump$BumpComplete, oldVersion, newVersion),
-																A2(
-																	_panosoft$elm_grove$AppUtils$writeFile,
-																	A2(
-																		_panosoft$elm_grove$Component_Bump$pathJoin,
-																		config,
-																		{
-																			ctor: '::',
-																			_0: config.cwd,
 																			_1: {
 																				ctor: '::',
-																				_0: A2(
-																					_panosoft$elm_utils$Utils_Ops_ops['?'],
-																					config.testing,
-																					{ctor: '_Tuple2', _0: 'test', _1: ''}),
-																				_1: {
-																					ctor: '::',
-																					_0: _panosoft$elm_grove$Package$elmJsonFilename,
-																					_1: {ctor: '[]'}
-																				}
+																				_0: {
+																					ctor: '_Tuple2',
+																					_0: config.patch,
+																					_1: _panosoft$elm_grove$Version$nextPatch(oldVersion)
+																				},
+																				_1: {ctor: '[]'}
 																			}
+																		}
+																	}))),
+														{
+															ctor: '_Tuple2',
+															_0: _panosoft$elm_grove$AppUtils$bug('major/minor/patch are all False'),
+															_1: function (newVersion) {
+																return A3(
+																	F3(
+																		function (v0, v1, v2) {
+																			return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
 																		}),
+																	newVersion,
+																	A2(_panosoft$elm_grove$Component_Bump$BumpComplete, oldVersion, newVersion),
 																	A2(
-																		_elm_lang$core$Json_Encode$encode,
-																		A2(
-																			_panosoft$elm_utils$Utils_Ops_ops['?!='],
-																			model.elmJsonIndent,
-																			_panosoft$elm_grove$AppUtils$bugMissing('elmJsonIndent')),
-																		_panosoft$elm_grove$ElmJson$elmJsonEncoder(
-																			_elm_lang$core$Native_Utils.update(
-																				elmJson,
-																				{
-																					version: _panosoft$elm_grove$Version$versionToString(newVersion)
-																				})))));
-														}
-													});
-											}
-										});
-								}
-							})))));
+																		_elm_lang$core$Task$andThen,
+																		function (_p24) {
+																			return A2(
+																				_panosoft$elm_grove$AppUtils$writeFile,
+																				A2(
+																					_panosoft$elm_grove$Component_Bump$pathJoin,
+																					config,
+																					{
+																						ctor: '::',
+																						_0: config.cwd,
+																						_1: {
+																							ctor: '::',
+																							_0: A2(
+																								_panosoft$elm_utils$Utils_Ops_ops['?'],
+																								config.testing,
+																								{ctor: '_Tuple2', _0: 'test', _1: ''}),
+																							_1: {
+																								ctor: '::',
+																								_0: _panosoft$elm_grove$Package$elmJsonFilename,
+																								_1: {ctor: '[]'}
+																							}
+																						}
+																					}),
+																				A2(
+																					_elm_lang$core$Json_Encode$encode,
+																					A2(
+																						_panosoft$elm_utils$Utils_Ops_ops['?!='],
+																						model.elmJsonIndent,
+																						_panosoft$elm_grove$AppUtils$bugMissing('elmJsonIndent')),
+																					_panosoft$elm_grove$ElmJson$elmJsonEncoder(
+																						_elm_lang$core$Native_Utils.update(
+																							elmJson,
+																							{
+																								version: _panosoft$elm_grove$Version$versionToString(newVersion)
+																							}))));
+																		},
+																		bumpTask));
+															}
+														});
+												}
+											});
+									}
+								});
+						}(
+							A2(
+								_elm_lang$core$Task$andThen,
+								function (_p25) {
+									return A2(
+										_elm_lang$core$Task$mapError,
+										function (_p26) {
+											return A2(_elm_node$core$Node_Error$Error, 'Should never happen', '');
+										},
+										A2(
+											_panosoft$elm_utils$Utils_Ops_ops['?'],
+											_elm_lang$core$Native_Utils.eq(config.generateDocs, _panosoft$elm_grove$Component_Config$GenerateDocsOn),
+											{
+												ctor: '_Tuple2',
+												_0: _panosoft$elm_grove$Console$log('Documentation generated'),
+												_1: _elm_lang$core$Task$succeed('')
+											}));
+								},
+								_panosoft$elm_grove$DocGenerator$generateDocs(
+									{testing: config.testing, cwd: config.cwd, pathSep: config.pathSep, generateDocs: config.generateDocs})))))));
 	});
 var _panosoft$elm_grove$Component_Bump$GitNewerVersionCheckComplete = function (a) {
 	return {ctor: 'GitNewerVersionCheckComplete', _0: a};
@@ -13160,20 +15165,20 @@ var _panosoft$elm_grove$Component_Bump$checkForNewVersions = F2(
 									_panosoft$elm_grove$Component_Bump$GitNewerVersionCheckComplete,
 									A2(
 										_elm_lang$core$Task$andThen,
-										function (_p22) {
-											var _p23 = _p22;
+										function (_p27) {
+											var _p28 = _p27;
 											return _elm_lang$core$Task$succeed(
 												A2(
 													_panosoft$elm_utils$Utils_Ops_ops['|?->'],
 													_elm_lang$core$List$head(
-														_panosoft$elm_grove$AppUtils$sortedVersions(_p23._2)),
+														_panosoft$elm_grove$AppUtils$sortedVersions(_p28._2)),
 													{
 														ctor: '_Tuple2',
 														_0: _elm_lang$core$Result$Err(
 															A2(
 																_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 																A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'no valid versions in repo:', packageName),
-																_panosoft$elm_grove$Output$parens(_p23._0))),
+																_panosoft$elm_grove$Output$parens(_p28._0))),
 														_1: function (latestVersion) {
 															return A2(
 																_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
@@ -13278,15 +15283,15 @@ var _panosoft$elm_grove$Component_Bump$bump = F2(
 		}(
 			A2(
 				_elm_lang$core$List$map,
-				function (_p24) {
-					var _p25 = _p24;
-					var _p27 = _p25._0;
+				function (_p29) {
+					var _p30 = _p29;
+					var _p32 = _p30._0;
 					return function (path) {
 						return A2(
 							_elm_lang$core$Task$attempt,
-							function (_p26) {
+							function (_p31) {
 								return config.routeToMe(
-									A3(_panosoft$elm_grove$Component_Bump$IsSymLinkCheckComplete, _p27, path, _p26));
+									A3(_panosoft$elm_grove$Component_Bump$IsSymLinkCheckComplete, _p32, path, _p31));
 							},
 							A2(
 								_elm_lang$core$Task$mapError,
@@ -13301,10 +15306,10 @@ var _panosoft$elm_grove$Component_Bump$bump = F2(
 								_0: A2(_panosoft$elm_grove$Package$elmPackagesRoot, config.testing, config.pathSep),
 								_1: {
 									ctor: '::',
-									_0: _p27,
+									_0: _p32,
 									_1: {
 										ctor: '::',
-										_0: _p25._1,
+										_0: _p30._1,
 										_1: {ctor: '[]'}
 									}
 								}
@@ -13333,31 +15338,31 @@ var _panosoft$elm_grove$Component_Bump$init = F2(
 			_1: _elm_lang$core$Maybe$Just(
 				A2(
 					_elm_lang$core$Task$attempt,
-					function (_p28) {
+					function (_p33) {
 						return config.routeToMe(
-							A2(_panosoft$elm_grove$Component_Bump$PackagesRead, initializedMsg, _p28));
+							A2(_panosoft$elm_grove$Component_Bump$PackagesRead, initializedMsg, _p33));
 					},
 					A2(
 						_elm_lang$core$Task$andThen,
-						function (_p29) {
-							var _p30 = _p29;
-							var _p35 = _p30._2;
-							var _p34 = _p30._1;
-							var _p33 = _p30._0;
+						function (_p34) {
+							var _p35 = _p34;
+							var _p40 = _p35._2;
+							var _p39 = _p35._1;
+							var _p38 = _p35._0;
 							return A2(
 								_elm_lang$core$Task$onError,
 								function (initError) {
-									var _p31 = initError;
-									if (_p31.ctor === 'ReadingNpmPackage') {
-										var _p32 = _p31._0;
-										if (_p32.ctor === 'SystemError') {
+									var _p36 = initError;
+									if (_p36.ctor === 'ReadingNpmPackage') {
+										var _p37 = _p36._0;
+										if (_p37.ctor === 'SystemError') {
 											return A2(
 												_panosoft$elm_utils$Utils_Ops_ops['?'],
-												_elm_lang$core$Native_Utils.eq(_p32._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
+												_elm_lang$core$Native_Utils.eq(_p37._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
 												{
 													ctor: '_Tuple2',
 													_0: _elm_lang$core$Task$succeed(
-														{ctor: '_Tuple4', _0: _p35, _1: _p34, _2: _p33, _3: _elm_lang$core$Maybe$Nothing}),
+														{ctor: '_Tuple4', _0: _p40, _1: _p39, _2: _p38, _3: _elm_lang$core$Maybe$Nothing}),
 													_1: _elm_lang$core$Task$fail(initError)
 												});
 										} else {
@@ -13376,9 +15381,9 @@ var _panosoft$elm_grove$Component_Bump$init = F2(
 										return _elm_lang$core$Task$succeed(
 											{
 												ctor: '_Tuple4',
-												_0: _p35,
-												_1: _p34,
-												_2: _p33,
+												_0: _p40,
+												_1: _p39,
+												_2: _p38,
 												_3: _elm_lang$core$Maybe$Just(npm)
 											});
 									},
@@ -13446,7 +15451,7 @@ var _panosoft$elm_grove$Component_Bump$operationError = F2(
 					ctor: '::',
 					_0: A2(
 						_elm_lang$core$Task$perform,
-						function (_p36) {
+						function (_p41) {
 							return _panosoft$elm_grove$Component_Bump$OperationComplete(-1);
 						},
 						task),
@@ -13466,7 +15471,7 @@ var _panosoft$elm_grove$Component_Bump$operationSuccessful = F2(
 					ctor: '::',
 					_0: A2(
 						_elm_lang$core$Task$perform,
-						function (_p37) {
+						function (_p42) {
 							return _panosoft$elm_grove$Component_Bump$OperationComplete(0);
 						},
 						task),
@@ -13487,8 +15492,8 @@ var _panosoft$elm_grove$Component_Bump$delayCmd = function (cmd) {
 };
 var _panosoft$elm_grove$Component_Bump$update = F3(
 	function (config, msg, model) {
-		var _p38 = msg;
-		switch (_p38.ctor) {
+		var _p43 = msg;
+		switch (_p43.ctor) {
 			case 'DoCmd':
 				return {
 					ctor: '_Tuple2',
@@ -13497,7 +15502,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 						model,
 						{
 							ctor: '::',
-							_0: _p38._0,
+							_0: _p43._0,
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -13520,27 +15525,27 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
-						_0: config.operationComplete(_p38._0),
+						_0: config.operationComplete(_p43._0),
 						_1: {ctor: '[]'}
 					}
 				};
 			case 'PackagesRead':
-				if (_p38._1.ctor === 'Err') {
+				if (_p43._1.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
 						_panosoft$elm_grove$Output$errorLog(
 							function (fileError) {
-								var _p39 = _p38._1._0;
-								switch (_p39.ctor) {
+								var _p44 = _p43._1._0;
+								switch (_p44.ctor) {
 									case 'GettingTags':
-										return A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to get tags in current repo Error:', _p39._0);
+										return A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to get tags in current repo Error:', _p44._0);
 									case 'ReadingExactDependencies':
-										return A2(fileError, _panosoft$elm_grove$Package$exactDependenciesFileName, _p39._0);
+										return A2(fileError, _panosoft$elm_grove$Package$exactDependenciesFileName, _p44._0);
 									case 'ReadingElmPackage':
-										return A2(fileError, _panosoft$elm_grove$Package$elmJsonFilename, _p39._0);
+										return A2(fileError, _panosoft$elm_grove$Package$elmJsonFilename, _p44._0);
 									default:
-										return A2(fileError, _panosoft$elm_grove$Package$npmJsonFilename, _p39._0);
+										return A2(fileError, _panosoft$elm_grove$Package$npmJsonFilename, _p44._0);
 								}
 							}(
 								F2(
@@ -13554,47 +15559,47 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 											_elm_node$core$Node_Error$message(nodeError));
 									}))));
 				} else {
-					var _p52 = _p38._1._0._2;
+					var _p57 = _p43._1._0._2;
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-						A2(_panosoft$elm_grove$Component_Bump$decodeExactDependencies, _panosoft$elm_grove$Package$exactDependenciesFileName, _p38._1._0._1),
+						A2(_panosoft$elm_grove$Component_Bump$decodeExactDependencies, _panosoft$elm_grove$Package$exactDependenciesFileName, _p43._1._0._1),
 						{
 							ctor: '_Tuple2',
-							_0: function (_p40) {
+							_0: function (_p45) {
 								return A2(
 									_panosoft$elm_grove$Component_Bump$operationError,
 									model,
-									_panosoft$elm_grove$Output$errorLog(_p40));
+									_panosoft$elm_grove$Output$errorLog(_p45));
 							},
 							_1: function (exactDependencies) {
-								return function (_p41) {
-									var _p42 = _p41;
+								return function (_p46) {
+									var _p47 = _p46;
 									return A2(
 										_panosoft$elm_utils$Utils_Ops_ops['|??->'],
 										A2(
 											_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-											_p42._1,
+											_p47._1,
 											{
 												ctor: '_Tuple2',
 												_0: _elm_lang$core$Result$Err,
-												_1: function (_p43) {
-													var _p44 = _p43;
-													var _p50 = _p44._0;
-													var _p49 = _p44._2;
+												_1: function (_p48) {
+													var _p49 = _p48;
+													var _p55 = _p49._0;
+													var _p54 = _p49._2;
 													return A2(
 														_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-														_p38._1._0._3,
+														_p43._1._0._3,
 														{
 															ctor: '_Tuple2',
-															_0: _elm_lang$core$Result$Ok(_p50),
+															_0: _elm_lang$core$Result$Ok(_p55),
 															_1: function (npmJsonStr) {
 																return A2(
 																	_panosoft$elm_utils$Utils_Ops_ops['|??->'],
 																	A3(
 																		_panosoft$elm_grove$NpmJson$validateNpmJson,
 																		npmJsonStr,
-																		_panosoft$elm_grove$Version$versionToString(_p49),
-																		_p44._1.repository),
+																		_panosoft$elm_grove$Version$versionToString(_p54),
+																		_p49._1.repository),
 																	{
 																		ctor: '_Tuple2',
 																		_0: function (errors) {
@@ -13605,7 +15610,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																						A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], _panosoft$elm_grove$Package$npmJsonFilename, 'has the following errors:\n\t'),
 																						A2(_elm_lang$core$String$join, '\n\t', errors))));
 																		},
-																		_1: function (_p45) {
+																		_1: function (_p50) {
 																			return A2(
 																				_panosoft$elm_utils$Utils_Ops_ops['|??->'],
 																				_panosoft$elm_grove$NpmJson$decodeNpmJsonVersion(npmJsonStr),
@@ -13622,13 +15627,13 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																										'Error:'),
 																									error)));
 																					},
-																					_1: function (_p46) {
-																						var _p47 = _p46;
-																						var _p48 = _p47._0;
+																					_1: function (_p51) {
+																						var _p52 = _p51;
+																						var _p53 = _p52._0;
 																						return A2(
 																							_panosoft$elm_utils$Utils_Ops_ops['?'],
 																							!_elm_lang$core$Native_Utils.eq(
-																								A2(_panosoft$elm_grove$Version$versionCompare, _p48, _p49),
+																								A2(_panosoft$elm_grove$Version$versionCompare, _p53, _p54),
 																								_elm_lang$core$Basics$EQ),
 																							{
 																								ctor: '_Tuple2',
@@ -13646,17 +15651,17 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																															_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 																															A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], _panosoft$elm_grove$Package$elmJsonFilename, 'version:'),
 																															_panosoft$elm_grove$Output$parens(
-																																_panosoft$elm_grove$Version$versionToString(_p49))),
+																																_panosoft$elm_grove$Version$versionToString(_p54))),
 																														'must equal'),
 																													_panosoft$elm_grove$Package$npmJsonFilename),
 																												'version:'),
 																											_panosoft$elm_grove$Output$parens(
-																												_panosoft$elm_grove$Version$versionToString(_p48))))),
+																												_panosoft$elm_grove$Version$versionToString(_p53))))),
 																								_1: _elm_lang$core$Result$Ok(
 																									_elm_lang$core$Native_Utils.update(
-																										_p50,
+																										_p55,
 																										{
-																											npmJsonStr: _elm_lang$core$Maybe$Just(_p47._1)
+																											npmJsonStr: _elm_lang$core$Maybe$Just(_p52._1)
 																										}))
 																							});
 																					}
@@ -13669,7 +15674,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 											}),
 										{
 											ctor: '_Tuple2',
-											_0: _panosoft$elm_grove$Component_Bump$operationError(_p42._0),
+											_0: _panosoft$elm_grove$Component_Bump$operationError(_p47._0),
 											_1: function (model) {
 												return {
 													ctor: '_Tuple2',
@@ -13679,7 +15684,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 														{ctor: '[]'}),
 													_1: {
 														ctor: '::',
-														_0: _p38._0,
+														_0: _p43._0,
 														_1: {ctor: '[]'}
 													}
 												};
@@ -13695,12 +15700,12 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 											model,
 											A2(
 												_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-												A2(_panosoft$elm_grove$ElmJson$decodeElmJson, _panosoft$elm_grove$Package$elmJsonFilename, _p52),
+												A2(_panosoft$elm_grove$ElmJson$decodeElmJson, _panosoft$elm_grove$Package$elmJsonFilename, _p57),
 												{
 													ctor: '_Tuple2',
-													_0: function (_p51) {
+													_0: function (_p56) {
 														return _elm_lang$core$Result$Err(
-															_panosoft$elm_grove$Output$errorLog(_p51));
+															_panosoft$elm_grove$Output$errorLog(_p56));
 													},
 													_1: function (elmJson) {
 														return A2(
@@ -13747,7 +15752,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																		A2(
 																			_panosoft$elm_utils$Utils_Ops_ops['?='],
 																			_elm_lang$core$List$head(
-																				_panosoft$elm_grove$AppUtils$sortedVersions(_p38._1._0._0)),
+																				_panosoft$elm_grove$AppUtils$sortedVersions(_p43._1._0._0)),
 																			A2(
 																				_panosoft$elm_utils$Utils_Ops_ops['?!='],
 																				_panosoft$elm_grove$Version$versionFromString('0.0.0'),
@@ -13764,13 +15769,13 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 											{
 												exactDependencies: exactDependencies,
 												elmJsonIndent: _elm_lang$core$Maybe$Just(
-													_panosoft$elm_grove$AppUtils$determineJsonIndent(_p52))
+													_panosoft$elm_grove$AppUtils$determineJsonIndent(_p57))
 											})));
 							}
 						});
 				}
 			case 'IsSymLinkCheckComplete':
-				if (_p38._2.ctor === 'Err') {
+				if (_p43._2.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
@@ -13778,7 +15783,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 							A2(
 								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 								A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check:', 'for symbolic links Error:'),
-								_p38._2._0)));
+								_p43._2._0)));
 				} else {
 					return function (elmJson) {
 						return function (model) {
@@ -13819,13 +15824,13 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 							}(
 								A2(
 									_panosoft$elm_utils$Utils_Ops_ops['?'],
-									_p38._2._0,
+									_p43._2._0,
 									{
 										ctor: '_Tuple2',
 										_0: _elm_lang$core$Native_Utils.update(
 											model,
 											{
-												linkedPackages: {ctor: '::', _0: _p38._0, _1: model.linkedPackages}
+												linkedPackages: {ctor: '::', _0: _p43._0, _1: model.linkedPackages}
 											}),
 										_1: model
 									}));
@@ -13840,12 +15845,12 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 							_panosoft$elm_grove$AppUtils$bugMissing('elmJson')));
 				}
 			case 'GitStatusCheckComplete':
-				if (_p38._0.ctor === 'Err') {
+				if (_p43._0.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
 						_panosoft$elm_grove$Output$errorLog(
-							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check repository git status Error:', _p38._0._0)));
+							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check repository git status Error:', _p43._0._0)));
 				} else {
 					return function (errors) {
 						return A2(
@@ -13868,34 +15873,34 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 								}(
 									A2(
 										_elm_lang$core$List$map,
-										function (_p53) {
-											var _p54 = _p53;
+										function (_p58) {
+											var _p59 = _p58;
 											return A2(
 												_elm_lang$core$Basics_ops['++'],
-												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Status:', _p54._1),
+												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Status:', _p59._1),
 												A2(
 													_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 													'\n\t',
-													A2(_elm_lang$core$String$join, ', ', _p54._0)));
+													A2(_elm_lang$core$String$join, ', ', _p59._0)));
 										},
 										errors))
 							});
 					}(
 						A2(
 							_elm_lang$core$List$filterMap,
-							function (_p55) {
-								var _p56 = _p55;
-								var _p57 = _p56._0;
+							function (_p60) {
+								var _p61 = _p60;
+								var _p62 = _p61._0;
 								return A2(
 									_panosoft$elm_utils$Utils_Ops_ops['?'],
 									_elm_lang$core$Native_Utils.eq(
-										_p57,
+										_p62,
 										{ctor: '[]'}),
 									{
 										ctor: '_Tuple2',
 										_0: _elm_lang$core$Maybe$Nothing,
 										_1: _elm_lang$core$Maybe$Just(
-											{ctor: '_Tuple2', _0: _p57, _1: _p56._1})
+											{ctor: '_Tuple2', _0: _p62, _1: _p61._1})
 									});
 							},
 							A2(
@@ -13903,83 +15908,83 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 								function (accessor) {
 									return {
 										ctor: '_Tuple2',
-										_0: A2(_elm_lang$core$Tuple$first, accessor, _p38._0._0),
+										_0: A2(_elm_lang$core$Tuple$first, accessor, _p43._0._0),
 										_1: _elm_lang$core$Tuple$second(accessor)
 									};
 								},
 								_panosoft$elm_grove$Git$fileStatusAccessors)));
 				}
 			case 'GitNewerVersionCheckComplete':
-				if (_p38._0.ctor === 'Err') {
+				if (_p43._0.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
 						_panosoft$elm_grove$Output$errorLog(
-							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check for newer versions Error:', _p38._0._0)));
+							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check for newer versions Error:', _p43._0._0)));
 				} else {
-					return function (_p58) {
-						var _p59 = _p58;
-						var _p71 = _p59._0;
+					return function (_p63) {
+						var _p64 = _p63;
+						var _p76 = _p64._0;
 						return A2(
 							_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-							_p38._0._0,
+							_p43._0._0,
 							{
 								ctor: '_Tuple2',
 								_0: function (error) {
 									return A2(
 										_panosoft$elm_grove$Component_Bump$operationError,
-										_p71,
+										_p76,
 										_panosoft$elm_grove$Output$errorLog(error));
 								},
 								_1: function (maybePackageInfo) {
-									return function (_p60) {
-										var _p61 = _p60;
-										var _p66 = _p61._1;
-										var _p65 = _p61._0._0;
-										var _p64 = _p61._0._1;
+									return function (_p65) {
+										var _p66 = _p65;
+										var _p71 = _p66._1;
+										var _p70 = _p66._0._0;
+										var _p69 = _p66._0._1;
 										return A2(
 											_panosoft$elm_utils$Utils_Ops_ops['?'],
-											_elm_lang$core$Native_Utils.eq(_p65.newVersionCheckCountDown, 0),
+											_elm_lang$core$Native_Utils.eq(_p70.newVersionCheckCountDown, 0),
 											{
 												ctor: '_Tuple2',
 												_0: A2(
 													_panosoft$elm_utils$Utils_Ops_ops['?'],
-													_p65.newVersionCheckFailed,
+													_p70.newVersionCheckFailed,
 													{
 														ctor: '_Tuple2',
 														_0: {
 															ctor: '_Tuple2',
 															_0: A2(
 																_elm_lang$core$Platform_Cmd_ops['!'],
-																_p65,
+																_p70,
 																{
 																	ctor: '::',
-																	_0: _p64,
+																	_0: _p69,
 																	_1: {
 																		ctor: '::',
-																		_0: _p59._1._0._1,
+																		_0: _p64._1._0._1,
 																		_1: {ctor: '[]'}
 																	}
 																}),
-															_1: _p66
+															_1: _p71
 														},
-														_1: function (_p62) {
-															var _p63 = _p62;
+														_1: function (_p67) {
+															var _p68 = _p67;
 															return {
 																ctor: '_Tuple2',
 																_0: A2(
 																	_elm_lang$core$Platform_Cmd_ops['!'],
-																	_p63._0._0,
+																	_p68._0._0,
 																	{
 																		ctor: '::',
-																		_0: _p64,
+																		_0: _p69,
 																		_1: {
 																			ctor: '::',
-																			_0: A2(_panosoft$elm_grove$Component_Bump$delayCmd, _p63._0._1, 100),
+																			_0: A2(_panosoft$elm_grove$Component_Bump$delayCmd, _p68._0._1, 100),
 																			_1: {ctor: '[]'}
 																		}
 																	}),
-																_1: A2(_elm_lang$core$List$append, _p66, _p63._1)
+																_1: A2(_elm_lang$core$List$append, _p71, _p68._1)
 															};
 														}(
 															A2(
@@ -13989,11 +15994,11 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																	ctor: '_Tuple2',
 																	_0: A2(
 																		_panosoft$elm_grove$Component_Bump$operationSuccessful,
-																		_p65,
+																		_p70,
 																		_panosoft$elm_grove$Console$log('Bump validation passed, skipping operation due to --dry-run parameter specified')),
 																	_1: {
 																		ctor: '_Tuple2',
-																		_0: A2(_panosoft$elm_grove$Component_Bump$doBump, config, _p65),
+																		_0: A2(_panosoft$elm_grove$Component_Bump$doBump, config, _p70),
 																		_1: {ctor: '[]'}
 																	}
 																}))
@@ -14002,13 +16007,13 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 													ctor: '_Tuple2',
 													_0: A2(
 														_elm_lang$core$Platform_Cmd_ops['!'],
-														_p65,
+														_p70,
 														{
 															ctor: '::',
-															_0: _p64,
+															_0: _p69,
 															_1: {ctor: '[]'}
 														}),
-													_1: _p66
+													_1: _p71
 												}
 											});
 									}(
@@ -14021,29 +16026,29 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 													ctor: '_Tuple2',
 													_0: A2(
 														_elm_lang$core$Platform_Cmd_ops['!'],
-														_p71,
+														_p76,
 														{ctor: '[]'}),
 													_1: {ctor: '[]'}
 												},
-												_1: function (_p67) {
-													var _p68 = _p67;
-													return function (_p69) {
-														var _p70 = _p69;
+												_1: function (_p72) {
+													var _p73 = _p72;
+													return function (_p74) {
+														var _p75 = _p74;
 														return {
 															ctor: '_Tuple2',
 															_0: A2(
 																_elm_lang$core$Platform_Cmd_ops['!'],
-																_p70._0,
+																_p75._0,
 																{
 																	ctor: '::',
 																	_0: A2(
 																		_elm_lang$core$Task$perform,
 																		_panosoft$elm_grove$Component_Bump$OutputComplete,
-																		_p70._1(
+																		_p75._1(
 																			A2(
 																				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-																				A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Newer version exists for:', _p68._1),
-																				_panosoft$elm_grove$Output$parens(_p68._0)))),
+																				A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Newer version exists for:', _p73._1),
+																				_panosoft$elm_grove$Output$parens(_p73._0)))),
 																	_1: {ctor: '[]'}
 																}),
 															_1: {ctor: '[]'}
@@ -14054,11 +16059,11 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 															config.allowOldDependencies,
 															{
 																ctor: '_Tuple2',
-																_0: {ctor: '_Tuple2', _0: _p71, _1: _panosoft$elm_grove$Output$warnLog},
+																_0: {ctor: '_Tuple2', _0: _p76, _1: _panosoft$elm_grove$Output$warnLog},
 																_1: {
 																	ctor: '_Tuple2',
 																	_0: _elm_lang$core$Native_Utils.update(
-																		_p71,
+																		_p76,
 																		{newVersionCheckFailed: true}),
 																	_1: _panosoft$elm_grove$Output$errorLog
 																}
@@ -14073,19 +16078,19 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{newVersionCheckCountDown: model.newVersionCheckCountDown - 1}),
-							_1: function (_p72) {
-								var _p73 = _p72;
+							_1: function (_p77) {
+								var _p78 = _p77;
 								return {
 									ctor: '_Tuple2',
 									_0: A2(
 										_elm_lang$core$Platform_Cmd_ops['!'],
-										_p73._0._0,
+										_p78._0._0,
 										{
 											ctor: '::',
-											_0: A2(_panosoft$elm_grove$Component_Bump$delayCmd, _p73._0._1, 100),
+											_0: A2(_panosoft$elm_grove$Component_Bump$delayCmd, _p78._0._1, 100),
 											_1: {ctor: '[]'}
 										}),
-									_1: _p73._1
+									_1: _p78._1
 								};
 							}(
 								A2(
@@ -14095,12 +16100,12 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 						});
 				}
 			default:
-				if (_p38._2.ctor === 'Err') {
+				if (_p43._2.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
 						_panosoft$elm_grove$Output$errorLog(
-							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to bump Error:', _p38._2._0)));
+							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to bump Error:', _p43._2._0)));
 				} else {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationSuccessful,
@@ -14115,514 +16120,10 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 										A2(
 											_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 											'Bumped version from:',
-											_panosoft$elm_grove$Version$versionToString(_p38._0)),
+											_panosoft$elm_grove$Version$versionToString(_p43._0)),
 										'to:'),
-									_panosoft$elm_grove$Version$versionToString(_p38._1)),
+									_panosoft$elm_grove$Version$versionToString(_p43._1)),
 								'\t(use \"git push && git push --tags\" to release package)')));
-				}
-		}
-	});
-
-const _panosoft$elm_grove$Native_Env = (_ => {
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	const env = JSON.stringify(process.env);
-	const homedir = require('os').homedir();
-
-	return {
-		env,
-		homedir
-	};
-})();
-
-var _panosoft$elm_grove$Env$homedir = _panosoft$elm_grove$Native_Env.homedir;
-var _panosoft$elm_grove$Env$env = A2(
-	_panosoft$elm_utils$Utils_Ops_ops['??='],
-	A2(
-		_elm_lang$core$Json_Decode$decodeString,
-		_elm_lang$core$Json_Decode$dict(_elm_lang$core$Json_Decode$string),
-		_panosoft$elm_grove$Native_Env.env),
-	function (_p0) {
-		return _elm_lang$core$Native_Utils.crash(
-			'Env',
-			{
-				start: {line: 16, column: 20},
-				end: {line: 16, column: 31}
-			})('BUG: Cannot decode env');
-	});
-
-var _panosoft$elm_grove$Component_Config_ops = _panosoft$elm_grove$Component_Config_ops || {};
-_panosoft$elm_grove$Component_Config_ops['|??**>'] = F2(
-	function (_p1, _p0) {
-		var _p2 = _p1;
-		var _p3 = _p0;
-		var _p4 = {ctor: '_Tuple2', _0: _p2._0, _1: _p2._1};
-		if (_p4._0.ctor === 'Ok') {
-			if (_p4._1.ctor === 'Ok') {
-				return _p3._2(
-					{ctor: '_Tuple2', _0: _p4._0._0, _1: _p4._1._0});
-			} else {
-				return _p3._1(_p4._1._0);
-			}
-		} else {
-			return _p3._0(_p4._0._0);
-		}
-	});
-var _panosoft$elm_grove$Component_Config$localOrGlobalPath = function (config) {
-	return A2(
-		_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-		config.local,
-		{
-			ctor: '_Tuple2',
-			_0: _panosoft$elm_grove$Env$homedir,
-			_1: A2(
-				_elm_lang$core$Basics$flip,
-				F2(
-					function (x, y) {
-						return A2(_panosoft$elm_utils$Utils_Ops_ops['?'], x, y);
-					}),
-				{ctor: '_Tuple2', _0: '.', _1: _panosoft$elm_grove$Env$homedir})
-		});
-};
-var _panosoft$elm_grove$Component_Config$pathJoin = F2(
-	function (config, pathParts) {
-		return A3(_panosoft$elm_grove$AppUtils$pathJoin, config.pathSep, config.cwd, pathParts);
-	});
-var _panosoft$elm_grove$Component_Config$configPath = F2(
-	function (config, path) {
-		return A2(
-			_panosoft$elm_grove$Component_Config$pathJoin,
-			config,
-			{
-				ctor: '::',
-				_0: A2(
-					_panosoft$elm_utils$Utils_Ops_ops['?'],
-					config.testing,
-					{ctor: '_Tuple2', _0: 'test', _1: path}),
-				_1: {
-					ctor: '::',
-					_0: config.configFilename,
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _panosoft$elm_grove$Component_Config$encoder = function (configFile) {
-	return _elm_lang$core$Json_Encode$object(
-		A2(
-			_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-			configFile.safeMode,
-			{
-				ctor: '_Tuple2',
-				_0: {ctor: '[]'},
-				_1: function (safeMode) {
-					return {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'safeMode',
-							_1: _elm_lang$core$Json_Encode$string(
-								function () {
-									var _p5 = safeMode;
-									switch (_p5.ctor) {
-										case 'SafeModeOn':
-											return 'on';
-										case 'SafeModeOff':
-											return 'off';
-										default:
-											return 'none';
-									}
-								}())
-						},
-						_1: {ctor: '[]'}
-					};
-				}
-			}));
-};
-var _panosoft$elm_grove$Component_Config$defaultConfigFile = {safeMode: _elm_lang$core$Maybe$Nothing};
-var _panosoft$elm_grove$Component_Config$defaultConfigFileString = A2(
-	_elm_lang$core$Json_Encode$encode,
-	4,
-	_panosoft$elm_grove$Component_Config$encoder(_panosoft$elm_grove$Component_Config$defaultConfigFile));
-var _panosoft$elm_grove$Component_Config$Config = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {testing: a, routeToMe: b, operationComplete: c, cwd: d, pathSep: e, configFilename: f, local: g, safe: h};
-	});
-var _panosoft$elm_grove$Component_Config$Model = function (a) {
-	return {configFile: a};
-};
-var _panosoft$elm_grove$Component_Config$ConfigFile = function (a) {
-	return {safeMode: a};
-};
-var _panosoft$elm_grove$Component_Config$SafeModeNone = {ctor: 'SafeModeNone'};
-var _panosoft$elm_grove$Component_Config$safeMode = F2(
-	function (config, model) {
-		return A2(
-			_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-			model.configFile,
-			{
-				ctor: '_Tuple2',
-				_0: _panosoft$elm_grove$Component_Config$SafeModeNone,
-				_1: function (configFile) {
-					return A2(_panosoft$elm_utils$Utils_Ops_ops['?='], configFile.safeMode, _panosoft$elm_grove$Component_Config$SafeModeNone);
-				}
-			});
-	});
-var _panosoft$elm_grove$Component_Config$SafeModeOff = {ctor: 'SafeModeOff'};
-var _panosoft$elm_grove$Component_Config$SafeModeOn = {ctor: 'SafeModeOn'};
-var _panosoft$elm_grove$Component_Config$decoder = A2(
-	_panosoft$elm_utils$Utils_Json_ops['<||'],
-	_elm_lang$core$Json_Decode$succeed(_panosoft$elm_grove$Component_Config$ConfigFile),
-	A2(
-		_elm_lang$core$Json_Decode$andThen,
-		function (maybeSafe) {
-			return _elm_lang$core$Json_Decode$succeed(
-				A2(
-					_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-					maybeSafe,
-					{
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Maybe$Nothing,
-						_1: function (safe) {
-							return _elm_lang$core$Maybe$Just(
-								function () {
-									var _p6 = _elm_lang$core$String$toLower(safe);
-									switch (_p6) {
-										case 'on':
-											return _panosoft$elm_grove$Component_Config$SafeModeOn;
-										case 'off':
-											return _panosoft$elm_grove$Component_Config$SafeModeOff;
-										default:
-											return _panosoft$elm_grove$Component_Config$SafeModeNone;
-									}
-								}());
-						}
-					}));
-		},
-		_elm_lang$core$Json_Decode$maybe(
-			A2(_elm_lang$core$Json_Decode$field, 'safeMode', _elm_lang$core$Json_Decode$string))));
-var _panosoft$elm_grove$Component_Config$ConfigurationComplete = function (a) {
-	return {ctor: 'ConfigurationComplete', _0: a};
-};
-var _panosoft$elm_grove$Component_Config$configure = F2(
-	function (config, model) {
-		return function (configFile) {
-			return function (path) {
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							configFile: _elm_lang$core$Maybe$Just(configFile)
-						}),
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$core$Task$attempt,
-							function (_p7) {
-								return config.routeToMe(
-									_panosoft$elm_grove$Component_Config$ConfigurationComplete(_p7));
-							},
-							A2(
-								_panosoft$elm_grove$AppUtils$writeFile,
-								path,
-								A2(
-									_elm_lang$core$Json_Encode$encode,
-									2,
-									_panosoft$elm_grove$Component_Config$encoder(configFile)))),
-						_1: {ctor: '[]'}
-					});
-			}(
-				A2(
-					_panosoft$elm_utils$Utils_Ops_ops['?'],
-					A2(_panosoft$elm_utils$Utils_Ops_ops['?='], config.local, false),
-					{
-						ctor: '_Tuple2',
-						_0: config.configFilename,
-						_1: A2(
-							_panosoft$elm_grove$Component_Config$configPath,
-							config,
-							_panosoft$elm_grove$Component_Config$localOrGlobalPath(config))
-					}));
-		}(
-			function (configFile) {
-				return A2(
-					_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-					config.safe,
-					{
-						ctor: '_Tuple2',
-						_0: configFile,
-						_1: function (safe) {
-							return function (safeMode) {
-								return _elm_lang$core$Native_Utils.update(
-									configFile,
-									{safeMode: safeMode});
-							}(
-								function () {
-									var _p8 = safe;
-									switch (_p8) {
-										case 'on':
-											return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$SafeModeOn);
-										case 'off':
-											return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$SafeModeOff);
-										case 'none':
-											return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$SafeModeNone);
-										case '':
-											return _elm_lang$core$Maybe$Nothing;
-										default:
-											return A2(
-												_panosoft$elm_grove$AppUtils$bug,
-												'Should never get here',
-												_elm_lang$core$Basics$always(_elm_lang$core$Maybe$Nothing));
-									}
-								}());
-						}
-					});
-			}(
-				A2(
-					_panosoft$elm_utils$Utils_Ops_ops['?!='],
-					model.configFile,
-					_panosoft$elm_grove$AppUtils$bugMissing('configFile'))));
-	});
-var _panosoft$elm_grove$Component_Config$ConfigFileRead = F2(
-	function (a, b) {
-		return {ctor: 'ConfigFileRead', _0: a, _1: b};
-	});
-var _panosoft$elm_grove$Component_Config$init = F2(
-	function (config, initializedMsg) {
-		return {
-			ctor: '_Tuple2',
-			_0: {configFile: _elm_lang$core$Maybe$Nothing},
-			_1: _elm_lang$core$Maybe$Just(
-				function (_p9) {
-					var _p10 = _p9;
-					var _p17 = _p10._0;
-					var _p16 = _p10._1;
-					return A2(
-						_elm_lang$core$Task$attempt,
-						function (_p11) {
-							return config.routeToMe(
-								A2(_panosoft$elm_grove$Component_Config$ConfigFileRead, initializedMsg, _p11));
-						},
-						A2(
-							_elm_lang$core$Task$andThen,
-							function (_p12) {
-								var _p13 = _p12;
-								return _elm_lang$core$Task$succeed(
-									{
-										ctor: '_Tuple2',
-										_0: {ctor: '_Tuple2', _0: _p13._0, _1: _p17},
-										_1: {ctor: '_Tuple2', _0: _p13._1, _1: _p16}
-									});
-							},
-							A2(
-								_elm_lang$core$Task$andThen,
-								function (localData) {
-									return A2(
-										_elm_lang$core$Task$onError,
-										function (nodeError) {
-											var _p14 = nodeError;
-											if (_p14.ctor === 'SystemError') {
-												return A2(
-													_panosoft$elm_utils$Utils_Ops_ops['?'],
-													_elm_lang$core$Native_Utils.eq(_p14._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
-													{
-														ctor: '_Tuple2',
-														_0: _elm_lang$core$Task$succeed(
-															{ctor: '_Tuple2', _0: localData, _1: _panosoft$elm_grove$Component_Config$defaultConfigFileString}),
-														_1: _elm_lang$core$Task$fail(
-															{ctor: '_Tuple2', _0: nodeError, _1: _p16})
-													});
-											} else {
-												return _elm_lang$core$Task$fail(
-													{ctor: '_Tuple2', _0: nodeError, _1: _p16});
-											}
-										},
-										A2(
-											_elm_lang$core$Task$andThen,
-											function (globalData) {
-												return _elm_lang$core$Task$succeed(
-													{ctor: '_Tuple2', _0: localData, _1: globalData});
-											},
-											A2(_elm_node$core$Node_FileSystem$readFileAsString, _p16, _elm_node$core$Node_Encoding$Utf8)));
-								},
-								A2(
-									_elm_lang$core$Task$onError,
-									function (nodeError) {
-										var _p15 = nodeError;
-										if (_p15.ctor === 'SystemError') {
-											return A2(
-												_panosoft$elm_utils$Utils_Ops_ops['?'],
-												_elm_lang$core$Native_Utils.eq(_p15._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
-												{
-													ctor: '_Tuple2',
-													_0: _elm_lang$core$Task$succeed(_panosoft$elm_grove$Component_Config$defaultConfigFileString),
-													_1: _elm_lang$core$Task$fail(
-														{ctor: '_Tuple2', _0: nodeError, _1: _p17})
-												});
-										} else {
-											return _elm_lang$core$Task$fail(
-												{ctor: '_Tuple2', _0: nodeError, _1: _p17});
-										}
-									},
-									A2(_elm_node$core$Node_FileSystem$readFileAsString, _p17, _elm_node$core$Node_Encoding$Utf8)))));
-				}(
-					{
-						ctor: '_Tuple2',
-						_0: A2(_panosoft$elm_grove$Component_Config$configPath, config, '.'),
-						_1: A2(_panosoft$elm_grove$Component_Config$configPath, config, _panosoft$elm_grove$Env$homedir)
-					}))
-		};
-	});
-var _panosoft$elm_grove$Component_Config$OperationComplete = function (a) {
-	return {ctor: 'OperationComplete', _0: a};
-};
-var _panosoft$elm_grove$Component_Config$operationError = F2(
-	function (model, task) {
-		return {
-			ctor: '_Tuple2',
-			_0: A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				model,
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$core$Task$perform,
-						function (_p18) {
-							return _panosoft$elm_grove$Component_Config$OperationComplete(-1);
-						},
-						task),
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		};
-	});
-var _panosoft$elm_grove$Component_Config$operationSuccessful = F2(
-	function (model, task) {
-		return {
-			ctor: '_Tuple2',
-			_0: A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				model,
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$core$Task$perform,
-						function (_p19) {
-							return _panosoft$elm_grove$Component_Config$OperationComplete(0);
-						},
-						task),
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		};
-	});
-var _panosoft$elm_grove$Component_Config$update = F3(
-	function (config, msg, model) {
-		var _p20 = msg;
-		switch (_p20.ctor) {
-			case 'OperationComplete':
-				return {
-					ctor: '_Tuple2',
-					_0: A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
-						{ctor: '[]'}),
-					_1: {
-						ctor: '::',
-						_0: config.operationComplete(_p20._0),
-						_1: {ctor: '[]'}
-					}
-				};
-			case 'ConfigFileRead':
-				if (_p20._1.ctor === 'Err') {
-					return A2(
-						_panosoft$elm_grove$Component_Config$operationError,
-						model,
-						_panosoft$elm_grove$Output$errorLog(
-							A2(
-								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-								A2(
-									_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-									A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to read:', _p20._1._0._1),
-									'Error:'),
-								_p20._1._0._0)));
-				} else {
-					return function (decodingError) {
-						return A2(
-							_panosoft$elm_grove$Component_Config_ops['|??**>'],
-							{
-								ctor: '_Tuple2',
-								_0: A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$Component_Config$decoder, _p20._1._0._0._0),
-								_1: A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$Component_Config$decoder, _p20._1._0._1._0)
-							},
-							{
-								ctor: '_Tuple3',
-								_0: decodingError(_p20._1._0._0._1),
-								_1: decodingError(_p20._1._0._1._1),
-								_2: function (_p21) {
-									var _p22 = _p21;
-									return function (configFile) {
-										return {
-											ctor: '_Tuple2',
-											_0: A2(
-												_elm_lang$core$Platform_Cmd_ops['!'],
-												_elm_lang$core$Native_Utils.update(
-													model,
-													{
-														configFile: _elm_lang$core$Maybe$Just(configFile)
-													}),
-												{ctor: '[]'}),
-											_1: {
-												ctor: '::',
-												_0: _p20._0,
-												_1: {ctor: '[]'}
-											}
-										};
-									}(
-										{
-											safeMode: A2(
-												_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-												_p22._0.safeMode,
-												{ctor: '_Tuple2', _0: _p22._1.safeMode, _1: _elm_lang$core$Maybe$Just})
-										});
-								}
-							});
-					}(
-						F2(
-							function (path, error) {
-								return A2(
-									_panosoft$elm_grove$Component_Config$operationError,
-									model,
-									_panosoft$elm_grove$Output$errorLog(
-										A2(
-											_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-											A2(
-												_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Config file:', path),
-												'decoding error:'),
-											error)));
-							}));
-				}
-			default:
-				if (_p20._0.ctor === 'Err') {
-					return A2(
-						_panosoft$elm_grove$Component_Config$operationError,
-						model,
-						_panosoft$elm_grove$Output$errorLog(
-							A2(
-								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-								A2(
-									_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-									A2(
-										_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-										'Unable to write:',
-										_panosoft$elm_grove$Component_Config$configPath(config)),
-									'Error:'),
-								_p20._0._0)));
-				} else {
-					return A2(
-						_panosoft$elm_grove$Component_Config$operationSuccessful,
-						model,
-						_panosoft$elm_grove$Console$log('Grove configuration updated'));
 				}
 		}
 	});
@@ -14764,7 +16265,7 @@ var _panosoft$elm_grove$Component_Init$prompts = {
 							_panosoft$elm_grove$Prompt$defaultPrompt,
 							{
 								prompt: 'Also create \'package.json\' [Y/n]',
-								pattern: _elm_lang$core$Maybe$Just('^(y(es)?|Y(es)?|n(o)|N(o))$'),
+								pattern: _elm_lang$core$Maybe$Just('^(y(es)?|Y(es)?|n(o)?|N(o)?)$'),
 								message: _elm_lang$core$Maybe$Just('Invalid yes/no answer'),
 								$default: _elm_lang$core$Maybe$Just('y'),
 								required: false
@@ -15422,61 +16923,6 @@ var _panosoft$elm_grove$Dependency$DependsOn = F2(
 		return {packageName: a, dependencyPath: b};
 	});
 
-const _panosoft$elm_grove$Native_Spawn = (_ => {
-	const { spawn } = require('child_process');
-	/* global _elm_lang$core$Native_Scheduler:false _elm_lang$core$Native_List:false */
-	const { nativeBinding, succeed, fail } = _elm_lang$core$Native_Scheduler;
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	const exec = (cmdLine, successExitCode, silent) => nativeBinding(callback => {
-		try {
-			const cmdLineParts = cmdLine.split(' ');
-			const cmd = spawn(cmdLineParts[0], cmdLineParts.slice(1, cmdLineParts.length));
-			if (!silent) {
-				cmd.stdout.on('data', data => process.stdout.write(data.toString()));
-				cmd.stderr.on('data', data => process.stderr.write(data.toString()));
-			}
-			cmd.on('exit', exitCode => callback(exitCode == successExitCode ? succeed() : fail(Error(`Exited with error code: ${exitCode}`))));
-		}
-		catch (error) {callback(fail(error));}
-	});
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	/* global F3:false */
-	return {
-		exec: F3(exec)
-	};
-})();
-
-var _panosoft$elm_grove$Spawn$exec = A2(
-	_panosoft$elm_utils$Utils_Func$compose3,
-	_elm_lang$core$Task$mapError(_elm_node$core$Node_Error$fromValue),
-	_panosoft$elm_grove$Native_Spawn.exec);
-
-const _panosoft$elm_grove$Native_Glob = (_ => {
-	const glob = require('glob');
-	/* global _elm_lang$core$Native_Scheduler:false _elm_lang$core$Native_List:false */
-	const { nativeBinding, succeed, fail } = _elm_lang$core$Native_Scheduler;
-	const { fromArray } = _elm_lang$core$Native_List;
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	const isNothing = (v => v.ctor == 'Nothing');
-	const find = (pattern, ignore, follow) => nativeBinding(callback => {
-		try {
-			ignore =isNothing(ignore) ? null : ignore._0;
-			glob(pattern, {ignore, follow}, (err, matches) => callback(err ? fail(err) : succeed(fromArray(matches))));
-		}
-		catch (error) { fail(error); }
-	});
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	/* global F3:false */
-	return {
-		find: F3(find)
-	};
-})();
-
-var _panosoft$elm_grove$Glob$find = A2(
-	_panosoft$elm_utils$Utils_Func$compose3,
-	_elm_lang$core$Task$mapError(_elm_node$core$Node_Error$fromValue),
-	_panosoft$elm_grove$Native_Glob.find);
-
 var _panosoft$elm_grove$Component_Rewriter$conflictLibsPattern = F2(
 	function (config, packages) {
 		return function (s) {
@@ -15731,7 +17177,7 @@ var _panosoft$elm_grove$Component_Rewriter$getPackageAndPath = F2(
 				_1: _panosoft$elm_utils$Utils_Match$getSubmatches2
 			});
 	});
-var _panosoft$elm_grove$Component_Rewriter$rewriteFilesPatern = F2(
+var _panosoft$elm_grove$Component_Rewriter$rewriteFilesPattern = F2(
 	function (config, packages) {
 		return function (s) {
 			return A2(
@@ -15866,7 +17312,7 @@ var _panosoft$elm_grove$Component_Rewriter$rewrite = F3(
 					},
 					A3(
 						_panosoft$elm_grove$Glob$find,
-						A2(_panosoft$elm_grove$Component_Rewriter$rewriteFilesPatern, config, packages),
+						A2(_panosoft$elm_grove$Component_Rewriter$rewriteFilesPattern, config, packages),
 						_elm_lang$core$Maybe$Just(
 							_panosoft$elm_grove$Component_Rewriter$rewriteFilesIgnorePattern(config)),
 						true)),
@@ -18683,7 +20129,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 									A2(
 										_panosoft$elm_utils$Utils_Ops_ops['|?>'],
 										A2(_elm_lang$core$Dict$get, packageName, model.linkedRepos),
-										_elm_lang$core$Basics$always('file://')),
+										_elm_lang$core$Basics$always('git+file://')),
 									A2(
 										_panosoft$elm_utils$Utils_Ops_ops['?'],
 										_elm_lang$core$Native_Utils.eq(
@@ -18884,7 +20330,14 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 																													_1: A2(
 																														_elm_lang$core$Basics_ops['++'],
 																														_p140._0,
-																														A2(_elm_lang$core$Basics_ops['++'], '#semver:^', _p140._2))
+																														A2(
+																															_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+																															A2(_elm_lang$core$Dict$get, packageName, model.linkedRepos),
+																															{
+																																ctor: '_Tuple2',
+																																_0: A2(_elm_lang$core$Basics_ops['++'], '#semver:^', _p140._2),
+																																_1: _elm_lang$core$Basics$always('')
+																															}))
 																												});
 																										}
 																									});
@@ -20022,8 +21475,8 @@ var _panosoft$elm_grove$Grove_App$parsePackages = function (packages) {
 											return _elm_lang$core$Native_Utils.crashCase(
 												'Grove.App',
 												{
-													start: {line: 102, column: 57},
-													end: {line: 116, column: 105}
+													start: {line: 105, column: 57},
+													end: {line: 119, column: 105}
 												},
 												_p0)('BUG: Should never get here');
 										},
@@ -20091,7 +21544,9 @@ var _panosoft$elm_grove$Grove_App$Options = function (a) {
 									return function (j) {
 										return function (k) {
 											return function (l) {
-												return {link: a, dryRun: b, npmProduction: c, npmSilent: d, major: e, minor: f, patch: g, allowUncommitted: h, allowOldDependencies: i, noRewrite: j, local: k, safe: l};
+												return function (m) {
+													return {link: a, dryRun: b, npmProduction: c, npmSilent: d, major: e, minor: f, patch: g, allowUncommitted: h, allowOldDependencies: i, noRewrite: j, local: k, safe: l, docs: m};
+												};
 											};
 										};
 									};
@@ -20142,7 +21597,8 @@ var _panosoft$elm_grove$Grove_App$configConfig = function (flags) {
 		pathSep: flags.pathSep,
 		configFilename: _panosoft$elm_grove$Grove_App$configFilename,
 		local: flags.options.local,
-		safe: A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], flags.options.safe, _elm_lang$core$String$toLower)
+		safe: A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], flags.options.safe, _elm_lang$core$String$toLower),
+		docs: A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], flags.options.docs, _elm_lang$core$String$toLower)
 	};
 };
 var _panosoft$elm_grove$Grove_App$configCfg = function (model) {
@@ -20194,11 +21650,35 @@ var _panosoft$elm_grove$Grove_App$installConfig = F3(
 var _panosoft$elm_grove$Grove_App$installCfg = function (model) {
 	return A3(_panosoft$elm_grove$Grove_App$installConfig, model, model.flags, model.packageSourceDict);
 };
-var _panosoft$elm_grove$Grove_App$bumpConfig = function (flags) {
-	return {testing: flags.testing, dryRun: flags.options.dryRun, major: flags.options.major, minor: flags.options.minor, patch: flags.options.patch, allowUncommitted: flags.options.allowUncommitted, allowOldDependencies: flags.options.allowOldDependencies, routeToMe: _panosoft$elm_grove$Grove_App$BumpMsg, operationComplete: _panosoft$elm_grove$Grove_App$ExitApp, elmVersion: flags.elmVersion, cwd: flags.cwd, pathSep: flags.pathSep};
-};
+var _panosoft$elm_grove$Grove_App$bumpConfig = F2(
+	function (model, flags) {
+		return function (configCfg) {
+			return {
+				testing: flags.testing,
+				dryRun: flags.options.dryRun,
+				major: flags.options.major,
+				minor: flags.options.minor,
+				patch: flags.options.patch,
+				allowUncommitted: flags.options.allowUncommitted,
+				allowOldDependencies: flags.options.allowOldDependencies,
+				routeToMe: _panosoft$elm_grove$Grove_App$BumpMsg,
+				operationComplete: _panosoft$elm_grove$Grove_App$ExitApp,
+				elmVersion: flags.elmVersion,
+				cwd: flags.cwd,
+				pathSep: flags.pathSep,
+				generateDocs: A2(
+					_panosoft$elm_grove$Component_Config$generateDocs,
+					configCfg,
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?!='],
+						model.configModel,
+						_panosoft$elm_grove$AppUtils$bugMissing('configModel')))
+			};
+		}(
+			_panosoft$elm_grove$Grove_App$configConfig(flags));
+	});
 var _panosoft$elm_grove$Grove_App$bumpCfg = function (model) {
-	return _panosoft$elm_grove$Grove_App$bumpConfig(model.flags);
+	return A2(_panosoft$elm_grove$Grove_App$bumpConfig, model, model.flags);
 };
 var _panosoft$elm_grove$Grove_App$initConfig = function (flags) {
 	return {testing: flags.testing, routeToMe: _panosoft$elm_grove$Grove_App$InitMsg, operationComplete: _panosoft$elm_grove$Grove_App$ExitApp, elmVersion: flags.elmVersion, cwd: flags.cwd, pathSep: flags.pathSep};
@@ -20232,6 +21712,9 @@ var _panosoft$elm_grove$Grove_App$uninstallConfig = F2(
 	});
 var _panosoft$elm_grove$Grove_App$uninstallCfg = function (model) {
 	return A2(_panosoft$elm_grove$Grove_App$uninstallConfig, model.flags, model.packageSourceDict);
+};
+var _panosoft$elm_grove$Grove_App$DocsGenerated = function (a) {
+	return {ctor: 'DocsGenerated', _0: a};
 };
 var _panosoft$elm_grove$Grove_App$InitInitialized = {ctor: 'InitInitialized'};
 var _panosoft$elm_grove$Grove_App$BumpInitialized = {ctor: 'BumpInitialized'};
@@ -20318,7 +21801,7 @@ var _panosoft$elm_grove$Grove_App$initCommand = F2(
 					}(
 						A2(
 							_panosoft$elm_grove$Component_Bump$init,
-							_panosoft$elm_grove$Grove_App$bumpConfig(flags),
+							A2(_panosoft$elm_grove$Grove_App$bumpConfig, model, flags),
 							_panosoft$elm_grove$Grove_App$BumpInitialized));
 				case 'init':
 					return function (_p17) {
@@ -20343,12 +21826,25 @@ var _panosoft$elm_grove$Grove_App$initCommand = F2(
 							_panosoft$elm_grove$Component_Init$init,
 							_panosoft$elm_grove$Grove_App$initConfig(flags),
 							_panosoft$elm_grove$Grove_App$InitInitialized));
+				case 'docs':
+					return function (task) {
+						return A2(
+							_elm_lang$core$Platform_Cmd_ops['!'],
+							model,
+							{
+								ctor: '::',
+								_0: A2(_elm_lang$core$Task$attempt, _panosoft$elm_grove$Grove_App$DocsGenerated, task),
+								_1: {ctor: '[]'}
+							});
+					}(
+						_panosoft$elm_grove$DocGenerator$generateDocs(
+							{testing: flags.testing, cwd: flags.cwd, pathSep: flags.pathSep, generateDocs: _panosoft$elm_grove$Component_Config$GenerateDocsOn}));
 				default:
 					return _elm_lang$core$Native_Utils.crashCase(
 						'Grove.App',
 						{
-							start: {line: 242, column: 17},
-							end: {line: 275, column: 84}
+							start: {line: 249, column: 17},
+							end: {line: 291, column: 84}
 						},
 						_p10)(
 						A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'BUG: Unsupported command:', flags.command));
@@ -20431,17 +21927,17 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 	function (msg, model) {
 		return function (_p23) {
 			var _p24 = _p23;
-			var _p47 = _p24._2;
-			var _p46 = _p24._1;
-			var _p45 = _p24._4;
-			var _p44 = _p24._0;
-			var _p43 = _p24._3;
+			var _p49 = _p24._2;
+			var _p48 = _p24._1;
+			var _p47 = _p24._4;
+			var _p46 = _p24._0;
+			var _p45 = _p24._3;
 			var updateInit = A5(
 				_panosoft$elm_parent_child_update$ParentChildUpdate$updateChildApp,
 				_panosoft$elm_grove$Component_Init$update(
 					_panosoft$elm_grove$Grove_App$initCfg(model)),
 				_panosoft$elm_grove$Grove_App$update,
-				_p45,
+				_p47,
 				_panosoft$elm_grove$Grove_App$InitMsg,
 				F2(
 					function (model, initModel) {
@@ -20456,7 +21952,7 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 				_panosoft$elm_grove$Component_Bump$update(
 					_panosoft$elm_grove$Grove_App$bumpCfg(model)),
 				_panosoft$elm_grove$Grove_App$update,
-				_p43,
+				_p45,
 				_panosoft$elm_grove$Grove_App$BumpMsg,
 				F2(
 					function (model, bumpModel) {
@@ -20471,7 +21967,7 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 				_panosoft$elm_grove$Component_Uninstall$update(
 					_panosoft$elm_grove$Grove_App$uninstallCfg(model)),
 				_panosoft$elm_grove$Grove_App$update,
-				_p47,
+				_p49,
 				_panosoft$elm_grove$Grove_App$UninstallMsg,
 				F2(
 					function (model, uninstallModel) {
@@ -20486,7 +21982,7 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 				_panosoft$elm_grove$Component_Install$update(
 					_panosoft$elm_grove$Grove_App$installCfg(model)),
 				_panosoft$elm_grove$Grove_App$update,
-				_p46,
+				_p48,
 				_panosoft$elm_grove$Grove_App$InstallMsg,
 				F2(
 					function (model, installModel) {
@@ -20501,7 +21997,7 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 				_panosoft$elm_grove$Component_Config$update(
 					_panosoft$elm_grove$Grove_App$configCfg(model)),
 				_panosoft$elm_grove$Grove_App$update,
-				_p44,
+				_p46,
 				_panosoft$elm_grove$Grove_App$ConfigMsg,
 				F2(
 					function (model, configModel) {
@@ -20552,7 +22048,7 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 								A2(
 									_panosoft$elm_grove$Component_Config$configure,
 									_panosoft$elm_grove$Grove_App$configCfg(model),
-									_p44(model))),
+									_p46(model))),
 							_1: A2(_panosoft$elm_grove$Grove_App$initCommand, _p28, model)
 						});
 				case 'InstallInitialized':
@@ -20574,7 +22070,7 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 						A2(
 							_panosoft$elm_grove$Component_Install$install,
 							_panosoft$elm_grove$Grove_App$installCfg(model),
-							_p46(model)));
+							_p48(model)));
 				case 'UninstallInitialized':
 					return function (_p31) {
 						var _p32 = _p31;
@@ -20594,7 +22090,7 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 						A2(
 							_panosoft$elm_grove$Component_Uninstall$uninstall,
 							_panosoft$elm_grove$Grove_App$uninstallCfg(model),
-							_p47(model)));
+							_p49(model)));
 				case 'BumpInitialized':
 					return function (_p33) {
 						var _p34 = _p33;
@@ -20614,7 +22110,7 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 						A2(
 							_panosoft$elm_grove$Component_Bump$bump,
 							_panosoft$elm_grove$Grove_App$bumpCfg(model),
-							_p43(model)));
+							_p45(model)));
 				case 'InitInitialized':
 					return function (_p35) {
 						var _p36 = _p35;
@@ -20634,20 +22130,60 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 						A2(
 							_panosoft$elm_grove$Component_Init$initialize,
 							_panosoft$elm_grove$Grove_App$initCfg(model),
-							_p45(model)));
-				case 'InstallForUninstall':
-					return function (cmd) {
-						return function (_p37) {
-							var _p38 = _p37;
+							_p47(model)));
+				case 'DocsGenerated':
+					if (_p25._0.ctor === 'Err') {
+						return function (cmd) {
 							return A2(
 								_elm_lang$core$Platform_Cmd_ops['!'],
-								_p38._0,
+								model,
+								{
+									ctor: '::',
+									_0: cmd,
+									_1: {ctor: '[]'}
+								});
+						}(
+							A2(
+								_elm_lang$core$Task$perform,
+								function (_p37) {
+									return _panosoft$elm_grove$Grove_App$ExitApp(-1);
+								},
+								_panosoft$elm_grove$Output$errorLog(
+									A2(
+										_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+										'Failed to create Elm Docs Error:',
+										_elm_node$core$Node_Error$message(_p25._0._0)))));
+					} else {
+						return function (cmd) {
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								model,
+								{
+									ctor: '::',
+									_0: cmd,
+									_1: {ctor: '[]'}
+								});
+						}(
+							A2(
+								_elm_lang$core$Task$perform,
+								function (_p38) {
+									return _panosoft$elm_grove$Grove_App$ExitApp(0);
+								},
+								_panosoft$elm_grove$Console$log('Elm Docs created')));
+					}
+				case 'InstallForUninstall':
+					return function (cmd) {
+						return function (_p39) {
+							var _p40 = _p39;
+							return A2(
+								_elm_lang$core$Platform_Cmd_ops['!'],
+								_p40._0,
 								{
 									ctor: '::',
 									_0: cmd,
 									_1: {
 										ctor: '::',
-										_0: _p38._1,
+										_0: _p40._1,
 										_1: {ctor: '[]'}
 									}
 								});
@@ -20656,42 +22192,42 @@ var _panosoft$elm_grove$Grove_App$update = F2(
 					}(
 						A2(
 							_elm_lang$core$Task$perform,
-							function (_p39) {
+							function (_p41) {
 								return _panosoft$elm_grove$Grove_App$Nop;
 							},
 							_panosoft$elm_grove$Console$log('***** Reinstalling remaining packages *****\n')));
 				case 'FinishUninstall':
-					var _p42 = _p25._0;
+					var _p44 = _p25._0;
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['?'],
-						!_elm_lang$core$Native_Utils.eq(_p42, 0),
+						!_elm_lang$core$Native_Utils.eq(_p44, 0),
 						{
 							ctor: '_Tuple2',
 							_0: A2(
 								_panosoft$elm_grove$Grove_App$update,
-								_panosoft$elm_grove$Grove_App$ExitApp(_p42),
+								_panosoft$elm_grove$Grove_App$ExitApp(_p44),
 								model),
-							_1: function (_p40) {
-								var _p41 = _p40;
+							_1: function (_p42) {
+								var _p43 = _p42;
 								return A2(
 									_elm_lang$core$Platform_Cmd_ops['!'],
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											uninstallModel: _elm_lang$core$Maybe$Just(_p41._0)
+											uninstallModel: _elm_lang$core$Maybe$Just(_p43._0)
 										}),
 									{
 										ctor: '::',
-										_0: _p41._1,
+										_0: _p43._1,
 										_1: {ctor: '[]'}
 									});
 							}(
 								A3(
 									_panosoft$elm_grove$Component_Uninstall$installComplete,
 									_panosoft$elm_grove$Grove_App$uninstallCfg(model),
-									_p47(model),
+									_p49(model),
 									_panosoft$elm_grove$Component_Install$getNpmPackages(
-										_p46(model))))
+										_p48(model))))
 						});
 				case 'ExitApp':
 					return A2(
@@ -20798,80 +22334,97 @@ var _panosoft$elm_grove$Grove_App$main = _elm_lang$core$Platform$programWithFlag
 												function (allowUncommitted) {
 													return A2(
 														_elm_lang$core$Json_Decode$andThen,
-														function (dryRun) {
+														function (docs) {
 															return A2(
 																_elm_lang$core$Json_Decode$andThen,
-																function (link) {
+																function (dryRun) {
 																	return A2(
 																		_elm_lang$core$Json_Decode$andThen,
-																		function (local) {
+																		function (link) {
 																			return A2(
 																				_elm_lang$core$Json_Decode$andThen,
-																				function (major) {
+																				function (local) {
 																					return A2(
 																						_elm_lang$core$Json_Decode$andThen,
-																						function (minor) {
+																						function (major) {
 																							return A2(
 																								_elm_lang$core$Json_Decode$andThen,
-																								function (noRewrite) {
+																								function (minor) {
 																									return A2(
 																										_elm_lang$core$Json_Decode$andThen,
-																										function (npmProduction) {
+																										function (noRewrite) {
 																											return A2(
 																												_elm_lang$core$Json_Decode$andThen,
-																												function (npmSilent) {
+																												function (npmProduction) {
 																													return A2(
 																														_elm_lang$core$Json_Decode$andThen,
-																														function (patch) {
+																														function (npmSilent) {
 																															return A2(
 																																_elm_lang$core$Json_Decode$andThen,
-																																function (safe) {
-																																	return _elm_lang$core$Json_Decode$succeed(
-																																		{allowOldDependencies: allowOldDependencies, allowUncommitted: allowUncommitted, dryRun: dryRun, link: link, local: local, major: major, minor: minor, noRewrite: noRewrite, npmProduction: npmProduction, npmSilent: npmSilent, patch: patch, safe: safe});
+																																function (patch) {
+																																	return A2(
+																																		_elm_lang$core$Json_Decode$andThen,
+																																		function (safe) {
+																																			return _elm_lang$core$Json_Decode$succeed(
+																																				{allowOldDependencies: allowOldDependencies, allowUncommitted: allowUncommitted, docs: docs, dryRun: dryRun, link: link, local: local, major: major, minor: minor, noRewrite: noRewrite, npmProduction: npmProduction, npmSilent: npmSilent, patch: patch, safe: safe});
+																																		},
+																																		A2(
+																																			_elm_lang$core$Json_Decode$field,
+																																			'safe',
+																																			_elm_lang$core$Json_Decode$oneOf(
+																																				{
+																																					ctor: '::',
+																																					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+																																					_1: {
+																																						ctor: '::',
+																																						_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+																																						_1: {ctor: '[]'}
+																																					}
+																																				})));
 																																},
-																																A2(
-																																	_elm_lang$core$Json_Decode$field,
-																																	'safe',
-																																	_elm_lang$core$Json_Decode$oneOf(
-																																		{
-																																			ctor: '::',
-																																			_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
-																																			_1: {
-																																				ctor: '::',
-																																				_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
-																																				_1: {ctor: '[]'}
-																																			}
-																																		})));
+																																A2(_elm_lang$core$Json_Decode$field, 'patch', _elm_lang$core$Json_Decode$bool));
 																														},
-																														A2(_elm_lang$core$Json_Decode$field, 'patch', _elm_lang$core$Json_Decode$bool));
+																														A2(_elm_lang$core$Json_Decode$field, 'npmSilent', _elm_lang$core$Json_Decode$bool));
 																												},
-																												A2(_elm_lang$core$Json_Decode$field, 'npmSilent', _elm_lang$core$Json_Decode$bool));
+																												A2(_elm_lang$core$Json_Decode$field, 'npmProduction', _elm_lang$core$Json_Decode$bool));
 																										},
-																										A2(_elm_lang$core$Json_Decode$field, 'npmProduction', _elm_lang$core$Json_Decode$bool));
+																										A2(_elm_lang$core$Json_Decode$field, 'noRewrite', _elm_lang$core$Json_Decode$bool));
 																								},
-																								A2(_elm_lang$core$Json_Decode$field, 'noRewrite', _elm_lang$core$Json_Decode$bool));
+																								A2(_elm_lang$core$Json_Decode$field, 'minor', _elm_lang$core$Json_Decode$bool));
 																						},
-																						A2(_elm_lang$core$Json_Decode$field, 'minor', _elm_lang$core$Json_Decode$bool));
+																						A2(_elm_lang$core$Json_Decode$field, 'major', _elm_lang$core$Json_Decode$bool));
 																				},
-																				A2(_elm_lang$core$Json_Decode$field, 'major', _elm_lang$core$Json_Decode$bool));
+																				A2(
+																					_elm_lang$core$Json_Decode$field,
+																					'local',
+																					_elm_lang$core$Json_Decode$oneOf(
+																						{
+																							ctor: '::',
+																							_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+																							_1: {
+																								ctor: '::',
+																								_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$bool),
+																								_1: {ctor: '[]'}
+																							}
+																						})));
 																		},
-																		A2(
-																			_elm_lang$core$Json_Decode$field,
-																			'local',
-																			_elm_lang$core$Json_Decode$oneOf(
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
-																					_1: {
-																						ctor: '::',
-																						_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$bool),
-																						_1: {ctor: '[]'}
-																					}
-																				})));
+																		A2(_elm_lang$core$Json_Decode$field, 'link', _elm_lang$core$Json_Decode$bool));
 																},
-																A2(_elm_lang$core$Json_Decode$field, 'link', _elm_lang$core$Json_Decode$bool));
+																A2(_elm_lang$core$Json_Decode$field, 'dryRun', _elm_lang$core$Json_Decode$bool));
 														},
-														A2(_elm_lang$core$Json_Decode$field, 'dryRun', _elm_lang$core$Json_Decode$bool));
+														A2(
+															_elm_lang$core$Json_Decode$field,
+															'docs',
+															_elm_lang$core$Json_Decode$oneOf(
+																{
+																	ctor: '::',
+																	_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+																	_1: {
+																		ctor: '::',
+																		_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+																		_1: {ctor: '[]'}
+																	}
+																})));
 												},
 												A2(_elm_lang$core$Json_Decode$field, 'allowUncommitted', _elm_lang$core$Json_Decode$bool));
 										},

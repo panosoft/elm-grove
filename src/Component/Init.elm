@@ -214,7 +214,7 @@ prompts =
     , ( \model value -> { model | createNpmJson = Just value }
       , { defaultPrompt
             | prompt = "Also create 'package.json' [Y/n]"
-            , pattern = Just "^(y(es)?|Y(es)?|n(o)|N(o))$"
+            , pattern = Just "^(y(es)?|Y(es)?|n(o)?|N(o)?)$"
             , message = Just "Invalid yes/no answer"
             , default = Just "y"
             , required = False

@@ -13,11 +13,13 @@ import Time exposing (Time)
 import Tuple exposing (..)
 import Dict exposing (Dict)
 import Task exposing (Task)
+import Regex
 import Json.Decode as JD exposing (field)
 import Json.Encode as JE exposing (..)
 import StringUtils exposing (..)
 import AppUtils exposing (..)
 import Utils.Ops exposing (..)
+import Utils.Regex exposing (..)
 import ElmJson exposing (..)
 import NpmJson exposing (..)
 import Node.Error as Node exposing (Error(..), Code(..))
@@ -29,6 +31,9 @@ import Git exposing (..)
 import Version exposing (..)
 import Common exposing (..)
 import Console exposing (..)
+import DocGenerator exposing (..)
+import Component.Config exposing (..)
+import Glob
 
 
 type alias Config msg =
@@ -44,6 +49,7 @@ type alias Config msg =
     , elmVersion : Int
     , cwd : String
     , pathSep : String
+    , generateDocs : GenerateDocs
     }
 
 
@@ -189,34 +195,53 @@ checkForNewVersions config model =
 
 doBump : Config msg -> Model -> ( Model, Cmd (Msg msg) )
 doBump config model =
-    -- Modify elmJson file
-    model.elmJson
-        |?!->
-            ( bugMissing "elmJson"
-            , \elmJson ->
-                versionFromString elmJson.version
+    -- Generate docs
+    DocGenerator.generateDocs
+        { testing = config.testing
+        , cwd = config.cwd
+        , pathSep = config.pathSep
+        , generateDocs = config.generateDocs
+        }
+        |> Task.andThen
+            (\_ ->
+                (config.generateDocs == GenerateDocsOn)
+                    ? ( Console.log "Documentation generated", Task.succeed "" )
+                    |> Task.mapError (\_ -> Node.Error "Should never happen" "")
+            )
+        -- Modify elmJson file
+        |> (\bumpTask ->
+                model.elmJson
                     |?!->
-                        ( bug ("bad version in elmJson:" +-+ elmJson.version)
-                        , \oldVersion ->
-                            ([ ( config.major, nextMajor oldVersion )
-                             , ( config.minor, nextMinor oldVersion )
-                             , ( config.patch, nextPatch oldVersion )
-                             ]
-                                |> List.filter first
-                                |> List.map second
-                                |> List.head
-                            )
+                        ( bugMissing "elmJson"
+                        , \elmJson ->
+                            versionFromString elmJson.version
                                 |?!->
-                                    ( bug "major/minor/patch are all False"
-                                    , \newVersion ->
-                                        { elmJson | version = versionToString newVersion }
-                                            |> elmJsonEncoder
-                                            |> JE.encode (model.elmJsonIndent ?!= bugMissing "elmJsonIndent")
-                                            |> writeFile (pathJoin config [ config.cwd, config.testing ? ( "test", "" ), elmJsonFilename ])
-                                            |> (,,) newVersion (BumpComplete oldVersion newVersion)
+                                    ( bug ("bad version in elmJson:" +-+ elmJson.version)
+                                    , \oldVersion ->
+                                        ([ ( config.major, nextMajor oldVersion )
+                                         , ( config.minor, nextMinor oldVersion )
+                                         , ( config.patch, nextPatch oldVersion )
+                                         ]
+                                            |> List.filter first
+                                            |> List.map second
+                                            |> List.head
+                                        )
+                                            |?!->
+                                                ( bug "major/minor/patch are all False"
+                                                , \newVersion ->
+                                                    bumpTask
+                                                        |> Task.andThen
+                                                            (\_ ->
+                                                                { elmJson | version = versionToString newVersion }
+                                                                    |> elmJsonEncoder
+                                                                    |> JE.encode (model.elmJsonIndent ?!= bugMissing "elmJsonIndent")
+                                                                    |> writeFile (pathJoin config [ config.cwd, config.testing ? ( "test", "" ), elmJsonFilename ])
+                                                            )
+                                                        |> (,,) newVersion (BumpComplete oldVersion newVersion)
+                                                )
                                     )
                         )
-            )
+           )
         -- Modify npmJson file (IFF it exists)
         |> (\( newVersion, msg, bumpTask ) ->
                 bumpTask
@@ -233,7 +258,7 @@ doBump config model =
                         )
                     |> (,,) newVersion msg
            )
-        -- Commit json files to repo
+        -- Commit docs & json files to repo
         |> (\( newVersion, msg, bumpTask ) ->
                 config.testing
                     ? ( ( pathJoin config [ config.cwd, "test" ]
@@ -260,7 +285,20 @@ doBump config model =
                                                 , always [ elmJsonFilename ]
                                                 , always [ elmJsonFilename, npmJsonFilename ]
                                                 )
-                                            |> (\filesToAdd -> Git.commit repo filesToAdd ("Bumped version to" +-+ versionToString newVersion))
+                                            |> (\filesToAdd ->
+                                                    Glob.find (pathJoin config [ DocGenerator.elmDocsPath, "**", "*" ]) Nothing False
+                                                        |> Task.mapError Node.message
+                                                        |> Task.andThen
+                                                            (\docFiles ->
+                                                                -- make relative paths since Glob has a bug, i.e. doesn't honor `absolute` option
+                                                                docFiles
+                                                                    |> List.map (replaceFirst (Regex.escape (config.cwd ++ config.pathSep)) "")
+                                                                    |> (\docFiles ->
+                                                                            Git.getFileStatuses repo
+                                                                                |> Task.andThen (\{ deleted } -> Git.commit repo (List.concat [ docFiles, filesToAdd ]) deleted ("Bumped version to" +-+ versionToString newVersion))
+                                                                       )
+                                                            )
+                                               )
                                             |> Task.andThen (\_ -> Task.succeed repo)
                                     )
                        )

@@ -266,8 +266,8 @@ conflictLibsPattern config packages =
         |> (\s -> (List.length packages == 1) ? ( s, "{" ++ s ++ "}" ))
 
 
-rewriteFilesPatern : Config msg -> List PackageName -> String
-rewriteFilesPatern config packages =
+rewriteFilesPattern : Config msg -> List PackageName -> String
+rewriteFilesPattern config packages =
     packages
         |> List.map (\packageName -> pathJoin config [ elmPackagesRoot config.testing config.pathSep, packageName, "**/*.js" ])
         |> String.join ","
@@ -287,6 +287,6 @@ rewriteFilesIgnorePattern config =
 rewrite : Config msg -> Model -> List PackageName -> ( Model, Cmd msg )
 rewrite config model packages =
     model
-        ! [ (Glob.find (rewriteFilesPatern config packages) (Just <| rewriteFilesIgnorePattern config) True)
+        ! [ (Glob.find (rewriteFilesPattern config packages) (Just <| rewriteFilesIgnorePattern config) True)
                 |> Task.attempt (config.routeToMe << FilesToRewriteFound packages)
           ]

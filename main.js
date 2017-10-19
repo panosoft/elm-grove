@@ -38,7 +38,7 @@ const usage = _ => {
 					{ name: 'install', summary: 'Installs latest specified package(s) or the most recent allowed for all packages in elm-package.json' },
 					{ name: 'uninstall', summary: 'Uninstalls specified package(s)' },
 					{ name: 'bump', summary: 'Bump version number of package, either major, minor or patch' },
-					{ name: 'docs', summary: 'Generate Elm Docs from codebase into "elm-docs" directory' }
+					{ name: 'docs', summary: 'Generate Elm Docs from codebase into "docs" directory' }
 				]
 			},
 			{
@@ -46,7 +46,7 @@ const usage = _ => {
 				content: [
 					{ name: '--local', summary: 'Configure into the current directory instead of the home directory'},
 					{ name: '--safe=[on|off|none]', summary: 'Set or Remove Safe Mode\non = error when attempting to install non-official Elm Packages\noff = warn when installing non-official Elm Packages\nnone = no safety check\n<blank> = remove from configuration'},
-					{ name: '--docs=[on|off]', summary: 'Generate docs into "elm-docs" directory when version is bumped\non = generate docs\noff = do not generate docs'}
+					{ name: '--docs=[on|off]', summary: 'Generate docs into "docs" directory when version is bumped\non = generate docs\noff = do not generate docs'}
 				]
 			},
 			{

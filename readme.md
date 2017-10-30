@@ -26,7 +26,7 @@ You can, however, benefit from all of the advanced Grove features AND all the ru
 Make sure you have the following:
 
 - Elm version 0.18.x
-- npm version 5.5.x+
+- npm version 5.3.0
 
 **Due to npm 5.x.x bugs, installing AND updating grove globally will have to be done unconventionally, for now.**
 

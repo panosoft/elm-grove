@@ -517,7 +517,8 @@ processElmJson config model packageName parentPath readOccurence elmJson =
                             )
                             |> operationError model
                       , ( Dict.union config.sources (elmJson.dependencySources ?= Dict.empty)
-                            |> Dict.filter (\_ -> not << String.contains "github.com")
+                            |> Dict.filter (\_ -> not << String.contains "http://github.com")
+                            |> Dict.filter (\_ -> not << String.contains "https://github.com")
                             |> (\sources -> (sources == Dict.empty) ? ( Nothing, Just sources ))
                         , (readOccurence == Initial)
                             ? ( (config.packages ?= []), [] )

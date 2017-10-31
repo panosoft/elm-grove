@@ -50,3 +50,9 @@
 * Added missing documentation for 1.0.6 features
 * Changed `file:\\` to `git+file:\\` for npm dependencies that are locally linked so npm will install from the directory instead of just linking to it
 * Don't add semver to linked npm dependencies
+
+1.1.1 / 2017-10-31
+==================
+
+##### Fixes
+* Fixed bug ([issue #8](https://github.com/panosoft/elm-grove/issues/8)) when installing via SSH from github.com

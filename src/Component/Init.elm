@@ -189,7 +189,7 @@ prompts =
     , ( \model value -> { model | repository = Just value }
       , { defaultPrompt
             | prompt = "Repository name"
-            , pattern = Just "^([a-zA-Z](?:[-][a-zA-Z]+)*)+/(?:[a-zA-Z](?:[-_][a-zA-Z]+)*)+$"
+            , pattern = Just "^([a-zA-Z0-9](?:[-][a-zA-Z0-9]+)*)+/(?:[a-zA-Z0-9](?:[-_][a-zA-Z0-9]+)*)+$"
             , message = Just "Invalid repo name... must be like: your-user-name/your-repo-name"
         }
       )

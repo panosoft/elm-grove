@@ -498,7 +498,7 @@ At the moment, Grove doesn't try to resolve this. The hope is that, someday, Elm
 
 In order to understand Release Scenarios, let's assume the following `git` history where the smaller circles are releases and the larger circles all the possible `HEAD`s of your repo:
 
-<p align="center"><img src="images/Release Scenarios.svg">
+<p align="center"><img src="images/Release Scenarios.png">
 
 
 #### Normal Release (Typical case)

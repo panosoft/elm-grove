@@ -73,12 +73,16 @@ const usage = _ => {
 			{
 				header: 'BUMP options',
 				content: [
-					{ name: '--dry-run', summary: 'Do all checks without changing the version'},
-					{ name: '--major', summary: 'bump MAJOR version in Elm and Npm packages'},
-					{ name: '--minor', summary: 'bump MINOR version in Elm and Npm packages'},
-					{ name: '--patch', summary: 'bump PATCH version in Elm and Npm packages'},
+					{ name: '--dry-run', summary: 'Do all checks without changing the version (implies --verbose)'},
+					{ name: '--verbose', summary: 'Display the differences between HEAD and latest version HEAD is based on'},
+					{ name: '--major', summary: 'bump MAJOR version in Elm and Npm packages (Application packages ONLY, Library packages will be automatically determined)'},
+					{ name: '--minor', summary: 'bump MINOR version in Elm and Npm packages (Application packages ONLY, Library packages will be automatically determined)'},
+					{ name: '--patch', summary: 'bump PATCH version in Elm and Npm packages (Application packages ONLY, Library packages will be automatically determined)'},
 					{ name: '--allow-uncommitted', summary: 'bump version in spite of uncommitted changes to repo'},
-					{ name: '--allow-old-dependencies', summary: 'bump version in spite of the existence of newer versions of dependencies'}
+					{ name: '--allow-old-dependencies', summary: 'bump version in spite of the existence of newer versions of dependencies'},
+					{ name: '--allow-rebased-release', summary: 'a Rebased release is where the HEAD is NOT based on the latest release of it\'s Major version, e.g. HEAD is based on 2.0.0 but the latest 2.x.x is 2.3.4'},
+					{ name: '--allow-legacy-release', summary: 'a Legacy release is where the HEAD is based on an older Major release, i.e. HEAD is based on 2.0.0 but the latest release is 5.3.1'},
+					{ name: '--allow-major-rebased-release', summary: 'allow a Rebased Release to be a Major Release'}
 				]
 			}
 		]
@@ -104,25 +108,33 @@ const uninstallOptionsDef = [
 ];
 const bumpOptionsDef = [
 	{ name: 'dry-run', type: Boolean },
+	{ name: 'verbose', type: Boolean },
 	{ name: 'major', type: Boolean },
 	{ name: 'minor', type: Boolean },
 	{ name: 'patch', type: Boolean },
 	{ name: 'allow-uncommitted', type: Boolean },
-	{ name: 'allow-old-dependencies', type: Boolean }
+	{ name: 'allow-old-dependencies', type: Boolean },
+	{ name: 'allow-rebased-release', type: Boolean },
+	{ name: 'allow-legacy-release', type: Boolean },
+	{ name: 'allow-major-rebased-release', type: Boolean }
 ];
 const defaultOptions = {
 	local: null,
 	safe: null,
 	docs: null,
 	dryRun: false,
-	link: false,
-	npmProduction: false,
-	npmSilent: false,
+	verbose: false,
 	major: false,
 	minor: false,
 	patch: false,
+	allowRebasedRelease: false,
+	allowLegacyRelease: false,
+	allowMajorRebasedRelease: false,
 	allowUncommitted: false,
 	allowOldDependencies: false,
+	link: false,
+	npmProduction: false,
+	npmSilent: false,
 	noRewrite: false
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -160,9 +172,7 @@ const parse = _ => {
 				break;
 			case 'bump':
 				options = Args(bumpOptionsDef, {partial: true});
-				if (!options.major && ! options.minor && !options.patch)
-					throw Error ('You must specify one of the following: --major, --minor, --patch');
-				else if (options.major && options.minor || options.minor && options.patch || options.patch && options.major)
+				if (options.major && options.minor || options.minor && options.patch || options.patch && options.major)
 					throw Error ('You may only specify one of the following: --major, --minor, --patch');
 				break;
 			case 'docs':

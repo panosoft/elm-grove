@@ -28,6 +28,7 @@ import Output exposing (..)
 import Console exposing (..)
 import Utils.Ops exposing (..)
 import Utils.Regex exposing (..)
+import Utils.Tuple as Tuple
 import Package exposing (..)
 import ElmJson exposing (..)
 import Env exposing (..)
@@ -38,6 +39,10 @@ import Common exposing (..)
 import Component.Rewriter as Rewriter
 import Http
 import Component.Config exposing (..)
+
+
+type alias Path =
+    Common.Path
 
 
 type alias Config msg =
@@ -207,7 +212,7 @@ clonePackageTask elmJson parentPackageName model dependsOn =
                                 |> Task.mapError (\_ -> ( dependsOn, "Should never happen" ))
                                 |> Task.andThen
                                     (\_ ->
-                                        Git.clone repoLocation
+                                        Git.clone repoLocation Env.tmpdir
                                             |> Task.andThen
                                                 (\repo ->
                                                     Git.getTags repo
@@ -292,7 +297,7 @@ getVersions tags range parentPackageName packageName =
                     |?!**>
                         ( \_ -> Err <| errorLog ("No version exists for:" +-+ packageName +-+ "as specified by:" +-+ parentPackageName +-+ "which is range:" +-+ range +-+ "existing versions:" +-+ (List.map versionToString allVersions))
                         , bug "Cannot get head of allVersions EVEN THOUGH head of inRangeVersion was retrieved"
-                        , \( inRangeVersion, latestVersion ) -> Ok ( versionToString inRangeVersion, versionToString latestVersion )
+                        , \( inRangeVersion, latestVersion ) -> Ok <| Tuple.map2 versionToString ( inRangeVersion, latestVersion )
                         )
            )
 
@@ -869,15 +874,28 @@ update config msg model =
                             result
                                 |??>
                                     (\npmJsonStr ->
-                                        hasDependencies npmJsonStr
-                                            ? ( validateNpmJson npmJsonStr (installState.maybeVersionStr ?!= bugMissing "checked out version") (installState.maybeElmJson ?!= bugMissing "elmJson").repository
-                                                    |??> (\_ -> checkComplete installState model <| isDirectDependency installState.dependsOn.dependencyPath)
-                                                    ??= (\errors ->
-                                                            errorLog ("Package" +-+ installState.dependsOn.packageName +-+ "has the following errors:\n\t" ++ (String.join "\n\t" errors))
-                                                                |> operationError model
-                                                        )
-                                              , checkComplete installState model False
-                                              )
+                                        installState.maybeElmJson
+                                            |?!->
+                                                ( bugMissing "elmJson"
+                                                , \elmJson ->
+                                                    (checkComplete installState model <| (isDirectDependency installState.dependsOn.dependencyPath && elmJson.nativeModules /= Nothing))
+                                                        |> (\( ( model, cmd ), msgs ) ->
+                                                                (hasDependencies npmJsonStr && elmJson.nativeModules /= Nothing)
+                                                                    ? ( validateNpmJson npmJsonStr (installState.maybeVersionStr ?!= bugMissing "checked out version") elmJson.repository
+                                                                            |??->
+                                                                                ( \errors ->
+                                                                                    Cmd.batch
+                                                                                        [ warnLog ("Package" +-+ installState.dependsOn.packageName +-+ "has the following errors:\n\t" ++ (String.join "\n\t" errors))
+                                                                                            |> Task.perform OutputComplete
+                                                                                        , cmd
+                                                                                        ]
+                                                                                , \_ -> cmd
+                                                                                )
+                                                                            |> (\cmd -> ( model ! [ cmd ], msgs ))
+                                                                      , checkComplete installState model False
+                                                                      )
+                                                           )
+                                                )
                                     )
                                 ??= (\_ -> checkComplete installState model False)
                        )
@@ -993,7 +1011,9 @@ update config msg model =
                                                                         |> Set.toList
                                                                         |> List.filterMap
                                                                             (\packageName ->
-                                                                                Dict.get packageName model.installed
+                                                                                (model.installed
+                                                                                    |> Dict.get packageName
+                                                                                )
                                                                                     |?->
                                                                                         ( Nothing
                                                                                         , (\( url, _, versionStr ) ->

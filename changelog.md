@@ -56,3 +56,23 @@
 
 ##### Fixes
 * Fixed bug ([issue #8](https://github.com/panosoft/elm-grove/issues/8)) when installing via SSH from github.com
+
+
+1.2.0 / 2017-11-08
+==================
+
+##### Features
+* Enforces Semantic Versioning - Bump will determine proper version based on changes to public interface
+* Normal, Rebased and Legacy release support
+
+##### Changes
+* `documentation.json` is now generated in current directory for tools, e.g. [elmjitsu](https://atom.io/packages/elmjutsu)
+* `grove-config.json` is now `.grove-config.json` (automatically renamed when you run Grove)
+
+##### Fixes
+* 3rd party `package.json` files are no longer held to the same standards as the ones for the current project's
+	* Validation errors are just Warnings
+	* Validation is only done if 3rd party package has `nativeModules`
+* Elm packages are only included in your `package.json` if the package has `nativeModules`
+* Init command's validation of repo names didn't allow for numbers
+* `grove init` followed directly by a `grove install <some-package>` would NOT update `package.json` with dependencies if `<some-package>` had dependencies

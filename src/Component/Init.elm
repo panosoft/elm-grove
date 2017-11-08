@@ -13,6 +13,7 @@ import Output exposing (..)
 import Prompt exposing (..)
 import AppUtils exposing (..)
 import Package exposing (..)
+import Version exposing (..)
 
 
 type alias Config msg =
@@ -122,7 +123,7 @@ update config msg model =
                 |> (\model -> ( nextPrompt config model promptIndex, [] ))
 
         PromptsComplete ->
-            { version = "0.0.0"
+            { version = initVersionStr
             , summary = model.summary ?!= bugMissing "summary"
             , repository = model.repository ?!= bugMissing "repository" ++ ".git"
             , license = model.license ?!= bugMissing "license"
@@ -144,7 +145,7 @@ update config msg model =
                             |> String.startsWith "y"
                         )
                             ? ( { name = "@" ++ model.repository ?!= bugMissing "repository"
-                                , version = "0.0.0"
+                                , version = initVersionStr
                                 , license = model.license ?!= bugMissing "license"
                                 }
                                     |> minimalNpmJsonEncoder
@@ -189,8 +190,14 @@ prompts =
     , ( \model value -> { model | repository = Just value }
       , { defaultPrompt
             | prompt = "Repository name"
-            , pattern = Just "^([a-zA-Z](?:[-][a-zA-Z]+)*)+/(?:[a-zA-Z](?:[-_][a-zA-Z]+)*)+$"
-            , message = Just "Invalid repo name... must be like: your-user-name/your-repo-name"
+            , pattern = Just "^([a-zA-Z0-9](?:[-][a-zA-Z0-9]+)*)+/[-_a-zA-Z0-9]+$"
+            , message =
+                Just
+                    ("Invalid repo name. Must be like: your-user-name/your-repo-name\n"
+                        ++ "  where:\n"
+                        ++ "    your-user-name is alphanumeric and dashes but cannot start or end with a dash\n"
+                        ++ "    your-repo-name is alphanumeric, dashes and underlines\n"
+                    )
         }
       )
     , ( \model value -> { model | license = Just value }

@@ -1,6 +1,9 @@
 module DocGenerator
     exposing
-        ( elmDocsPath
+        ( GeneratePrep(..)
+        , elmDocsPath
+        , docsJsonFilename
+        , generateDocsJsonTask
         , generateDocs
         )
 
@@ -12,7 +15,6 @@ import AppUtils exposing (..)
 import Common exposing (..)
 import Utils.Ops exposing (..)
 import Component.Config exposing (..)
-import Env
 import Docs.Generator as Docs
 import Spawn
 
@@ -40,24 +42,34 @@ pathJoin config pathParts =
     AppUtils.pathJoin config.pathSep config.cwd pathParts
 
 
+type GeneratePrep
+    = GeneratePrepNothing
+    | GeneratePrepInstallPackages
+
+
+generateDocsJsonTask : Path -> Path -> GeneratePrep -> Task String ()
+generateDocsJsonTask sourcePath docsJsonPath generatePrep =
+    ("cd" +-+ sourcePath +-+ ((generatePrep == GeneratePrepInstallPackages) ? ( "&& grove install", "" )) +-+ "&& elm-make --docs" +-+ docsJsonPath)
+        |> (\cmd ->
+                Spawn.exec cmd 0 True
+                    |> Task.mapError (\error -> "Elm compilation failure:" +-+ Node.message error)
+                    |> Task.onError
+                        (\error ->
+                            Spawn.exec cmd 0 False
+                                |> Task.onError (\_ -> Task.fail error)
+                        )
+           )
+
+
 generateDocs : Config -> Task Node.Error ()
 generateDocs config =
     FileSystem.remove (pathJoin config [ config.cwd, config.testing ? ( "test", "" ), elmDocsPath ])
         |> Task.andThen
             (\_ ->
                 (config.generateDocs == GenerateDocsOn)
-                    ? ( pathJoin config [ Env.tmpdir, docsJsonFilename ]
-                            |> (\docsJsonFilename ->
-                                    Spawn.exec ("elm-make --docs" +-+ docsJsonFilename) 0 True
-                                        |> Task.mapError (\error -> "Elm compilation failure:" +-+ Node.message error)
-                                        |> Task.onError
-                                            (\error ->
-                                                Spawn.exec ("elm-make --docs" +-+ docsJsonFilename) 0 False
-                                                    |> Task.onError (\_ -> Task.fail error)
-                                            )
-                                        |> Task.andThen (\_ -> Docs.generate config.pathSep docsJsonFilename <| pathJoin config [ ".", elmDocsPath ])
-                                        |> Task.mapError (\error -> Node.Error error "")
-                               )
+                    ? ( generateDocsJsonTask "." docsJsonFilename GeneratePrepNothing
+                            |> Task.andThen (\_ -> Docs.generate config.pathSep docsJsonFilename <| pathJoin config [ ".", elmDocsPath ])
+                            |> Task.mapError (\error -> Node.Error error "")
                       , Task.succeed ()
                       )
             )

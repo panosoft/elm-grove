@@ -6,7 +6,7 @@ const _panosoft$elm_grove$Native_Spawn = (_ => {
 	const exec = (cmdLine, successExitCode, silent) => nativeBinding(callback => {
 		try {
 			const cmdLineParts = cmdLine.split(' ');
-			const cmd = spawn(cmdLineParts[0], cmdLineParts.slice(1, cmdLineParts.length));
+			const cmd = spawn(cmdLineParts[0], cmdLineParts.slice(1, cmdLineParts.length), {shell: true});
 			if (!silent) {
 				cmd.stdout.on('data', data => process.stdout.write(data.toString()));
 				cmd.stderr.on('data', data => process.stderr.write(data.toString()));

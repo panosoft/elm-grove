@@ -73,7 +73,7 @@ extractOrAddDependencies json =
                     |> List.head
                 )
                     |?> (\match -> ( replaceAll "†" "\n" match.match, singleLineJson ))
-                    ?= ( "  \"dependencies\":{\n}\n", replaceFirst "†\\}†$" """,†  "dependencies": {†}†}†""" singleLineJson )
+                    ?= ( "  \"dependencies\":{\n}\n", replaceFirst "†\\}†*$" """,†  "dependencies": {†}†}†""" singleLineJson )
            )
         |> (\( dependenciesStr, singleLineJson ) -> ( replaceFirst "\"dependencies\":" "" dependenciesStr, singleLineJson ))
 
@@ -124,14 +124,14 @@ validateName name repository =
                             |> String.split "/"
                             |> List.length
                             |> (/=) 2
-                  , "must be in the format <user>/<repo>"
+                  , "should be in the format <user>/<repo>"
                   )
                 , ( \name ->
                         String.left 1 name /= "@"
-                  , "must start with an @"
+                  , "should start with an @"
                   )
                 , ( \name -> name /= ("@" ++ repository)
-                  , "must match elm json repository:" +-+ repository
+                  , "should match elm json repository:" +-+ repository
                   )
                 ]
                     |> List.filterMap

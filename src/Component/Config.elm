@@ -26,6 +26,7 @@ import Node.Error as Node exposing (Error(..), Code(..))
 import Env exposing (..)
 import Utils.Ops exposing (..)
 import Utils.Json exposing (..)
+import Utils.Task as Task exposing (..)
 import StringUtils exposing (..)
 
 
@@ -194,37 +195,62 @@ configPath config path =
     pathJoin config [ config.testing ? ( "test", path ), config.configFilename ]
 
 
+oldConfigPath : Config msg -> Path -> Path
+oldConfigPath config path =
+    pathJoin config [ config.testing ? ( "test", path ), String.dropLeft 1 config.configFilename ]
+
+
+rename : Path -> Path -> Task ( Node.Error, Path ) ()
+rename oldPath newPath =
+    FileSystem.rename oldPath newPath
+        |> Task.onError
+            (\nodeError ->
+                case nodeError of
+                    SystemError code _ ->
+                        (code == NoSuchFileOrDirectory) ? ( Task.succeed (), Task.fail ( nodeError, oldPath ) )
+
+                    _ ->
+                        Task.fail ( nodeError, oldPath )
+            )
+
+
 init : Config msg -> msg -> ( Model, Maybe (Cmd msg) )
 init config initializedMsg =
     ( { configFile = Nothing }
     , Just <|
-        (( configPath config ".", configPath config Env.homedir )
-            |> (\( localPath, globalPath ) ->
-                    FileSystem.readFileAsString localPath Utf8
-                        |> Task.onError
-                            (\nodeError ->
-                                case nodeError of
-                                    SystemError code _ ->
-                                        (code == NoSuchFileOrDirectory) ? ( Task.succeed defaultConfigFileString, Task.fail ( nodeError, localPath ) )
-
-                                    _ ->
-                                        Task.fail ( nodeError, localPath )
-                            )
+        (( configPath config ".", configPath config Env.homedir, oldConfigPath config ".", oldConfigPath config Env.homedir )
+            |> (\( localPath, globalPath, oldLocalPath, oldGlobalPath ) ->
+                    -- migrate old config filename
+                    ( rename oldLocalPath localPath, rename oldGlobalPath globalPath )
+                        |> Task.sequence2
                         |> Task.andThen
-                            (\localData ->
-                                FileSystem.readFileAsString globalPath Utf8
-                                    |> Task.andThen (\globalData -> Task.succeed ( localData, globalData ))
+                            (\_ ->
+                                FileSystem.readFileAsString localPath Utf8
                                     |> Task.onError
                                         (\nodeError ->
                                             case nodeError of
                                                 SystemError code _ ->
-                                                    (code == NoSuchFileOrDirectory) ? ( Task.succeed ( localData, defaultConfigFileString ), Task.fail ( nodeError, globalPath ) )
+                                                    (code == NoSuchFileOrDirectory) ? ( Task.succeed defaultConfigFileString, Task.fail ( nodeError, localPath ) )
 
                                                 _ ->
-                                                    Task.fail ( nodeError, globalPath )
+                                                    Task.fail ( nodeError, localPath )
                                         )
+                                    |> Task.andThen
+                                        (\localData ->
+                                            FileSystem.readFileAsString globalPath Utf8
+                                                |> Task.andThen (\globalData -> Task.succeed ( localData, globalData ))
+                                                |> Task.onError
+                                                    (\nodeError ->
+                                                        case nodeError of
+                                                            SystemError code _ ->
+                                                                (code == NoSuchFileOrDirectory) ? ( Task.succeed ( localData, defaultConfigFileString ), Task.fail ( nodeError, globalPath ) )
+
+                                                            _ ->
+                                                                Task.fail ( nodeError, globalPath )
+                                                    )
+                                        )
+                                    |> Task.andThen (\( localData, globalData ) -> Task.succeed ( ( localData, localPath ), ( globalData, globalPath ) ))
                             )
-                        |> Task.andThen (\( localData, globalData ) -> Task.succeed ( ( localData, localPath ), ( globalData, globalPath ) ))
                         |> Task.attempt (config.routeToMe << ConfigFileRead initializedMsg)
                )
         )

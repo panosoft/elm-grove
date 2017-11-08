@@ -23,6 +23,10 @@ import Git exposing (..)
 import Version exposing (..)
 
 
+type alias Path =
+    Common.Path
+
+
 bug : String -> (a -> b)
 bug message =
     (\_ -> Debug.crash ("BUG:" +-+ message))

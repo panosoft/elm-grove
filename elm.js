@@ -6423,6 +6423,19 @@ var _elm_community$json_extra$Json_Decode_Extra$doubleEncoded = function (decode
 		},
 		_elm_lang$core$Json_Decode$string);
 };
+var _elm_community$json_extra$Json_Decode_Extra$keys = A2(
+	_elm_lang$core$Json_Decode$map,
+	A2(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (_p4, acc) {
+				var _p5 = _p4;
+				return {ctor: '::', _0: _p5._0, _1: acc};
+			}),
+		{ctor: '[]'}),
+	_elm_lang$core$Json_Decode$keyValuePairs(
+		_elm_lang$core$Json_Decode$succeed(
+			{ctor: '_Tuple0'})));
 var _elm_community$json_extra$Json_Decode_Extra$sequenceHelp = F2(
 	function (decoders, jsonValues) {
 		return (!_elm_lang$core$Native_Utils.eq(
@@ -6463,11 +6476,11 @@ var _elm_community$json_extra$Json_Decode_Extra$indexedList = function (indexedD
 var _elm_community$json_extra$Json_Decode_Extra$optionalField = F2(
 	function (fieldName, decoder) {
 		var finishDecoding = function (json) {
-			var _p4 = A2(
+			var _p6 = A2(
 				_elm_lang$core$Json_Decode$decodeValue,
 				A2(_elm_lang$core$Json_Decode$field, fieldName, _elm_lang$core$Json_Decode$value),
 				json);
-			if (_p4.ctor === 'Ok') {
+			if (_p6.ctor === 'Ok') {
 				return A2(
 					_elm_lang$core$Json_Decode$map,
 					_elm_lang$core$Maybe$Just,
@@ -6487,21 +6500,21 @@ var _elm_community$json_extra$Json_Decode_Extra$withDefault = F2(
 	});
 var _elm_community$json_extra$Json_Decode_Extra$decodeDictFromTuples = F2(
 	function (keyDecoder, tuples) {
-		var _p5 = tuples;
-		if (_p5.ctor === '[]') {
+		var _p7 = tuples;
+		if (_p7.ctor === '[]') {
 			return _elm_lang$core$Json_Decode$succeed(_elm_lang$core$Dict$empty);
 		} else {
-			var _p6 = A2(_elm_lang$core$Json_Decode$decodeString, keyDecoder, _p5._0._0);
-			if (_p6.ctor === 'Ok') {
+			var _p8 = A2(_elm_lang$core$Json_Decode$decodeString, keyDecoder, _p7._0._0);
+			if (_p8.ctor === 'Ok') {
 				return A2(
 					_elm_lang$core$Json_Decode$andThen,
-					function (_p7) {
+					function (_p9) {
 						return _elm_lang$core$Json_Decode$succeed(
-							A3(_elm_lang$core$Dict$insert, _p6._0, _p5._0._1, _p7));
+							A3(_elm_lang$core$Dict$insert, _p8._0, _p7._0._1, _p9));
 					},
-					A2(_elm_community$json_extra$Json_Decode_Extra$decodeDictFromTuples, keyDecoder, _p5._1));
+					A2(_elm_community$json_extra$Json_Decode_Extra$decodeDictFromTuples, keyDecoder, _p7._1));
 			} else {
-				return _elm_lang$core$Json_Decode$fail(_p6._0);
+				return _elm_lang$core$Json_Decode$fail(_p8._0);
 			}
 		}
 	});
@@ -6520,9 +6533,9 @@ var _elm_community$json_extra$Json_Decode_Extra$set = function (decoder) {
 };
 var _elm_community$json_extra$Json_Decode_Extra$date = A2(
 	_elm_lang$core$Json_Decode$andThen,
-	function (_p8) {
+	function (_p10) {
 		return _elm_community$json_extra$Json_Decode_Extra$fromResult(
-			_elm_lang$core$Date$fromString(_p8));
+			_elm_lang$core$Date$fromString(_p10));
 	},
 	_elm_lang$core$Json_Decode$string);
 var _elm_community$json_extra$Json_Decode_Extra$andMap = _elm_lang$core$Json_Decode$map2(
@@ -8549,7 +8562,7 @@ const _elm_node$core$Native_Buffer = function () {
     const { StringDecoder } = require("string_decoder")
 
 
-    // fromString : String -> String -> Result String Buffer
+    // fromString : String -> String -> Result Error Buffer
     const fromString = F2((encoding, string) => {
         try {
             const buffer = Buffer.from(string, encoding)
@@ -8558,7 +8571,7 @@ const _elm_node$core$Native_Buffer = function () {
     })
 
 
-    // toString : String -> Buffer -> Result String String
+    // toString : String -> Buffer -> Result Error String
     const toString = F2((encoding, buffer) => {
         try {
             const decoder = new StringDecoder(encoding)
@@ -8607,7 +8620,7 @@ const _elm_node$core$Native_FileSystem = (_ => {
                 // copying a single file with no errors returns files and error undefined ...
                 return callback(succeed({ errors : [], files : files || [ to ] }))
             })
-        } catch (error) { callback(fail(error)) }
+        } catch (error) { return callback(fail(error)) }
     }))
 
 
@@ -8620,7 +8633,7 @@ const _elm_node$core$Native_FileSystem = (_ => {
                 if (error) return callback(fail(error))
                 return callback(succeed(data))
             })
-        } catch (error) { callback(fail(error)) }
+        } catch (error) { return callback(fail(error)) }
     })
 
 
@@ -8675,53 +8688,53 @@ const _elm_node$core$Native_FileSystem = (_ => {
     // writeFileFromBuffer : String -> String -> Buffer -> Task Decode.Value ()
     const writeFileFromBuffer = F3((filename, mode, buffer) => writeFile(filename, mode, null, buffer))
 
-    const exists = path => nativeBinding(callback => {
+    const exists = filename => nativeBinding(callback => {
         try {
-            fs.access(path, fs.constants.F_OK, err => callback(err ? succeed(false) : succeed(true)))
+            fs.access(filename, fs.constants.F_OK, err => callback(err ? succeed(false) : succeed(true)))
         }
-        catch (error) {callback(fail(error))}
+        catch (error) { return callback(fail(error)) }
     })
 
-    const mkdirp_ = path => nativeBinding(callback => {
+    const mkdirp_ = filename => nativeBinding(callback => {
         try {
-            mkdirp(path, err => callback(err ? fail(err) : succeed()))
+            mkdirp(filename, err => callback(err ? fail(err) : succeed()))
         }
-        catch (error) {callback(fail(error))}
+        catch (error) { return callback(fail(error)) }
     })
 
-    const rename = (oldPath, newPath) => nativeBinding(callback => {
+    const rename = F2((from, to) => nativeBinding(callback => {
         try {
-            fs.rename(oldPath, newPath, err => callback(err ? fail(err) : succeed()))
+            fs.rename(from, to, err => callback(err ? fail(err) : succeed()))
         }
-        catch (error) {callback(fail(error))}
+        catch (error) { return callback(fail(error)) }
+    }))
+
+    const isSymlink = filename => nativeBinding(callback => {
+        try {
+            fs.lstat(filename, (err, stats) => callback(err ? fail(err) : succeed(stats.isSymbolicLink())))
+        }
+        catch (error) { return callback(fail(error)) }
     })
 
-    const isSymlink = path => nativeBinding(callback => {
+    const makeSymlink = F3((target, filename, type) => nativeBinding(callback => {
         try {
-            fs.lstat(path, (err, stats) => callback(err ? fail(err) : succeed(stats.isSymbolicLink())))
+            fs.symlink(target, filename, type, err => callback(err ? fail(err) : succeed()))
         }
-        catch (error) {callback(fail(error))}
-    })
-
-    const makeSymlink = (target, path, type) => nativeBinding(callback => {
-        try {
-            fs.symlink(target, path, type, err => callback(err ? fail(err) : succeed()))
-        }
-        catch (error) {callback(fail(error))}
-    })
+        catch (error) { return callback(fail(error)) }
+    }))
 
     const exports =
         { copy
+        , exists
+        , isSymlink
+        , makeSymlink : makeSymlink
+        , mkdirp : mkdirp_
         , readFileAsString
         , readFileAsBuffer
         , remove
+        , rename : rename
         , writeFileFromString
         , writeFileFromBuffer
-        , exists
-        , mkdirp : mkdirp_
-        , rename : F2(rename)
-		, isSymlink
-		, makeSymlink : F3(makeSymlink)
         }
     return exports
 })()
@@ -10401,36 +10414,36 @@ var _elm_node$core$Node_FileSystem_LowLevel$readFileAsString = _elm_node$core$Na
 var _elm_node$core$Node_FileSystem_LowLevel$copy = _elm_node$core$Native_FileSystem.copy;
 
 var _elm_node$core$Node_FileSystem$makeSymlink = F3(
-	function (target, path, type_) {
+	function (target, filename, type_) {
 		return A2(
 			_elm_lang$core$Task$mapError,
 			_elm_node$core$Node_Error$fromValue,
-			A3(_elm_node$core$Node_FileSystem_LowLevel$makeSymlink, target, path, type_));
+			A3(_elm_node$core$Node_FileSystem_LowLevel$makeSymlink, target, filename, type_));
 	});
-var _elm_node$core$Node_FileSystem$isSymlink = function (path) {
+var _elm_node$core$Node_FileSystem$isSymlink = function (filename) {
 	return A2(
 		_elm_lang$core$Task$mapError,
 		_elm_node$core$Node_Error$fromValue,
-		_elm_node$core$Node_FileSystem_LowLevel$isSymlink(path));
+		_elm_node$core$Node_FileSystem_LowLevel$isSymlink(filename));
 };
 var _elm_node$core$Node_FileSystem$rename = F2(
-	function (oldPath, newPath) {
+	function (from, to) {
 		return A2(
 			_elm_lang$core$Task$mapError,
 			_elm_node$core$Node_Error$fromValue,
-			A2(_elm_node$core$Node_FileSystem_LowLevel$rename, oldPath, newPath));
+			A2(_elm_node$core$Node_FileSystem_LowLevel$rename, from, to));
 	});
-var _elm_node$core$Node_FileSystem$mkdirp = function (path) {
+var _elm_node$core$Node_FileSystem$mkdirp = function (filename) {
 	return A2(
 		_elm_lang$core$Task$mapError,
 		_elm_node$core$Node_Error$fromValue,
-		_elm_node$core$Node_FileSystem_LowLevel$mkdirp(path));
+		_elm_node$core$Node_FileSystem_LowLevel$mkdirp(filename));
 };
-var _elm_node$core$Node_FileSystem$exists = function (path) {
+var _elm_node$core$Node_FileSystem$exists = function (filename) {
 	return A2(
 		_elm_lang$core$Task$mapError,
 		_elm_node$core$Node_Error$fromValue,
-		_elm_node$core$Node_FileSystem_LowLevel$exists(path));
+		_elm_node$core$Node_FileSystem_LowLevel$exists(filename));
 };
 var _elm_node$core$Node_FileSystem$writeFileFromBuffer = F3(
 	function (filename, mode, data) {
@@ -11410,8 +11423,8 @@ var _panosoft$elm_docs$Docs_Generator$makeTableOfContents = F2(
 					return _elm_lang$core$Native_Utils.crash(
 						'Docs.Generator',
 						{
-							start: {line: 165, column: 21},
-							end: {line: 165, column: 32}
+							start: {line: 171, column: 21},
+							end: {line: 171, column: 32}
 						})('BUG: non-unique name');
 				},
 				_1: function (dict) {
@@ -11782,8 +11795,8 @@ var _panosoft$elm_docs$Docs_Generator$processComments = function (_p12) {
 								return _elm_lang$core$Native_Utils.crash(
 									'Docs.Generator',
 									{
-										start: {line: 191, column: 33},
-										end: {line: 191, column: 44}
+										start: {line: 197, column: 33},
+										end: {line: 197, column: 44}
 									})('BUG: bad regex');
 							},
 							_1: A2(
@@ -12172,672 +12185,561 @@ var _panosoft$elm_docs$Docs_Generator$generate = F3(
 					A2(_elm_node$core$Node_FileSystem$readFileAsString, source, _elm_node$core$Node_Encoding$Utf8))));
 	});
 
-
-const _panosoft$elm_grove$Native_Git = (_ => {
-	const os = require('os');
-	const path = require('path');
-	const git = require('nodegit');
-	const rm = require('rimraf');
-	const mkdirp = require('mkdirp');
-
+const _panosoft$elm_grove$Native_Console = (_ => {
 	/* global _elm_lang$core$Native_Scheduler:false _elm_lang$core$Native_List:false */
 	const { nativeBinding, succeed, fail } = _elm_lang$core$Native_Scheduler;
-	const { toArray, fromArray } = _elm_lang$core$Native_List;
-
-	const failure = (callback, prefix) => error => callback(fail(prefix + ' (' + error + ')'));
-
-	const clone = url => nativeBinding(callback => {
-		try {
-			const fail = failure(callback, 'Unable to clone: ' + url);
-			const w = '[a-zA-Z0-9]';
-			const hostnameRegex = `(?:(?:${w}|${w}[a-zA-Z0-9-]*${w})\.)*(?:${w}|${w}[A-Za-z0-9-]*${w})`;
-			const repoRegex = '([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)';
-			const sshRegex = RegExp(`^git@${hostnameRegex}:${repoRegex}(?:\.git)?$`, 'g');
-			const httpRegex = RegExp(`^https?://${hostnameRegex}/${repoRegex}(?:\.git)?$`, 'g');
-			let match = sshRegex.exec(url);
-			if (!match)
-				match = httpRegex.exec(url);
-			if (match && match[1]) {
-				const cloneLocation = path.join(os.tmpdir(), match[1], match[2]);
-				rm(cloneLocation, err => {
-					if (err)
-						callback(fail(err));
-					else {
-						git.Clone(url, cloneLocation, {
-							fetchOpts: {
-								callbacks: {
-									certificateCheck: _ => 1,
-									credentials: (url, username) => git.Cred.sshKeyNew(username, path.join(os.homedir(), '.ssh', 'id_rsa.pub'), path.join(os.homedir(), '.ssh', 'id_rsa'), '')
-								}
-							}
-						})
-						.then(repo => callback(succeed({repo, url, cloneLocation})))
-						.catch(fail);
-					}
-				});
-			}
-			else
-				fail('Invalid url');
-		}
-		catch (error) { fail(error); }
-	});
-
-	const initRepo = path => nativeBinding(callback => {
-		const fail = failure(callback, 'Unable to init repo at: ' + path);
-		try {
-			git.Repository.init(path, 0)
-			.then(repo => callback(succeed({repo, url: 'file://' + path})))
-			.catch(fail);
-		}
-		catch (error) { fail(error); }
-	});
-
-	const getRepo = path => nativeBinding(callback => {
-		const fail = failure(callback, 'Unable get repo at: ' + path);
-		try {
-			git.Repository.open(path)
-			.then(repo => callback(succeed({repo, url: 'file://' + path})))
-			.catch(fail);
-		}
-		catch (error) { fail(error); }
-	});
-
-	const createLightweightTag = (Repo, tagName) => nativeBinding(callback => {
-		const fail = failure(callback, 'Unable create tag: ' + tagName + ' for repo: ' + Repo.url);
-		try {
-			Repo.repo.getHeadCommit()
-			.then(commit =>
-				git.Tag.createLightweight(Repo.repo, tagName, commit, 0)
-				.then(tag => callback(succeed(tag)))
-				.catch(fail)
-			)
-			.catch(fail);
-		}
-		catch (error) { fail(error); }
-	});
-
-	const createAnnotatedTag = (Repo, tagName, message) => nativeBinding(callback => {
-		const fail = failure(callback, 'Unable create tag: ' + tagName + ' for repo: ' + Repo.url);
-		try {
-			Repo.repo.getHeadCommit()
-			.then(commit =>
-				Repo.repo.createTag(commit.id().tostrS(), tagName, message)
-				.then(tag => callback(succeed(tag)))
-				.catch(fail)
-			)
-			.catch(fail);
-		}
-		catch (error) { fail(error); }
-	});
-
-	const getTags = Repo => nativeBinding(callback => {
-		const fail = failure(callback, 'Unable get tags for repo: ' + Repo.url);
-		try {
-			git.Tag.list(Repo.repo)
-			.then(list => callback(succeed(fromArray(list))))
-			.catch(fail);
-		}
-		catch (error) { fail(error); }
-	});
-
-	const getFileStatuses = Repo => nativeBinding(callback => {
-		const filter = list => list.filter(x => x);
-		Repo.repo.getStatusExt()
-		.then(fileStatuses => {
-			callback (succeed ({
-				'conflicted': fromArray(filter(fileStatuses.map(status => status.isConflicted() ? status.path() : null))),
-				'deleted': fromArray(filter(fileStatuses.map(status => status.isDeleted() ? status.path() : null))),
-				'modified': fromArray(filter(fileStatuses.map(status => status.isModified() ? status.path() : null))),
-				'$new': fromArray(filter(fileStatuses.map(status => status.isNew() ? status.path() : null))),
-				'renamed': fromArray(filter(fileStatuses.map(status => status.isRenamed() ? status.path() : null))),
-				'typeChange': fromArray(filter(fileStatuses.map(status => status.isTypechange() ? status.path() : null))),
-			}));
-		})
-		.catch(fail);
-	});
-
-	const commit = (Repo, filesToAdd, filesToDelete, message) => nativeBinding(callback => {
-		const fail = failure(callback, 'Unable commit to repo: ' + Repo.url);
-		try {
-			let _index;
-			Repo.repo.refreshIndex()
-			.then (index => _index = index)
-			.then (_ => toArray(filesToAdd).reduce( (lastFilePromise, path) => lastFilePromise .then(_ => _index.addByPath(path)), Promise.resolve()))
-			.then (_ => toArray(filesToDelete).reduce( (lastFilePromise, path) => lastFilePromise .then(_ => _index.removeByPath(path)), Promise.resolve()))
-			.then (_ => _index.write())
-			.then (_ => _index.writeTree())
-			.then(treeOid =>
-				Repo.repo.getHeadCommit()
-				.then (parent =>
-					Repo.repo.createCommit('HEAD', git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message, treeOid, parent ? [parent] : parent)
-					.then(oid => callback(succeed(oid.tostrS())))
-				)
-			)
-			.catch(fail);
-		}
-		catch (error) { fail(error); }
-	});
-
-	// const commit = (Repo, filesToAdd, filesToDelete, message) => nativeBinding(callback => {
-	// 	const fail = failure(callback, 'Unable commit to repo: ' + Repo.url);
-	// 	try {
-	// 		Repo.repo.refreshIndex()
-	// 		.then (index =>
-	// 			toArray(filesToDelete).reduce( (lastFilePromise, path) => lastFilePromise
-	// 			.then(_ => index.removeByPath(path)), Promise.resolve())
-	// 			.then (_ => index.write())
-	// 			.then (_ => index.writeTree())
-	// 		)
-	// 		.then(_ =>
-	// 			Repo.repo.createCommitOnHead(toArray(filesToAdd), git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message)
-	// 			.then(oid => callback(succeed(oid.tostrS())))
-	// 		)
-	// 		.catch(fail);
-	// 	}
-	// 	catch (error) { fail(error); }
-	// });
-	//
-	const checkout = (Repo, tag, targetDirectory) => nativeBinding(callback => {
-		const fail = failure(callback, 'Unable check out tag: "' + tag + '" for repo: '+ Repo.url);
-		try {
-			const co = commit =>
-				mkdirp(targetDirectory, err =>
-					err ? fail(err) :
-						git.Checkout.tree(Repo.repo, commit, {
-							checkoutStrategy: git.Checkout.STRATEGY.FORCE,
-							targetDirectory
-						}).then(_ => callback(succeed()))
-						.catch(fail)
-				);
-			// first treat the tag as an Annotated Tag, if errors then treat as Lightweight Tag
-			Repo.repo.getTagByName(tag)
-			.then(co)
-			// .then(oid =>  co(oid.id().toString()))
-			.catch(_ =>
-				Repo.repo.getReferenceCommit(tag)
-				.then(co)
-				.catch(fail)
-			);
-		}
-		catch (error) { fail(error); }
-	});
 	///////////////////////////////////////////////////////////////////////////////////////////////////
-	/* global F2:false, F3:false, F4:false */
+	const log = msg => nativeBinding(callback => {
+		/*eslint no-control-regex: "off"*/
+		const displayMsg = process.stdout.isTTY ? msg : msg.replace(/\x1B\[\d+?m/g, '');
+		console.log(displayMsg);
+		callback(succeed(msg));
+	});
+
 	return {
-		clone,
-		initRepo,
-		getRepo,
-		createLightweightTag: F2(createLightweightTag),
-		createAnnotatedTag: F3(createAnnotatedTag),
-		getTags,
-		getFileStatuses,
-		commit: F4(commit),
-		checkout: F3(checkout)
+		log
 	};
 })();
 
-var _panosoft$elm_grove$Git$printableRepo = function (repo) {
+var _panosoft$elm_grove$Console$log = _panosoft$elm_grove$Native_Console.log;
+
+var _panosoft$elm_grove$Output$getPrefix = function (msg) {
 	return function (_p0) {
 		var _p1 = _p0;
-		return _elm_lang$core$Basics$toString(
-			{url: _p1.url, cloneLocation: _p1.cloneLocation});
-	}(repo);
-};
-var _panosoft$elm_grove$Git$checkout = _panosoft$elm_grove$Native_Git.checkout;
-var _panosoft$elm_grove$Git$commit = _panosoft$elm_grove$Native_Git.commit;
-var _panosoft$elm_grove$Git$getFileStatuses = _panosoft$elm_grove$Native_Git.getFileStatuses;
-var _panosoft$elm_grove$Git$getTags = _panosoft$elm_grove$Native_Git.getTags;
-var _panosoft$elm_grove$Git$createAnnotatedTag = _panosoft$elm_grove$Native_Git.createAnnotatedTag;
-var _panosoft$elm_grove$Git$createLightweightTag = _panosoft$elm_grove$Native_Git.createLightweightTag;
-var _panosoft$elm_grove$Git$getRepo = _panosoft$elm_grove$Native_Git.getRepo;
-var _panosoft$elm_grove$Git$initRepo = _panosoft$elm_grove$Native_Git.initRepo;
-var _panosoft$elm_grove$Git$clone = _panosoft$elm_grove$Native_Git.clone;
-var _panosoft$elm_grove$Git$fileStatusAccessors = {
-	ctor: '::',
-	_0: {
-		ctor: '_Tuple2',
-		_0: function (_) {
-			return _.conflicted;
-		},
-		_1: 'conflicted'
-	},
-	_1: {
-		ctor: '::',
-		_0: {
+		return {
 			ctor: '_Tuple2',
-			_0: function (_) {
-				return _.deleted;
-			},
-			_1: 'deleted'
-		},
-		_1: {
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: function (_) {
-					return _.modified;
-				},
-				_1: 'modified'
-			},
-			_1: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: function (_) {
-						return _.$new;
-					},
-					_1: 'new'
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: function (_) {
-							return _.renamed;
-						},
-						_1: 'renamed'
-					},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: function (_) {
-								return _.typeChange;
-							},
-							_1: 'typeChange'
-						},
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		}
-	}
-};
-var _panosoft$elm_grove$Git$Repo = F3(
-	function (a, b, c) {
-		return {repo: a, url: b, cloneLocation: c};
-	});
-var _panosoft$elm_grove$Git$FileStatuses = F6(
-	function (a, b, c, d, e, f) {
-		return {conflicted: a, deleted: b, modified: c, $new: d, renamed: e, typeChange: f};
-	});
-var _panosoft$elm_grove$Git$String = {ctor: 'String'};
-var _panosoft$elm_grove$Git$RepoOpaque = {ctor: 'RepoOpaque'};
-var _panosoft$elm_grove$Git$Tag = {ctor: 'Tag'};
-
-var _panosoft$elm_grove$Version$nextPatch = function (version) {
-	return _elm_lang$core$Native_Utils.update(
-		version,
-		{patch: version.patch + 1});
-};
-var _panosoft$elm_grove$Version$nextMinor = function (version) {
-	return _elm_lang$core$Native_Utils.update(
-		version,
-		{minor: version.minor + 1, patch: 0});
-};
-var _panosoft$elm_grove$Version$nextMajor = function (version) {
-	return _elm_lang$core$Native_Utils.update(
-		version,
-		{major: version.major + 1, minor: 0, patch: 0});
-};
-var _panosoft$elm_grove$Version$versionCompare = F2(
-	function (v1, v2) {
-		return function (diff) {
-			return A2(
-				_panosoft$elm_utils$Utils_Ops_ops['?'],
-				_elm_lang$core$Native_Utils.eq(diff, 0),
-				{
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Basics$EQ,
-					_1: A2(
-						_panosoft$elm_utils$Utils_Ops_ops['?'],
-						_elm_lang$core$Native_Utils.cmp(diff, 0) > 0,
-						{ctor: '_Tuple2', _0: _elm_lang$core$Basics$GT, _1: _elm_lang$core$Basics$LT})
-				});
-		}(
-			A2(
-				_panosoft$elm_utils$Utils_Ops_ops['?'],
-				_elm_lang$core$Native_Utils.eq(v1.major, v2.major),
-				{
-					ctor: '_Tuple2',
-					_0: A2(
-						_panosoft$elm_utils$Utils_Ops_ops['?'],
-						_elm_lang$core$Native_Utils.eq(v1.minor, v2.minor),
-						{ctor: '_Tuple2', _0: v1.patch - v2.patch, _1: v1.minor - v2.minor}),
-					_1: v1.major - v2.major
-				}));
-	});
-var _panosoft$elm_grove$Version$inRange = F2(
-	function (range, version) {
-		var _p0 = range;
-		if (_p0.ctor === 'Range') {
-			return A2(
-				_panosoft$elm_utils$Utils_Ops_ops['?'],
-				A2(
-					_elm_lang$core$List$member,
-					A2(_panosoft$elm_grove$Version$versionCompare, version, _p0._0),
-					{
-						ctor: '::',
-						_0: _elm_lang$core$Basics$EQ,
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$core$Basics$GT,
-							_1: {ctor: '[]'}
-						}
-					}),
-				{
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.eq(
-						A2(_panosoft$elm_grove$Version$versionCompare, version, _p0._1),
-						_elm_lang$core$Basics$LT),
-					_1: false
-				});
-		} else {
-			return _elm_lang$core$Native_Utils.eq(
-				A2(_panosoft$elm_grove$Version$versionCompare, version, _p0._0),
-				_elm_lang$core$Basics$EQ);
-		}
-	});
-var _panosoft$elm_grove$Version$versionToString = function (version) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_elm_lang$core$Basics$toString(version.major),
+			_0: A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '†', '\n', _p1._0),
+			_1: A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '†', '\n', _p1._1)
+		};
+	}(
 		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'.',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(version.minor),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'.',
-					_elm_lang$core$Basics$toString(version.patch)))));
-};
-var _panosoft$elm_grove$Version$rangeToString = function (range) {
-	var _p1 = range;
-	if (_p1.ctor === 'Range') {
-		return A2(
-			_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-			A2(
-				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-				_panosoft$elm_grove$Version$versionToString(_p1._0),
-				'<= v <'),
-			_panosoft$elm_grove$Version$versionToString(_p1._1));
-	} else {
-		var _p2 = _p1._0;
-		return A2(
-			_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-			A2(
-				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-				_panosoft$elm_grove$Version$versionToString(_p2),
-				'<= v <='),
-			_panosoft$elm_grove$Version$versionToString(_p2));
-	}
-};
-var _panosoft$elm_grove$Version$get = F2(
-	function (index, list) {
-		return A2(
-			_panosoft$elm_utils$Utils_Ops_ops['?='],
-			A2(
-				_panosoft$elm_utils$Utils_Ops_ops['?='],
-				A2(_panosoft$elm_utils$Utils_Ops_ops['!!'], list, index),
-				_elm_lang$core$Maybe$Just('')),
-			'');
-	});
-var _panosoft$elm_grove$Version$getNum = F2(
-	function (index, list) {
-		return A2(
-			_panosoft$elm_utils$Utils_Ops_ops['??='],
-			_elm_lang$core$String$toInt(
-				A2(_panosoft$elm_grove$Version$get, index, list)),
-			_elm_lang$core$Basics$always(0));
-	});
-var _panosoft$elm_grove$Version$Version = F3(
-	function (a, b, c) {
-		return {major: a, minor: b, patch: c};
-	});
-var _panosoft$elm_grove$Version$versionFromString = function (versionStr) {
-	return A2(
-		_panosoft$elm_utils$Utils_Ops_ops['|?>'],
-		_elm_lang$core$List$head(
-			A3(
-				_elm_lang$core$Regex$find,
-				_elm_lang$core$Regex$All,
-				_elm_lang$core$Regex$regex('^(\\d+)\\.(\\d+)\\.(\\d+)$'),
-				versionStr)),
-		function (match) {
-			return A3(
-				_panosoft$elm_grove$Version$Version,
-				A2(_panosoft$elm_grove$Version$getNum, 0, match.submatches),
-				A2(_panosoft$elm_grove$Version$getNum, 1, match.submatches),
-				A2(_panosoft$elm_grove$Version$getNum, 2, match.submatches));
-		});
-};
-var _panosoft$elm_grove$Version$ExactRange = function (a) {
-	return {ctor: 'ExactRange', _0: a};
-};
-var _panosoft$elm_grove$Version$rangeFromVersion = function (version) {
-	return _panosoft$elm_grove$Version$ExactRange(version);
-};
-var _panosoft$elm_grove$Version$Range = F2(
-	function (a, b) {
-		return {ctor: 'Range', _0: a, _1: b};
-	});
-var _panosoft$elm_grove$Version$rangeFromString = function (rangeStr) {
-	return A2(
-		_panosoft$elm_utils$Utils_Ops_ops['?='],
-		A2(
-			_panosoft$elm_utils$Utils_Ops_ops['|?>'],
+			_panosoft$elm_utils$Utils_Ops_ops['|?->'],
 			_elm_lang$core$List$head(
 				A3(
 					_elm_lang$core$Regex$find,
-					_elm_lang$core$Regex$All,
-					_elm_lang$core$Regex$regex('^(\\d+\\.\\d+\\.\\d+)\\s+<=\\s+v\\s+<(=?)\\s+(\\d+\\.\\d+\\.\\d+)$'),
-					rangeStr)),
-			function (match) {
-				return A2(
-					_panosoft$elm_utils$Utils_Ops_ops['?='],
-					A2(
-						_panosoft$elm_utils$Utils_Ops_ops['|?>'],
-						_panosoft$elm_grove$Version$versionFromString(
-							A2(_panosoft$elm_grove$Version$get, 0, match.submatches)),
-						function (from) {
-							return A2(
-								_panosoft$elm_utils$Utils_Ops_ops['?='],
-								A2(
-									_panosoft$elm_utils$Utils_Ops_ops['|?>'],
-									_panosoft$elm_grove$Version$versionFromString(
-										A2(_panosoft$elm_grove$Version$get, 2, match.submatches)),
-									function (to) {
-										return A2(
-											_panosoft$elm_utils$Utils_Ops_ops['?'],
-											_elm_lang$core$Native_Utils.eq(
-												A2(_panosoft$elm_grove$Version$get, 1, match.submatches),
-												'='),
-											{
-												ctor: '_Tuple2',
-												_0: A2(
-													_panosoft$elm_utils$Utils_Ops_ops['?'],
-													!_elm_lang$core$Native_Utils.eq(from, to),
-													{
-														ctor: '_Tuple2',
-														_0: _elm_lang$core$Maybe$Nothing,
-														_1: _elm_lang$core$Maybe$Just(
-															_panosoft$elm_grove$Version$ExactRange(from))
-													}),
-												_1: _elm_lang$core$Maybe$Just(
-													A2(_panosoft$elm_grove$Version$Range, from, to))
-											});
-									}),
-								_elm_lang$core$Maybe$Nothing);
-						}),
-					_elm_lang$core$Maybe$Nothing);
-			}),
-		_elm_lang$core$Maybe$Nothing);
-};
-var _panosoft$elm_grove$Version$toRangeToNextMajorVersion = function (version) {
-	return _panosoft$elm_grove$Version$rangeToString(
-		A2(
-			_panosoft$elm_grove$Version$Range,
-			version,
-			_elm_lang$core$Native_Utils.update(
-				version,
-				{major: version.major + 1, minor: 0, patch: 0})));
-};
-
-var _panosoft$elm_grove$AppUtils$determineJsonIndent = function (json) {
-	return A2(
-		_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-		_elm_lang$core$List$head(
-			A3(
-				_elm_lang$core$Regex$find,
-				_elm_lang$core$Regex$AtMost(1),
-				_elm_lang$core$Regex$regex('†(\\s*)\"'),
-				A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\n', '†', json))),
-		{
-			ctor: '_Tuple2',
-			_0: 4,
-			_1: function (match) {
-				return _elm_lang$core$String$length(
-					_panosoft$elm_utils$Utils_Match$getSubmatches1(match));
-			}
-		});
-};
-var _panosoft$elm_grove$AppUtils$sortedVersions = function (tags) {
-	return _elm_lang$core$List$reverse(
-		A2(
-			_elm_lang$core$List$sortWith,
-			_panosoft$elm_grove$Version$versionCompare,
-			A2(_elm_lang$core$List$filterMap, _panosoft$elm_grove$Version$versionFromString, tags)));
-};
-var _panosoft$elm_grove$AppUtils$writeFile = function (filename) {
-	return A3(_elm_node$core$Node_FileSystem$writeFileFromString, filename, '666', _elm_node$core$Node_Encoding$Utf8);
-};
-var _panosoft$elm_grove$AppUtils$pathJoin = F3(
-	function (pathSep, rootDir, pathParts) {
-		return function (pathParts) {
-			return function (isAbsolute) {
-				return A2(
-					_elm_lang$core$String$join,
-					pathSep,
-					A2(
-						_panosoft$elm_utils$Utils_Ops_ops['?'],
-						isAbsolute,
-						{
-							ctor: '_Tuple2',
-							_0: pathParts,
-							_1: {ctor: '::', _0: rootDir, _1: pathParts}
-						}));
-			}(
-				A2(
-					_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-					_elm_lang$core$List$head(pathParts),
-					{
-						ctor: '_Tuple2',
-						_0: false,
-						_1: function (root) {
-							return _elm_lang$core$Native_Utils.eq(
-								A2(_elm_lang$core$String$left, 1, root),
-								pathSep);
-						}
-					}));
-		}(
-			A2(
-				_elm_lang$core$List$filter,
-				F2(
-					function (x, y) {
-						return !_elm_lang$core$Native_Utils.eq(x, y);
-					})(''),
-				pathParts));
-	});
-var _panosoft$elm_grove$AppUtils$msgToCmd = function (msg) {
-	return A2(
-		_elm_lang$core$Task$perform,
-		_elm_lang$core$Basics$always(msg),
-		_elm_lang$core$Task$succeed(
-			{ctor: '_Tuple0'}));
-};
-var _panosoft$elm_grove$AppUtils$bugMissing = F2(
-	function (missing, _p0) {
-		return _elm_lang$core$Native_Utils.crash(
-			'AppUtils',
+					_elm_lang$core$Regex$AtMost(1),
+					_elm_lang$core$Regex$regex('^(†*)(.+$)'),
+					A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\n', '†', msg))),
 			{
-				start: {line: 33, column: 12},
-				end: {line: 33, column: 23}
-			})(
-			A2(
-				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-				A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'BUG:', missing),
-				'missing'));
-	});
-var _panosoft$elm_grove$AppUtils$bug = F2(
-	function (message, _p1) {
-		return _elm_lang$core$Native_Utils.crash(
-			'AppUtils',
-			{
-				start: {line: 28, column: 12},
-				end: {line: 28, column: 23}
-			})(
-			A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'BUG:', message));
-	});
-
-var _panosoft$elm_grove$Package$defaultGitServer = 'https://github.com/';
-var _panosoft$elm_grove$Package$defaultRepoLocation = function (packageName) {
+				ctor: '_Tuple2',
+				_0: {ctor: '_Tuple2', _0: '', _1: msg},
+				_1: _panosoft$elm_utils$Utils_Match$getSubmatches2
+			}));
+};
+var _panosoft$elm_grove$Output$parens = function (str) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
-		_panosoft$elm_grove$Package$defaultGitServer,
-		A2(_elm_lang$core$Basics_ops['++'], packageName, '.git'));
+		'(',
+		A2(_elm_lang$core$Basics_ops['++'], str, ')'));
 };
-var _panosoft$elm_grove$Package$getRepoLocation = F2(
-	function (sources, packageName) {
+var _panosoft$elm_grove$Output$colorize = F2(
+	function (color, str) {
 		return A2(
-			_panosoft$elm_utils$Utils_Ops_ops['?='],
-			A2(
-				_elm_lang$core$Dict$get,
-				packageName,
-				A2(_panosoft$elm_utils$Utils_Ops_ops['?='], sources, _elm_lang$core$Dict$empty)),
-			_panosoft$elm_grove$Package$defaultRepoLocation(packageName));
-	});
-var _panosoft$elm_grove$Package$elmCorePackageName = 'elm-lang/core';
-var _panosoft$elm_grove$Package$elmJsonFilename = 'elm-package.json';
-var _panosoft$elm_grove$Package$npmJsonFilename = 'package.json';
-var _panosoft$elm_grove$Package$elmVersion = function (elmVersion) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		'0.',
-		A2(
 			_elm_lang$core$Basics_ops['++'],
-			_elm_lang$core$Basics$toString(elmVersion),
+			'[',
 			A2(
 				_elm_lang$core$Basics_ops['++'],
-				'.0 <= v < 0.',
+				_elm_lang$core$Basics$toString(color),
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(elmVersion + 1),
-					'.0'))));
+					'm',
+					A2(_elm_lang$core$Basics_ops['++'], str, '[0m'))));
+	});
+var _panosoft$elm_grove$Output$magenta = 35;
+var _panosoft$elm_grove$Output$cyan = 36;
+var _panosoft$elm_grove$Output$yellow = 33;
+var _panosoft$elm_grove$Output$warnLog = function (msg) {
+	return function (_p2) {
+		var _p3 = _p2;
+		return _panosoft$elm_grove$Console$log(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p3._0,
+				A2(
+					_panosoft$elm_grove$Output$colorize,
+					_panosoft$elm_grove$Output$yellow,
+					A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'WARNING:', _p3._1))));
+	}(
+		_panosoft$elm_grove$Output$getPrefix(msg));
 };
-var _panosoft$elm_grove$Package$exactDependenciesFileName = 'exact-dependencies.json';
-var _panosoft$elm_grove$Package$elmStuff = function (testing) {
+var _panosoft$elm_grove$Output$red = 31;
+var _panosoft$elm_grove$Output$errorLog = function (msg) {
+	return function (_p4) {
+		var _p5 = _p4;
+		return _panosoft$elm_grove$Console$log(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p5._0,
+				A2(
+					_panosoft$elm_grove$Output$colorize,
+					_panosoft$elm_grove$Output$red,
+					A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'ERROR:', _p5._1))));
+	}(
+		_panosoft$elm_grove$Output$getPrefix(msg));
+};
+var _panosoft$elm_grove$Output$green = 32;
+
+var _panosoft$elm_grove$ApiChanges$moduleListToDict = function (modules) {
+	return _elm_lang$core$Dict$fromList(
+		A2(
+			_elm_lang$core$List$map,
+			function (module_) {
+				return {
+					ctor: '_Tuple2',
+					_0: module_.name,
+					_1: {
+						aliases: _elm_lang$core$Dict$fromList(
+							A2(
+								_elm_lang$core$List$map,
+								function (alias_) {
+									return {ctor: '_Tuple2', _0: alias_.name, _1: alias_.type_};
+								},
+								module_.aliases)),
+						unions: _elm_lang$core$Dict$fromList(
+							A2(
+								_elm_lang$core$List$map,
+								function (union) {
+									return A2(
+										F2(
+											function (v0, v1) {
+												return {ctor: '_Tuple2', _0: v0, _1: v1};
+											}),
+										A2(
+											_elm_lang$core$String$join,
+											' ',
+											{ctor: '::', _0: union.name, _1: union.args}),
+										_elm_lang$core$Dict$fromList(
+											A2(
+												_elm_lang$core$List$map,
+												function (_p0) {
+													var _p1 = _p0;
+													return {ctor: '_Tuple2', _0: _p1._0, _1: _p1._1};
+												},
+												union.tags)));
+								},
+								module_.unions)),
+						values: _elm_lang$core$Dict$fromList(
+							A2(
+								_elm_lang$core$List$map,
+								function (value) {
+									return {ctor: '_Tuple2', _0: value.name, _1: value.type_};
+								},
+								module_.values))
+					}
+				};
+			},
+			modules));
+};
+var _panosoft$elm_grove$ApiChanges$unionDictToNameTypeDict = function (dict) {
+	return A2(
+		_elm_lang$core$Dict$map,
+		F2(
+			function (name, sumTypesDict) {
+				return A2(
+					_elm_lang$core$String$join,
+					' | ',
+					_elm_lang$core$Dict$values(
+						A2(
+							_elm_lang$core$Dict$map,
+							F2(
+								function (name, types) {
+									return A2(
+										_elm_lang$core$String$join,
+										' ',
+										{ctor: '::', _0: name, _1: types});
+								}),
+							sumTypesDict)));
+			}),
+		dict);
+};
+var _panosoft$elm_grove$ApiChanges$parens = function (s) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'(',
+		A2(_elm_lang$core$Basics_ops['++'], s, ')'));
+};
+var _panosoft$elm_grove$ApiChanges$parenFuncTypes = function (type_) {
 	return A2(
 		_panosoft$elm_utils$Utils_Ops_ops['?'],
-		testing,
-		{ctor: '_Tuple2', _0: 'elm-test-stuff', _1: 'elm-stuff'});
+		A2(_elm_lang$core$String$contains, '->', type_),
+		{
+			ctor: '_Tuple2',
+			_0: _panosoft$elm_grove$ApiChanges$parens(type_),
+			_1: type_
+		});
 };
-var _panosoft$elm_grove$Package$elmPackagesRoot = F2(
-	function (testing, pathSep) {
+var _panosoft$elm_grove$ApiChanges$mtModuleElements = {aliases: _elm_lang$core$Dict$empty, unions: _elm_lang$core$Dict$empty, values: _elm_lang$core$Dict$empty};
+var _panosoft$elm_grove$ApiChanges$removeRedundantTypes = function (code) {
+	return A4(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('(\\b\\w+\\b)\\.(\\b\\w+\\b)'),
+		function (match) {
+			return function (_p2) {
+				var _p3 = _p2;
+				var _p5 = _p3._1;
+				var _p4 = _p3._0;
+				return A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?'],
+					_elm_lang$core$Native_Utils.eq(_p4, _p5),
+					{
+						ctor: '_Tuple2',
+						_0: _p4,
+						_1: A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p4,
+							A2(_elm_lang$core$Basics_ops['++'], '.', _p5))
+					});
+			}(
+				_panosoft$elm_utils$Utils_Match$getSubmatches2(match));
+		},
+		code);
+};
+var _panosoft$elm_grove$ApiChanges$moduleApiChangesToString = function (moduleApiChanges) {
+	return function (changeReport) {
 		return A2(
-			_elm_lang$core$String$join,
-			pathSep,
+			_elm_lang$core$Basics_ops['++'],
+			'',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?'],
+					_elm_lang$core$Native_Utils.eq(
+						changeReport.additions,
+						{ctor: '[]'}),
+					{
+						ctor: '_Tuple2',
+						_0: '',
+						_1: A2(
+							_elm_lang$core$Basics_ops['++'],
+							'\tAdded:\n',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'\t-----\n',
+								_panosoft$elm_grove$ApiChanges$removeRedundantTypes(
+									A2(_elm_lang$core$String$join, '\n', changeReport.additions))))
+					}),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?'],
+						_elm_lang$core$Native_Utils.eq(
+							changeReport.changes,
+							{ctor: '[]'}),
+						{
+							ctor: '_Tuple2',
+							_0: '',
+							_1: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'\n\n\tChanged:',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'\n\t-------\n',
+									_panosoft$elm_grove$ApiChanges$removeRedundantTypes(
+										A2(_elm_lang$core$String$join, '\n\n', changeReport.changes))))
+						}),
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?'],
+						_elm_lang$core$Native_Utils.eq(
+							changeReport.deletions,
+							{ctor: '[]'}),
+						{
+							ctor: '_Tuple2',
+							_0: '',
+							_1: A2(
+								_elm_lang$core$Basics_ops['++'],
+								'\n\n\tDeleted:',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'\n\t-------\n',
+									_panosoft$elm_grove$ApiChanges$removeRedundantTypes(
+										A2(_elm_lang$core$String$join, '\n', changeReport.deletions))))
+						}))));
+	}(
+		A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (_p6, changeReport) {
+					var _p7 = _p6;
+					var _p9 = _p7._0;
+					var _p8 = _p7._1;
+					switch (_p8.ctor) {
+						case 'Addition':
+							return _elm_lang$core$Native_Utils.update(
+								changeReport,
+								{
+									additions: {
+										ctor: '::',
+										_0: A2(
+											_panosoft$elm_grove$Output$colorize,
+											_panosoft$elm_grove$Output$green,
+											A2(
+												_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+												A2(
+													_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+													A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], '\t\t+', _p9),
+													':'),
+												_p8._0)),
+										_1: changeReport.additions
+									}
+								});
+						case 'Change':
+							return _elm_lang$core$Native_Utils.update(
+								changeReport,
+								{
+									changes: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$core$Basics_ops['++'],
+											A2(
+												_panosoft$elm_grove$Output$colorize,
+												_panosoft$elm_grove$Output$red,
+												A2(
+													_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+													A2(
+														_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+														A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], '\t\t-', _p9),
+														':'),
+													_p8._0.old)),
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'\n',
+												A2(
+													_panosoft$elm_grove$Output$colorize,
+													_panosoft$elm_grove$Output$green,
+													A2(
+														_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+														A2(
+															_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+															A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], '\t\t+', _p9),
+															':'),
+														_p8._0.$new)))),
+										_1: changeReport.changes
+									}
+								});
+						default:
+							return _elm_lang$core$Native_Utils.update(
+								changeReport,
+								{
+									deletions: {
+										ctor: '::',
+										_0: A2(
+											_panosoft$elm_grove$Output$colorize,
+											_panosoft$elm_grove$Output$red,
+											A2(
+												_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+												A2(
+													_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+													A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], '\t\t-', _p9),
+													':'),
+												_p8._0)),
+										_1: changeReport.deletions
+									}
+								});
+					}
+				}),
 			{
-				ctor: '::',
-				_0: _panosoft$elm_grove$Package$elmStuff(testing),
-				_1: {
-					ctor: '::',
-					_0: 'packages',
-					_1: {ctor: '[]'}
-				}
-			});
+				additions: {ctor: '[]'},
+				changes: {ctor: '[]'},
+				deletions: {ctor: '[]'}
+			},
+			_elm_lang$core$Dict$toList(moduleApiChanges)));
+};
+var _panosoft$elm_grove$ApiChanges$packageApiChangesToString = function (packageApiChanges) {
+	return function (separator) {
+		return function (changes) {
+			return A2(
+				_panosoft$elm_utils$Utils_Ops_ops['?'],
+				_elm_lang$core$Native_Utils.eq(
+					changes,
+					{ctor: '[]'}),
+				{
+					ctor: '_Tuple2',
+					_0: '',
+					_1: A3(
+						_elm_lang$core$Basics$flip,
+						F2(
+							function (x, y) {
+								return A2(_elm_lang$core$Basics_ops['++'], x, y);
+							}),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'\n\n',
+							A2(_elm_lang$core$Basics_ops['++'], separator, '\n\n')),
+						A2(
+							F2(
+								function (x, y) {
+									return A2(_elm_lang$core$Basics_ops['++'], x, y);
+								}),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'\n\n',
+								A2(_elm_lang$core$Basics_ops['++'], separator, '\n\n')),
+							A3(
+								_panosoft$elm_utils$Utils_Regex$replaceAll,
+								'\t',
+								'  ',
+								A2(
+									_elm_lang$core$String$join,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'\n\n',
+										A2(_elm_lang$core$Basics_ops['++'], separator, '\n\n')),
+									changes))))
+				});
+		}(
+			A2(
+				_elm_lang$core$List$filterMap,
+				_elm_lang$core$Basics$identity,
+				A2(
+					_elm_lang$core$List$map,
+					function (_p10) {
+						var _p11 = _p10;
+						return function (moduleChanges) {
+							return A2(
+								_panosoft$elm_utils$Utils_Ops_ops['?'],
+								_elm_lang$core$Native_Utils.eq(moduleChanges, ''),
+								{
+									ctor: '_Tuple2',
+									_0: _elm_lang$core$Maybe$Nothing,
+									_1: _elm_lang$core$Maybe$Just(
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											A2(
+												_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+												'MODULE:',
+												A2(_panosoft$elm_grove$Output$colorize, _panosoft$elm_grove$Output$magenta, _p11._0)),
+											A2(_elm_lang$core$Basics_ops['++'], '\n\n', moduleChanges)))
+								});
+						}(
+							_panosoft$elm_grove$ApiChanges$moduleApiChangesToString(_p11._1));
+					},
+					_elm_lang$core$Dict$toList(packageApiChanges))));
+	}('---------------------------------------------------------------------------------------------------------');
+};
+var _panosoft$elm_grove$ApiChanges$ModuleElements = F3(
+	function (a, b, c) {
+		return {aliases: a, unions: b, values: c};
 	});
+var _panosoft$elm_grove$ApiChanges$ModuleApiChangeReport = F3(
+	function (a, b, c) {
+		return {additions: a, changes: b, deletions: c};
+	});
+var _panosoft$elm_grove$ApiChanges$Deletion = function (a) {
+	return {ctor: 'Deletion', _0: a};
+};
+var _panosoft$elm_grove$ApiChanges$Change = function (a) {
+	return {ctor: 'Change', _0: a};
+};
+var _panosoft$elm_grove$ApiChanges$Addition = function (a) {
+	return {ctor: 'Addition', _0: a};
+};
+var _panosoft$elm_grove$ApiChanges$compareNameTypeDicts = F3(
+	function (currentDict, previousDict, moduleApiChanges) {
+		return function (moduleApiChanges) {
+			return A3(
+				_elm_lang$core$Dict$foldl,
+				F3(
+					function (name, previousType, changes) {
+						return A2(
+							_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+							A2(_elm_lang$core$Dict$get, name, previousDict),
+							{
+								ctor: '_Tuple2',
+								_0: A2(
+									_elm_lang$core$Dict$insert,
+									name,
+									_panosoft$elm_grove$ApiChanges$Addition(previousType)),
+								_1: _elm_lang$core$Basics$always(_elm_lang$core$Basics$identity)
+							})(changes);
+					}),
+				moduleApiChanges,
+				currentDict);
+		}(
+			A3(
+				_elm_lang$core$Dict$foldl,
+				F3(
+					function (name, previousType, changes) {
+						return A2(
+							_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+							A2(_elm_lang$core$Dict$get, name, currentDict),
+							{
+								ctor: '_Tuple2',
+								_0: A2(
+									_elm_lang$core$Dict$insert,
+									name,
+									_panosoft$elm_grove$ApiChanges$Deletion(previousType)),
+								_1: function (currentType) {
+									return A2(
+										_panosoft$elm_utils$Utils_Ops_ops['?'],
+										!_elm_lang$core$Native_Utils.eq(currentType, previousType),
+										{
+											ctor: '_Tuple2',
+											_0: A2(
+												_elm_lang$core$Dict$insert,
+												name,
+												_panosoft$elm_grove$ApiChanges$Change(
+													{old: previousType, $new: currentType})),
+											_1: _elm_lang$core$Basics$identity
+										});
+								}
+							})(changes);
+					}),
+				moduleApiChanges,
+				previousDict));
+	});
+var _panosoft$elm_grove$ApiChanges$compareModules = F2(
+	function (currentModule, previousModule) {
+		return A3(
+			_panosoft$elm_grove$ApiChanges$compareNameTypeDicts,
+			currentModule.values,
+			previousModule.values,
+			A3(
+				_panosoft$elm_grove$ApiChanges$compareNameTypeDicts,
+				_panosoft$elm_grove$ApiChanges$unionDictToNameTypeDict(currentModule.unions),
+				_panosoft$elm_grove$ApiChanges$unionDictToNameTypeDict(previousModule.unions),
+				A3(_panosoft$elm_grove$ApiChanges$compareNameTypeDicts, currentModule.aliases, previousModule.aliases, _elm_lang$core$Dict$empty)));
+	});
+var _panosoft$elm_grove$ApiChanges$compareModuleDicts = F2(
+	function (currentModules, previousModules) {
+		return function (packageApiChanges) {
+			return A3(
+				_elm_lang$core$Dict$foldl,
+				F3(
+					function (name, currentModule, packageApiChanges) {
+						return function (moduleApiChanges) {
+							return A3(_elm_lang$core$Dict$insert, name, moduleApiChanges, packageApiChanges);
+						}(
+							A2(
+								_panosoft$elm_grove$ApiChanges$compareModules,
+								currentModule,
+								A2(
+									_panosoft$elm_utils$Utils_Ops_ops['?='],
+									A2(_elm_lang$core$Dict$get, name, previousModules),
+									_panosoft$elm_grove$ApiChanges$mtModuleElements)));
+					}),
+				packageApiChanges,
+				A2(_elm_lang$core$Dict$diff, currentModules, previousModules));
+		}(
+			A3(
+				_elm_lang$core$Dict$foldl,
+				F3(
+					function (name, previousModule, packageApiChanges) {
+						return function (moduleApiChanges) {
+							return A3(_elm_lang$core$Dict$insert, name, moduleApiChanges, packageApiChanges);
+						}(
+							A2(
+								_panosoft$elm_grove$ApiChanges$compareModules,
+								A2(
+									_panosoft$elm_utils$Utils_Ops_ops['?='],
+									A2(_elm_lang$core$Dict$get, name, currentModules),
+									_panosoft$elm_grove$ApiChanges$mtModuleElements),
+								previousModule));
+					}),
+				_elm_lang$core$Dict$empty,
+				previousModules));
+	});
+
 
 var _panosoft$elm_utils$Utils_Tuple$map9 = F2(
 	function (f, _p0) {
@@ -13218,6 +13120,963 @@ _panosoft$elm_utils$Utils_Json_ops['<||'] = _elm_lang$core$Json_Decode$map2(
 			return x(y);
 		}));
 
+const _panosoft$elm_grove$Native_Git = (_ => {
+	const os = require('os');
+	const path = require('path');
+	const git = require('nodegit');
+	const rm = require('rimraf');
+	const mkdirp = require('mkdirp');
+
+	/* global _elm_lang$core$Native_Scheduler:false _elm_lang$core$Native_List:false */
+	const { nativeBinding, succeed, fail } = _elm_lang$core$Native_Scheduler;
+	const { toArray, fromArray } = _elm_lang$core$Native_List;
+	/* global _elm_lang$core$Result$Err:false _elm_lang$core$Result$Ok:false */
+	const Err = _elm_lang$core$Result$Err;
+	const Ok = _elm_lang$core$Result$Ok;
+
+	const failure = (callback, prefix) => error => callback(fail(prefix + ' (' + error + ')'));
+	const failureResult = prefix => error => Err(prefix + '(' + error + ')');
+
+	const clone = (url, destinationPath) => nativeBinding(callback => {
+		try {
+			const fail = failure(callback, 'Unable to clone: ' + url);
+			const w = '[a-zA-Z0-9]';
+			const hostnameRegex = `(?:(?:${w}|${w}[a-zA-Z0-9-]*${w})\.)*(?:${w}|${w}[A-Za-z0-9-]*${w})`;
+			const repoRegex = '([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)';
+			const sshRegex = RegExp(`^git@${hostnameRegex}:${repoRegex}(?:\.git)?$`, 'g');
+			const httpRegex = RegExp(`^https?://${hostnameRegex}/${repoRegex}(?:\.git)?$`, 'g');
+			let match = sshRegex.exec(url);
+			if (!match)
+				match = httpRegex.exec(url);
+			if (match && match[1]) {
+				const cloneLocation = path.join(destinationPath, match[1], match[2]);
+				rm(cloneLocation, err => {
+					if (err)
+						callback(fail(err));
+					else {
+						git.Clone(url, cloneLocation, {
+							fetchOpts: {
+								callbacks: {
+									certificateCheck: _ => 1,
+									credentials: (url, username) => git.Cred.sshKeyNew(username, path.join(os.homedir(), '.ssh', 'id_rsa.pub'), path.join(os.homedir(), '.ssh', 'id_rsa'), '')
+								}
+							}
+						})
+						.then(repo => callback(succeed({repo, url, cloneLocation})))
+						.catch(fail);
+					}
+				});
+			}
+			else
+				fail('Invalid url');
+		}
+		catch (error) { fail(error); }
+	});
+
+	const initRepo = path => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable to init repo at: ' + path);
+		try {
+			git.Repository.init(path, 0)
+			.then(repo => callback(succeed({repo, url: 'file://' + path})))
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+
+	const getRepo = path => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get repo at: ' + path);
+		try {
+			git.Repository.open(path)
+			.then(repo => callback(succeed({repo, url: 'file://' + path})))
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+
+	const createLightweightTag = (Repo, tagName) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable create tag: ' + tagName + ' for repo: ' + Repo.url);
+		try {
+			Repo.repo.getHeadCommit()
+			.then(commit =>
+				git.Tag.createLightweight(Repo.repo, tagName, commit, 0)
+				.then(tag => callback(succeed(tag)))
+				.catch(fail)
+			)
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+
+	const createAnnotatedTag = (Repo, tagName, message) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable create tag: ' + tagName + ' for repo: ' + Repo.url);
+		try {
+			Repo.repo.getHeadCommit()
+			.then(commit =>
+				Repo.repo.createTag(commit.id().tostrS(), tagName, message)
+				.then(tag => callback(succeed(tag)))
+				.catch(fail)
+			)
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+
+	const getTags = Repo => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get tags for repo: ' + Repo.url);
+		try {
+			git.Tag.list(Repo.repo)
+			.then(list => callback(succeed(fromArray(list))))
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+
+	const getFileStatuses = Repo => nativeBinding(callback => {
+		const filter = list => list.filter(x => x);
+		Repo.repo.getStatusExt()
+		.then(fileStatuses => {
+			callback (succeed ({
+				'conflicted': fromArray(filter(fileStatuses.map(status => status.isConflicted() ? status.path() : null))),
+				'deleted': fromArray(filter(fileStatuses.map(status => status.isDeleted() ? status.path() : null))),
+				'modified': fromArray(filter(fileStatuses.map(status => status.isModified() ? status.path() : null))),
+				'$new': fromArray(filter(fileStatuses.map(status => status.isNew() ? status.path() : null))),
+				'renamed': fromArray(filter(fileStatuses.map(status => status.isRenamed() ? status.path() : null))),
+				'typeChange': fromArray(filter(fileStatuses.map(status => status.isTypechange() ? status.path() : null))),
+			}));
+		})
+		.catch(fail);
+	});
+
+	const commit = (Repo, filesToAdd, filesToDelete, message) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable commit to repo: ' + Repo.url);
+		try {
+			let _index;
+			Repo.repo.refreshIndex()
+			.then (index => _index = index)
+			.then (_ => toArray(filesToAdd).reduce( (lastFilePromise, path) => lastFilePromise .then(_ => _index.addByPath(path)), Promise.resolve()))
+			.then (_ => toArray(filesToDelete).reduce( (lastFilePromise, path) => lastFilePromise .then(_ => _index.removeByPath(path)), Promise.resolve()))
+			.then (_ => _index.write())
+			.then (_ => _index.writeTree())
+			.then(treeOid =>
+				Repo.repo.getHeadCommit()
+				.then (parent =>
+					Repo.repo.createCommit('HEAD', git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message, treeOid, parent ? [parent] : parent)
+					.then(oid => callback(succeed(oid.tostrS())))
+				)
+			)
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+	const checkoutInternal = (fail, callback) => (Repo, commit, targetDirectory) =>
+		mkdirp(targetDirectory, err =>
+			err ? fail(err) :
+				git.Checkout.tree(Repo.repo, commit, {
+					checkoutStrategy: git.Checkout.STRATEGY.FORCE | git.Checkout.STRATEGY.DONT_UPDATE_INDEX,
+					targetDirectory
+				}).then(_ => callback(succeed()))
+				.catch(fail)
+		);
+	const checkoutCommit = (Repo, commit, targetDirectory) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable to checkout commit: "' + commit + '" for repo: '+ Repo.url);
+		try {
+			checkoutInternal(fail, callback)(Repo, commit, targetDirectory);
+		}
+		catch (error) { fail(error); }
+	});
+	const checkout = (Repo, tag, targetDirectory) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable to checkout tag: "' + tag + '" for repo: '+ Repo.url);
+		try {
+			const co = checkoutInternal(fail, callback);
+			// first treat the tag as an Annotated Tag, if errors then treat as Lightweight Tag
+			Repo.repo.getTagByName(tag)
+			.then(commit => co(Repo, commit, targetDirectory))
+			// .then(oid =>  co(oid.id().toString()))
+			.catch(_ =>
+				Repo.repo.getReferenceCommit(tag)
+				.then(commit => co(Repo, commit, targetDirectory))
+				.catch(fail)
+			);
+		}
+		catch (error) { fail(error); }
+	});
+	const getMasterCommit = Repo => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get Master commit: for repo: '+ Repo.url);
+		try {
+			Repo.repo.getMasterCommit()
+			.then(commit => callback(succeed(commit)))
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+	const getHeadCommit = Repo => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get Head commit: for repo: '+ Repo.url);
+		try {
+			Repo.repo.getHeadCommit()
+			.then(commit => callback(succeed(commit)))
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+	const getCommitTagHistory = (Repo, commit) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get Tag Commit History for Commit: ' + commit + ' for repo: '+ Repo.url);
+		try {
+			if (!commit)
+				callback(succeed(fromArray([])));
+			else {
+				const history = commit.history(git.Revwalk.SORT.Time);
+				history.on('end', commits => {
+					try {
+						callback(succeed(fromArray(commits)));
+					}
+					catch (error) { fail(error); }
+				});
+				history.start();
+			}
+		}
+		catch (error) { fail(error); }
+	});
+	const getCommitSha = commit => {
+		const fail = failureResult('Unable get SHA for Commit: ' + commit);
+		try {
+			return Ok(commit.sha());
+		}
+		catch (error) { return fail(error); }
+	};
+	const getTagShas = (Repo, tagList) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get Tag Shas for Tags: ' + toArray(tagList) + ' for repo: '+ Repo.url);
+		try {
+			const tags = toArray(tagList);
+			Promise.all(
+				tags.map(tagName =>
+					git.Reference.lookup(Repo.repo, `refs/tags/${tagName}`)
+					// This resolves the tag (annotated or not) to a commit ref
+					.then(ref => ref.peel(git.Object.TYPE.COMMIT))
+					.then(ref => git.Commit.lookup(Repo.repo, ref.id()))
+					.then(commit => ({
+						tagName: tagName,
+						sha: commit.sha()
+					}))
+					.catch(fail)
+				)
+			)
+			.then (tagCommits => callback(succeed(tagCommits)))
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	/* global F2:false, F3:false, F4:false */
+	return {
+		clone: F2(clone),
+		initRepo,
+		getRepo,
+		createLightweightTag: F2(createLightweightTag),
+		createAnnotatedTag: F3(createAnnotatedTag),
+		getTags,
+		getFileStatuses,
+		commit: F4(commit),
+		checkoutCommit: F3(checkoutCommit),
+		checkout: F3(checkout),
+		getMasterCommit,
+		getHeadCommit,
+		getCommitTagHistory: F2(getCommitTagHistory),
+		getCommitSha,
+		getTagShas: F2(getTagShas)
+	};
+})();
+
+var _panosoft$elm_grove$LowLevel_Git$getTagShas = _panosoft$elm_grove$Native_Git.getTagShas;
+var _panosoft$elm_grove$LowLevel_Git$getCommitSha = _panosoft$elm_grove$Native_Git.getCommitSha;
+var _panosoft$elm_grove$LowLevel_Git$getCommitTagHistory = _panosoft$elm_grove$Native_Git.getCommitTagHistory;
+var _panosoft$elm_grove$LowLevel_Git$getHeadCommit = _panosoft$elm_grove$Native_Git.getHeadCommit;
+var _panosoft$elm_grove$LowLevel_Git$getMasterCommit = _panosoft$elm_grove$Native_Git.getMasterCommit;
+var _panosoft$elm_grove$LowLevel_Git$checkout = _panosoft$elm_grove$Native_Git.checkout;
+var _panosoft$elm_grove$LowLevel_Git$checkoutCommit = _panosoft$elm_grove$Native_Git.checkoutCommit;
+var _panosoft$elm_grove$LowLevel_Git$commit = _panosoft$elm_grove$Native_Git.commit;
+var _panosoft$elm_grove$LowLevel_Git$getFileStatuses = _panosoft$elm_grove$Native_Git.getFileStatuses;
+var _panosoft$elm_grove$LowLevel_Git$getTags = _panosoft$elm_grove$Native_Git.getTags;
+var _panosoft$elm_grove$LowLevel_Git$createAnnotatedTag = _panosoft$elm_grove$Native_Git.createAnnotatedTag;
+var _panosoft$elm_grove$LowLevel_Git$createLightweightTag = _panosoft$elm_grove$Native_Git.createLightweightTag;
+var _panosoft$elm_grove$LowLevel_Git$getRepo = _panosoft$elm_grove$Native_Git.getRepo;
+var _panosoft$elm_grove$LowLevel_Git$initRepo = _panosoft$elm_grove$Native_Git.initRepo;
+var _panosoft$elm_grove$LowLevel_Git$clone = _panosoft$elm_grove$Native_Git.clone;
+var _panosoft$elm_grove$LowLevel_Git$Repo = F3(
+	function (a, b, c) {
+		return {repo: a, url: b, cloneLocation: c};
+	});
+var _panosoft$elm_grove$LowLevel_Git$FileStatuses = F6(
+	function (a, b, c, d, e, f) {
+		return {conflicted: a, deleted: b, modified: c, $new: d, renamed: e, typeChange: f};
+	});
+var _panosoft$elm_grove$LowLevel_Git$RepoOpaque = {ctor: 'RepoOpaque'};
+var _panosoft$elm_grove$LowLevel_Git$Tag = {ctor: 'Tag'};
+var _panosoft$elm_grove$LowLevel_Git$Commit = {ctor: 'Commit'};
+
+var _panosoft$elm_grove$Git$printableRepo = function (repo) {
+	return function (_p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Basics$toString(
+			{url: _p1.url, cloneLocation: _p1.cloneLocation});
+	}(repo);
+};
+var _panosoft$elm_grove$Git$getCommitSha = _panosoft$elm_grove$LowLevel_Git$getCommitSha;
+var _panosoft$elm_grove$Git$getCommitTagHistory = _panosoft$elm_grove$LowLevel_Git$getCommitTagHistory;
+var _panosoft$elm_grove$Git$getHeadCommit = _panosoft$elm_grove$LowLevel_Git$getHeadCommit;
+var _panosoft$elm_grove$Git$getMasterCommit = _panosoft$elm_grove$LowLevel_Git$getMasterCommit;
+var _panosoft$elm_grove$Git$checkout = _panosoft$elm_grove$LowLevel_Git$checkout;
+var _panosoft$elm_grove$Git$checkoutCommit = _panosoft$elm_grove$LowLevel_Git$checkoutCommit;
+var _panosoft$elm_grove$Git$commit = _panosoft$elm_grove$LowLevel_Git$commit;
+var _panosoft$elm_grove$Git$getFileStatuses = _panosoft$elm_grove$LowLevel_Git$getFileStatuses;
+var _panosoft$elm_grove$Git$getTags = _panosoft$elm_grove$LowLevel_Git$getTags;
+var _panosoft$elm_grove$Git$createAnnotatedTag = _panosoft$elm_grove$LowLevel_Git$createAnnotatedTag;
+var _panosoft$elm_grove$Git$createLightweightTag = _panosoft$elm_grove$LowLevel_Git$createLightweightTag;
+var _panosoft$elm_grove$Git$getRepo = _panosoft$elm_grove$LowLevel_Git$getRepo;
+var _panosoft$elm_grove$Git$initRepo = _panosoft$elm_grove$LowLevel_Git$initRepo;
+var _panosoft$elm_grove$Git$clone = _panosoft$elm_grove$LowLevel_Git$clone;
+var _panosoft$elm_grove$Git$fileStatusAccessors = {
+	ctor: '::',
+	_0: {
+		ctor: '_Tuple2',
+		_0: function (_) {
+			return _.conflicted;
+		},
+		_1: 'conflicted'
+	},
+	_1: {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: function (_) {
+				return _.deleted;
+			},
+			_1: 'deleted'
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: function (_) {
+					return _.modified;
+				},
+				_1: 'modified'
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: function (_) {
+						return _.$new;
+					},
+					_1: 'new'
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: function (_) {
+							return _.renamed;
+						},
+						_1: 'renamed'
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: function (_) {
+								return _.typeChange;
+							},
+							_1: 'typeChange'
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}
+	}
+};
+var _panosoft$elm_grove$Git$TagSha = F2(
+	function (a, b) {
+		return {tagName: a, sha: b};
+	});
+var _panosoft$elm_grove$Git$getTagShas = F2(
+	function (repo, tagNames) {
+		return function (decoder) {
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (decodeResults) {
+					return A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+						decodeResults,
+						{
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Task$fail,
+							_1: function (tagShas) {
+								return _elm_lang$core$Task$succeed(
+									_elm_lang$core$Dict$fromList(
+										A2(
+											_elm_lang$core$List$map,
+											function (_p2) {
+												var _p3 = _p2;
+												return {ctor: '_Tuple2', _0: _p3.tagName, _1: _p3.sha};
+											},
+											tagShas)));
+							}
+						});
+				},
+				A2(
+					_elm_lang$core$Task$andThen,
+					function (_p4) {
+						return _elm_lang$core$Task$succeed(
+							A2(
+								_elm_lang$core$Json_Decode$decodeValue,
+								_elm_lang$core$Json_Decode$list(decoder),
+								_p4));
+					},
+					A2(_panosoft$elm_grove$LowLevel_Git$getTagShas, repo, tagNames)));
+		}(
+			A2(
+				_panosoft$elm_utils$Utils_Json_ops['<||'],
+				A2(
+					_panosoft$elm_utils$Utils_Json_ops['<||'],
+					_elm_lang$core$Json_Decode$succeed(_panosoft$elm_grove$Git$TagSha),
+					A2(_elm_lang$core$Json_Decode$field, 'tagName', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'sha', _elm_lang$core$Json_Decode$string)));
+	});
+
+var _panosoft$elm_grove$Version$nextPatch = function (version) {
+	return _elm_lang$core$Native_Utils.update(
+		version,
+		{patch: version.patch + 1});
+};
+var _panosoft$elm_grove$Version$nextMinor = function (version) {
+	return _elm_lang$core$Native_Utils.update(
+		version,
+		{minor: version.minor + 1, patch: 0});
+};
+var _panosoft$elm_grove$Version$nextMajor = function (version) {
+	return _elm_lang$core$Native_Utils.update(
+		version,
+		{major: version.major + 1, minor: 0, patch: 0});
+};
+var _panosoft$elm_grove$Version$versionCompare = F2(
+	function (v1, v2) {
+		return function (diff) {
+			return A2(
+				_panosoft$elm_utils$Utils_Ops_ops['?'],
+				_elm_lang$core$Native_Utils.eq(diff, 0),
+				{
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Basics$EQ,
+					_1: A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?'],
+						_elm_lang$core$Native_Utils.cmp(diff, 0) > 0,
+						{ctor: '_Tuple2', _0: _elm_lang$core$Basics$GT, _1: _elm_lang$core$Basics$LT})
+				});
+		}(
+			A2(
+				_panosoft$elm_utils$Utils_Ops_ops['?'],
+				_elm_lang$core$Native_Utils.eq(v1.major, v2.major),
+				{
+					ctor: '_Tuple2',
+					_0: A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?'],
+						_elm_lang$core$Native_Utils.eq(v1.minor, v2.minor),
+						{ctor: '_Tuple2', _0: v1.patch - v2.patch, _1: v1.minor - v2.minor}),
+					_1: v1.major - v2.major
+				}));
+	});
+var _panosoft$elm_grove$Version$inRange = F2(
+	function (range, version) {
+		var _p0 = range;
+		if (_p0.ctor === 'Range') {
+			return A2(
+				_panosoft$elm_utils$Utils_Ops_ops['?'],
+				A2(
+					_elm_lang$core$List$member,
+					A2(_panosoft$elm_grove$Version$versionCompare, version, _p0._0),
+					{
+						ctor: '::',
+						_0: _elm_lang$core$Basics$EQ,
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$core$Basics$GT,
+							_1: {ctor: '[]'}
+						}
+					}),
+				{
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.eq(
+						A2(_panosoft$elm_grove$Version$versionCompare, version, _p0._1),
+						_elm_lang$core$Basics$LT),
+					_1: false
+				});
+		} else {
+			return _elm_lang$core$Native_Utils.eq(
+				A2(_panosoft$elm_grove$Version$versionCompare, version, _p0._0),
+				_elm_lang$core$Basics$EQ);
+		}
+	});
+var _panosoft$elm_grove$Version$versionToString = function (version) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString(version.major),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'.',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(version.minor),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'.',
+					_elm_lang$core$Basics$toString(version.patch)))));
+};
+var _panosoft$elm_grove$Version$rangeToString = function (range) {
+	var _p1 = range;
+	if (_p1.ctor === 'Range') {
+		return A2(
+			_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+			A2(
+				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+				_panosoft$elm_grove$Version$versionToString(_p1._0),
+				'<= v <'),
+			_panosoft$elm_grove$Version$versionToString(_p1._1));
+	} else {
+		var _p2 = _p1._0;
+		return A2(
+			_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+			A2(
+				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+				_panosoft$elm_grove$Version$versionToString(_p2),
+				'<= v <='),
+			_panosoft$elm_grove$Version$versionToString(_p2));
+	}
+};
+var _panosoft$elm_grove$Version$get = F2(
+	function (index, list) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['?='],
+			A2(
+				_panosoft$elm_utils$Utils_Ops_ops['?='],
+				A2(_panosoft$elm_utils$Utils_Ops_ops['!!'], list, index),
+				_elm_lang$core$Maybe$Just('')),
+			'');
+	});
+var _panosoft$elm_grove$Version$getNum = F2(
+	function (index, list) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['??='],
+			_elm_lang$core$String$toInt(
+				A2(_panosoft$elm_grove$Version$get, index, list)),
+			_elm_lang$core$Basics$always(0));
+	});
+var _panosoft$elm_grove$Version$initVersionStr = '0.0.0';
+var _panosoft$elm_grove$Version$Version = F3(
+	function (a, b, c) {
+		return {major: a, minor: b, patch: c};
+	});
+var _panosoft$elm_grove$Version$versionFromString = function (versionStr) {
+	return A2(
+		_panosoft$elm_utils$Utils_Ops_ops['|?>'],
+		_elm_lang$core$List$head(
+			A3(
+				_elm_lang$core$Regex$find,
+				_elm_lang$core$Regex$All,
+				_elm_lang$core$Regex$regex('^(\\d+)\\.(\\d+)\\.(\\d+)$'),
+				versionStr)),
+		function (match) {
+			return A3(
+				_panosoft$elm_grove$Version$Version,
+				A2(_panosoft$elm_grove$Version$getNum, 0, match.submatches),
+				A2(_panosoft$elm_grove$Version$getNum, 1, match.submatches),
+				A2(_panosoft$elm_grove$Version$getNum, 2, match.submatches));
+		});
+};
+var _panosoft$elm_grove$Version$ExactRange = function (a) {
+	return {ctor: 'ExactRange', _0: a};
+};
+var _panosoft$elm_grove$Version$rangeFromVersion = function (version) {
+	return _panosoft$elm_grove$Version$ExactRange(version);
+};
+var _panosoft$elm_grove$Version$Range = F2(
+	function (a, b) {
+		return {ctor: 'Range', _0: a, _1: b};
+	});
+var _panosoft$elm_grove$Version$rangeFromString = function (rangeStr) {
+	return A2(
+		_panosoft$elm_utils$Utils_Ops_ops['?='],
+		A2(
+			_panosoft$elm_utils$Utils_Ops_ops['|?>'],
+			_elm_lang$core$List$head(
+				A3(
+					_elm_lang$core$Regex$find,
+					_elm_lang$core$Regex$All,
+					_elm_lang$core$Regex$regex('^(\\d+\\.\\d+\\.\\d+)\\s+<=\\s+v\\s+<(=?)\\s+(\\d+\\.\\d+\\.\\d+)$'),
+					rangeStr)),
+			function (match) {
+				return A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?='],
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|?>'],
+						_panosoft$elm_grove$Version$versionFromString(
+							A2(_panosoft$elm_grove$Version$get, 0, match.submatches)),
+						function (from) {
+							return A2(
+								_panosoft$elm_utils$Utils_Ops_ops['?='],
+								A2(
+									_panosoft$elm_utils$Utils_Ops_ops['|?>'],
+									_panosoft$elm_grove$Version$versionFromString(
+										A2(_panosoft$elm_grove$Version$get, 2, match.submatches)),
+									function (to) {
+										return A2(
+											_panosoft$elm_utils$Utils_Ops_ops['?'],
+											_elm_lang$core$Native_Utils.eq(
+												A2(_panosoft$elm_grove$Version$get, 1, match.submatches),
+												'='),
+											{
+												ctor: '_Tuple2',
+												_0: A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													!_elm_lang$core$Native_Utils.eq(from, to),
+													{
+														ctor: '_Tuple2',
+														_0: _elm_lang$core$Maybe$Nothing,
+														_1: _elm_lang$core$Maybe$Just(
+															_panosoft$elm_grove$Version$ExactRange(from))
+													}),
+												_1: _elm_lang$core$Maybe$Just(
+													A2(_panosoft$elm_grove$Version$Range, from, to))
+											});
+									}),
+								_elm_lang$core$Maybe$Nothing);
+						}),
+					_elm_lang$core$Maybe$Nothing);
+			}),
+		_elm_lang$core$Maybe$Nothing);
+};
+var _panosoft$elm_grove$Version$toRangeToNextMajorVersion = function (version) {
+	return _panosoft$elm_grove$Version$rangeToString(
+		A2(
+			_panosoft$elm_grove$Version$Range,
+			version,
+			_elm_lang$core$Native_Utils.update(
+				version,
+				{major: version.major + 1, minor: 0, patch: 0})));
+};
+
+var _panosoft$elm_grove$AppUtils$determineJsonIndent = function (json) {
+	return A2(
+		_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+		_elm_lang$core$List$head(
+			A3(
+				_elm_lang$core$Regex$find,
+				_elm_lang$core$Regex$AtMost(1),
+				_elm_lang$core$Regex$regex('†(\\s*)\"'),
+				A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\n', '†', json))),
+		{
+			ctor: '_Tuple2',
+			_0: 4,
+			_1: function (match) {
+				return _elm_lang$core$String$length(
+					_panosoft$elm_utils$Utils_Match$getSubmatches1(match));
+			}
+		});
+};
+var _panosoft$elm_grove$AppUtils$sortedVersions = function (tags) {
+	return _elm_lang$core$List$reverse(
+		A2(
+			_elm_lang$core$List$sortWith,
+			_panosoft$elm_grove$Version$versionCompare,
+			A2(_elm_lang$core$List$filterMap, _panosoft$elm_grove$Version$versionFromString, tags)));
+};
+var _panosoft$elm_grove$AppUtils$writeFile = function (filename) {
+	return A3(_elm_node$core$Node_FileSystem$writeFileFromString, filename, '666', _elm_node$core$Node_Encoding$Utf8);
+};
+var _panosoft$elm_grove$AppUtils$pathJoin = F3(
+	function (pathSep, rootDir, pathParts) {
+		return function (pathParts) {
+			return function (isAbsolute) {
+				return A2(
+					_elm_lang$core$String$join,
+					pathSep,
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?'],
+						isAbsolute,
+						{
+							ctor: '_Tuple2',
+							_0: pathParts,
+							_1: {ctor: '::', _0: rootDir, _1: pathParts}
+						}));
+			}(
+				A2(
+					_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+					_elm_lang$core$List$head(pathParts),
+					{
+						ctor: '_Tuple2',
+						_0: false,
+						_1: function (root) {
+							return _elm_lang$core$Native_Utils.eq(
+								A2(_elm_lang$core$String$left, 1, root),
+								pathSep);
+						}
+					}));
+		}(
+			A2(
+				_elm_lang$core$List$filter,
+				F2(
+					function (x, y) {
+						return !_elm_lang$core$Native_Utils.eq(x, y);
+					})(''),
+				pathParts));
+	});
+var _panosoft$elm_grove$AppUtils$msgToCmd = function (msg) {
+	return A2(
+		_elm_lang$core$Task$perform,
+		_elm_lang$core$Basics$always(msg),
+		_elm_lang$core$Task$succeed(
+			{ctor: '_Tuple0'}));
+};
+var _panosoft$elm_grove$AppUtils$bugMissing = F2(
+	function (missing, _p0) {
+		return _elm_lang$core$Native_Utils.crash(
+			'AppUtils',
+			{
+				start: {line: 37, column: 12},
+				end: {line: 37, column: 23}
+			})(
+			A2(
+				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+				A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'BUG:', missing),
+				'missing'));
+	});
+var _panosoft$elm_grove$AppUtils$bug = F2(
+	function (message, _p1) {
+		return _elm_lang$core$Native_Utils.crash(
+			'AppUtils',
+			{
+				start: {line: 32, column: 12},
+				end: {line: 32, column: 23}
+			})(
+			A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'BUG:', message));
+	});
+
+var _panosoft$elm_utils$Utils_Task$sequence2 = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (a) {
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (b) {
+					return _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple2', _0: a, _1: b});
+				},
+				_p1._1);
+		},
+		_p1._0);
+};
+var _panosoft$elm_utils$Utils_Task$sequence3 = function (_p2) {
+	var _p3 = _p2;
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p4) {
+			var _p5 = _p4;
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (c) {
+					return _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple3', _0: _p5._0, _1: _p5._1, _2: c});
+				},
+				_p3._2);
+		},
+		_panosoft$elm_utils$Utils_Task$sequence2(
+			{ctor: '_Tuple2', _0: _p3._0, _1: _p3._1}));
+};
+var _panosoft$elm_utils$Utils_Task$sequence4 = function (_p6) {
+	var _p7 = _p6;
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p8) {
+			var _p9 = _p8;
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (d) {
+					return _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple4', _0: _p9._0, _1: _p9._1, _2: _p9._2, _3: d});
+				},
+				_p7._3);
+		},
+		_panosoft$elm_utils$Utils_Task$sequence3(
+			{ctor: '_Tuple3', _0: _p7._0, _1: _p7._1, _2: _p7._2}));
+};
+var _panosoft$elm_utils$Utils_Task$sequence5 = function (_p10) {
+	var _p11 = _p10;
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p12) {
+			var _p13 = _p12;
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (e) {
+					return _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple5', _0: _p13._0, _1: _p13._1, _2: _p13._2, _3: _p13._3, _4: e});
+				},
+				_p11._4);
+		},
+		_panosoft$elm_utils$Utils_Task$sequence4(
+			{ctor: '_Tuple4', _0: _p11._0, _1: _p11._1, _2: _p11._2, _3: _p11._3}));
+};
+var _panosoft$elm_utils$Utils_Task$sequence6 = function (_p14) {
+	var _p15 = _p14;
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p16) {
+			var _p17 = _p16;
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (f) {
+					return _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple6', _0: _p17._0, _1: _p17._1, _2: _p17._2, _3: _p17._3, _4: _p17._4, _5: f});
+				},
+				_p15._5);
+		},
+		_panosoft$elm_utils$Utils_Task$sequence5(
+			{ctor: '_Tuple5', _0: _p15._0, _1: _p15._1, _2: _p15._2, _3: _p15._3, _4: _p15._4}));
+};
+var _panosoft$elm_utils$Utils_Task$sequence7 = function (_p18) {
+	var _p19 = _p18;
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p20) {
+			var _p21 = _p20;
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (g) {
+					return _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple7', _0: _p21._0, _1: _p21._1, _2: _p21._2, _3: _p21._3, _4: _p21._4, _5: _p21._5, _6: g});
+				},
+				_p19._6);
+		},
+		_panosoft$elm_utils$Utils_Task$sequence6(
+			{ctor: '_Tuple6', _0: _p19._0, _1: _p19._1, _2: _p19._2, _3: _p19._3, _4: _p19._4, _5: _p19._5}));
+};
+var _panosoft$elm_utils$Utils_Task$sequence8 = function (_p22) {
+	var _p23 = _p22;
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p24) {
+			var _p25 = _p24;
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (h) {
+					return _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple8', _0: _p25._0, _1: _p25._1, _2: _p25._2, _3: _p25._3, _4: _p25._4, _5: _p25._5, _6: _p25._6, _7: h});
+				},
+				_p23._7);
+		},
+		_panosoft$elm_utils$Utils_Task$sequence7(
+			{ctor: '_Tuple7', _0: _p23._0, _1: _p23._1, _2: _p23._2, _3: _p23._3, _4: _p23._4, _5: _p23._5, _6: _p23._6}));
+};
+var _panosoft$elm_utils$Utils_Task$sequence9 = function (_p26) {
+	var _p27 = _p26;
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p28) {
+			var _p29 = _p28;
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (i) {
+					return _elm_lang$core$Task$succeed(
+						{ctor: '_Tuple9', _0: _p29._0, _1: _p29._1, _2: _p29._2, _3: _p29._3, _4: _p29._4, _5: _p29._5, _6: _p29._6, _7: _p29._7, _8: i});
+				},
+				_p27._8);
+		},
+		_panosoft$elm_utils$Utils_Task$sequence8(
+			{ctor: '_Tuple8', _0: _p27._0, _1: _p27._1, _2: _p27._2, _3: _p27._3, _4: _p27._4, _5: _p27._5, _6: _p27._6, _7: _p27._7}));
+};
+var _panosoft$elm_utils$Utils_Task$andThenIf = F2(
+	function (cond, _p30) {
+		var _p31 = _p30;
+		return _elm_lang$core$Task$andThen(
+			A2(
+				_panosoft$elm_utils$Utils_Ops_ops['?'],
+				cond,
+				{ctor: '_Tuple2', _0: _p31._0, _1: _p31._1}));
+	});
+var _panosoft$elm_utils$Utils_Task$untilSuccess = F2(
+	function (failureValue, tasks) {
+		var _p32 = tasks;
+		if (_p32.ctor === '[]') {
+			return _elm_lang$core$Task$fail(failureValue);
+		} else {
+			return A2(
+				_elm_lang$core$Task$onError,
+				function (_p33) {
+					return A2(_panosoft$elm_utils$Utils_Task$untilSuccess, failureValue, _p32._1);
+				},
+				A2(_elm_lang$core$Task$andThen, _elm_lang$core$Task$succeed, _p32._0));
+		}
+	});
+
+var _panosoft$elm_grove$Package$defaultGitServer = 'https://github.com/';
+var _panosoft$elm_grove$Package$defaultRepoLocation = function (packageName) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_panosoft$elm_grove$Package$defaultGitServer,
+		A2(_elm_lang$core$Basics_ops['++'], packageName, '.git'));
+};
+var _panosoft$elm_grove$Package$getRepoLocation = F2(
+	function (sources, packageName) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['?='],
+			A2(
+				_elm_lang$core$Dict$get,
+				packageName,
+				A2(_panosoft$elm_utils$Utils_Ops_ops['?='], sources, _elm_lang$core$Dict$empty)),
+			_panosoft$elm_grove$Package$defaultRepoLocation(packageName));
+	});
+var _panosoft$elm_grove$Package$elmCorePackageName = 'elm-lang/core';
+var _panosoft$elm_grove$Package$elmJsonFilename = 'elm-package.json';
+var _panosoft$elm_grove$Package$npmJsonFilename = 'package.json';
+var _panosoft$elm_grove$Package$elmVersion = function (elmVersion) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'0.',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_elm_lang$core$Basics$toString(elmVersion),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'.0 <= v < 0.',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(elmVersion + 1),
+					'.0'))));
+};
+var _panosoft$elm_grove$Package$exactDependenciesFileName = 'exact-dependencies.json';
+var _panosoft$elm_grove$Package$elmStuff = function (testing) {
+	return A2(
+		_panosoft$elm_utils$Utils_Ops_ops['?'],
+		testing,
+		{ctor: '_Tuple2', _0: 'elm-test-stuff', _1: 'elm-stuff'});
+};
+var _panosoft$elm_grove$Package$elmPackagesRoot = F2(
+	function (testing, pathSep) {
+		return A2(
+			_elm_lang$core$String$join,
+			pathSep,
+			{
+				ctor: '::',
+				_0: _panosoft$elm_grove$Package$elmStuff(testing),
+				_1: {
+					ctor: '::',
+					_0: 'packages',
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+
 var _panosoft$elm_grove$ElmJson$elmJsonEncoder = function (elmJson) {
 	return _elm_lang$core$Json_Encode$object(
 		A2(
@@ -13463,100 +14322,6 @@ var _panosoft$elm_grove$ElmJson$decodeElmJson = F2(
 			});
 	});
 
-const _panosoft$elm_grove$Native_Console = (_ => {
-	/* global _elm_lang$core$Native_Scheduler:false _elm_lang$core$Native_List:false */
-	const { nativeBinding, succeed, fail } = _elm_lang$core$Native_Scheduler;
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	const log = msg => nativeBinding(callback => {
-		/*eslint no-control-regex: "off"*/
-		const displayMsg = process.stdout.isTTY ? msg : msg.replace(/\x1B\[\d+?m/g, '');
-		console.log(displayMsg);
-		callback(succeed(msg));
-	});
-
-	return {
-		log
-	};
-})();
-
-var _panosoft$elm_grove$Console$log = _panosoft$elm_grove$Native_Console.log;
-
-var _panosoft$elm_grove$Output$getPrefix = function (msg) {
-	return function (_p0) {
-		var _p1 = _p0;
-		return {
-			ctor: '_Tuple2',
-			_0: A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '†', '\n', _p1._0),
-			_1: A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '†', '\n', _p1._1)
-		};
-	}(
-		A2(
-			_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-			_elm_lang$core$List$head(
-				A3(
-					_elm_lang$core$Regex$find,
-					_elm_lang$core$Regex$AtMost(1),
-					_elm_lang$core$Regex$regex('^(†*)(.+$)'),
-					A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\n', '†', msg))),
-			{
-				ctor: '_Tuple2',
-				_0: {ctor: '_Tuple2', _0: '', _1: msg},
-				_1: _panosoft$elm_utils$Utils_Match$getSubmatches2
-			}));
-};
-var _panosoft$elm_grove$Output$parens = function (str) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		'(',
-		A2(_elm_lang$core$Basics_ops['++'], str, ')'));
-};
-var _panosoft$elm_grove$Output$colorize = F2(
-	function (color, str) {
-		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'[',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(color),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'm',
-					A2(_elm_lang$core$Basics_ops['++'], str, '[0m'))));
-	});
-var _panosoft$elm_grove$Output$magenta = 35;
-var _panosoft$elm_grove$Output$cyan = 36;
-var _panosoft$elm_grove$Output$yellow = 33;
-var _panosoft$elm_grove$Output$warnLog = function (msg) {
-	return function (_p2) {
-		var _p3 = _p2;
-		return _panosoft$elm_grove$Console$log(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p3._0,
-				A2(
-					_panosoft$elm_grove$Output$colorize,
-					_panosoft$elm_grove$Output$yellow,
-					A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'WARNING:', _p3._1))));
-	}(
-		_panosoft$elm_grove$Output$getPrefix(msg));
-};
-var _panosoft$elm_grove$Output$red = 31;
-var _panosoft$elm_grove$Output$errorLog = function (msg) {
-	return function (_p4) {
-		var _p5 = _p4;
-		return _panosoft$elm_grove$Console$log(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p5._0,
-				A2(
-					_panosoft$elm_grove$Output$colorize,
-					_panosoft$elm_grove$Output$red,
-					A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'ERROR:', _p5._1))));
-	}(
-		_panosoft$elm_grove$Output$getPrefix(msg));
-};
-var _panosoft$elm_grove$Output$green = 32;
-
 var _panosoft$elm_grove$NpmJson$validateName = F2(
 	function (name, repository) {
 		return function (repository) {
@@ -13603,7 +14368,7 @@ var _panosoft$elm_grove$NpmJson$validateName = F2(
 									_elm_lang$core$List$length(
 										A2(_elm_lang$core$String$split, '/', name)));
 							},
-							_1: 'must be in the format <user>/<repo>'
+							_1: 'should be in the format <user>/<repo>'
 						},
 						_1: {
 							ctor: '::',
@@ -13614,7 +14379,7 @@ var _panosoft$elm_grove$NpmJson$validateName = F2(
 										A2(_elm_lang$core$String$left, 1, name),
 										'@');
 								},
-								_1: 'must start with an @'
+								_1: 'should start with an @'
 							},
 							_1: {
 								ctor: '::',
@@ -13625,7 +14390,7 @@ var _panosoft$elm_grove$NpmJson$validateName = F2(
 											name,
 											A2(_elm_lang$core$Basics_ops['++'], '@', repository));
 									},
-									_1: A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'must match elm json repository:', repository)
+									_1: A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'should match elm json repository:', repository)
 								},
 								_1: {ctor: '[]'}
 							}
@@ -13836,7 +14601,7 @@ var _panosoft$elm_grove$NpmJson$extractOrAddDependencies = function (json) {
 				{
 					ctor: '_Tuple2',
 					_0: '  \"dependencies\":{\n}\n',
-					_1: A3(_panosoft$elm_utils$Utils_Regex$replaceFirst, '†\\}†$', ',†  \"dependencies\": {†}†}†', singleLineJson)
+					_1: A3(_panosoft$elm_utils$Utils_Regex$replaceFirst, '†\\}†*$', ',†  \"dependencies\": {†}†}†', singleLineJson)
 				});
 		}(
 			A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\n', '†', json)));
@@ -13987,6 +14752,30 @@ var _panosoft$elm_grove$Env$env = A2(
 			})('BUG: Cannot decode env');
 	});
 
+var _panosoft$elm_grove$Component_Config$rename = F2(
+	function (oldPath, newPath) {
+		return A2(
+			_elm_lang$core$Task$onError,
+			function (nodeError) {
+				var _p0 = nodeError;
+				if (_p0.ctor === 'SystemError') {
+					return A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?'],
+						_elm_lang$core$Native_Utils.eq(_p0._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
+						{
+							ctor: '_Tuple2',
+							_0: _elm_lang$core$Task$succeed(
+								{ctor: '_Tuple0'}),
+							_1: _elm_lang$core$Task$fail(
+								{ctor: '_Tuple2', _0: nodeError, _1: oldPath})
+						});
+				} else {
+					return _elm_lang$core$Task$fail(
+						{ctor: '_Tuple2', _0: nodeError, _1: oldPath});
+				}
+			},
+			A2(_elm_node$core$Node_FileSystem$rename, oldPath, newPath));
+	});
 var _panosoft$elm_grove$Component_Config$localOrGlobalPath = function (config) {
 	return A2(
 		_panosoft$elm_utils$Utils_Ops_ops['|?->'],
@@ -14025,6 +14814,24 @@ var _panosoft$elm_grove$Component_Config$configPath = F2(
 				}
 			});
 	});
+var _panosoft$elm_grove$Component_Config$oldConfigPath = F2(
+	function (config, path) {
+		return A2(
+			_panosoft$elm_grove$Component_Config$pathJoin,
+			config,
+			{
+				ctor: '::',
+				_0: A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?'],
+					config.testing,
+					{ctor: '_Tuple2', _0: 'test', _1: path}),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$core$String$dropLeft, 1, config.configFilename),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _panosoft$elm_grove$Component_Config$encoder = function (configFile) {
 	return _elm_lang$core$Json_Encode$object(
 		_elm_lang$core$List$concat(
@@ -14044,8 +14851,8 @@ var _panosoft$elm_grove$Component_Config$encoder = function (configFile) {
 									_0: 'safeMode',
 									_1: _elm_lang$core$Json_Encode$string(
 										function () {
-											var _p0 = safeMode;
-											switch (_p0.ctor) {
+											var _p1 = safeMode;
+											switch (_p1.ctor) {
 												case 'SafeModeOn':
 													return 'on';
 												case 'SafeModeOff':
@@ -14075,8 +14882,8 @@ var _panosoft$elm_grove$Component_Config$encoder = function (configFile) {
 										_0: 'generateDocs',
 										_1: _elm_lang$core$Json_Encode$string(
 											function () {
-												var _p1 = generateDocs;
-												if (_p1.ctor === 'GenerateDocsOn') {
+												var _p2 = generateDocs;
+												if (_p2.ctor === 'GenerateDocsOn') {
 													return 'on';
 												} else {
 													return 'off';
@@ -14156,8 +14963,8 @@ var _panosoft$elm_grove$Component_Config$decoder = A2(
 							_1: function (safe) {
 								return _elm_lang$core$Maybe$Just(
 									function () {
-										var _p2 = _elm_lang$core$String$toLower(safe);
-										switch (_p2) {
+										var _p3 = _elm_lang$core$String$toLower(safe);
+										switch (_p3) {
 											case 'on':
 												return _panosoft$elm_grove$Component_Config$SafeModeOn;
 											case 'off':
@@ -14184,8 +14991,8 @@ var _panosoft$elm_grove$Component_Config$decoder = A2(
 						_1: function (generateDocs) {
 							return _elm_lang$core$Maybe$Just(
 								function () {
-									var _p3 = _elm_lang$core$String$toLower(generateDocs);
-									if (_p3 === 'on') {
+									var _p4 = _elm_lang$core$String$toLower(generateDocs);
+									if (_p4 === 'on') {
 										return _panosoft$elm_grove$Component_Config$GenerateDocsOn;
 									} else {
 										return _panosoft$elm_grove$Component_Config$GenerateDocsOff;
@@ -14214,9 +15021,9 @@ var _panosoft$elm_grove$Component_Config$configure = F2(
 						ctor: '::',
 						_0: A2(
 							_elm_lang$core$Task$attempt,
-							function (_p4) {
+							function (_p5) {
 								return config.routeToMe(
-									_panosoft$elm_grove$Component_Config$ConfigurationComplete(_p4));
+									_panosoft$elm_grove$Component_Config$ConfigurationComplete(_p5));
 							},
 							A2(
 								_panosoft$elm_grove$AppUtils$writeFile,
@@ -14254,8 +15061,8 @@ var _panosoft$elm_grove$Component_Config$configure = F2(
 									{generateDocs: generateDocs});
 							}(
 								function () {
-									var _p5 = docs;
-									switch (_p5) {
+									var _p6 = docs;
+									switch (_p6) {
 										case 'on':
 											return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$GenerateDocsOn);
 										case 'off':
@@ -14286,8 +15093,8 @@ var _panosoft$elm_grove$Component_Config$configure = F2(
 										{safeMode: safeMode});
 								}(
 									function () {
-										var _p6 = safe;
-										switch (_p6) {
+										var _p7 = safe;
+										switch (_p7) {
 											case 'on':
 												return _elm_lang$core$Maybe$Just(_panosoft$elm_grove$Component_Config$SafeModeOn);
 											case 'off':
@@ -14321,83 +15128,95 @@ var _panosoft$elm_grove$Component_Config$init = F2(
 			ctor: '_Tuple2',
 			_0: {configFile: _elm_lang$core$Maybe$Nothing},
 			_1: _elm_lang$core$Maybe$Just(
-				function (_p7) {
-					var _p8 = _p7;
-					var _p15 = _p8._0;
-					var _p14 = _p8._1;
+				function (_p8) {
+					var _p9 = _p8;
+					var _p17 = _p9._0;
+					var _p16 = _p9._1;
 					return A2(
 						_elm_lang$core$Task$attempt,
-						function (_p9) {
+						function (_p10) {
 							return config.routeToMe(
-								A2(_panosoft$elm_grove$Component_Config$ConfigFileRead, initializedMsg, _p9));
+								A2(_panosoft$elm_grove$Component_Config$ConfigFileRead, initializedMsg, _p10));
 						},
 						A2(
 							_elm_lang$core$Task$andThen,
-							function (_p10) {
-								var _p11 = _p10;
-								return _elm_lang$core$Task$succeed(
-									{
-										ctor: '_Tuple2',
-										_0: {ctor: '_Tuple2', _0: _p11._0, _1: _p15},
-										_1: {ctor: '_Tuple2', _0: _p11._1, _1: _p14}
-									});
-							},
-							A2(
-								_elm_lang$core$Task$andThen,
-								function (localData) {
-									return A2(
-										_elm_lang$core$Task$onError,
-										function (nodeError) {
-											var _p12 = nodeError;
-											if (_p12.ctor === 'SystemError') {
-												return A2(
-													_panosoft$elm_utils$Utils_Ops_ops['?'],
-													_elm_lang$core$Native_Utils.eq(_p12._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
-													{
-														ctor: '_Tuple2',
-														_0: _elm_lang$core$Task$succeed(
-															{ctor: '_Tuple2', _0: localData, _1: _panosoft$elm_grove$Component_Config$defaultConfigFileString}),
-														_1: _elm_lang$core$Task$fail(
-															{ctor: '_Tuple2', _0: nodeError, _1: _p14})
-													});
-											} else {
-												return _elm_lang$core$Task$fail(
-													{ctor: '_Tuple2', _0: nodeError, _1: _p14});
-											}
+							function (_p11) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (_p12) {
+										var _p13 = _p12;
+										return _elm_lang$core$Task$succeed(
+											{
+												ctor: '_Tuple2',
+												_0: {ctor: '_Tuple2', _0: _p13._0, _1: _p17},
+												_1: {ctor: '_Tuple2', _0: _p13._1, _1: _p16}
+											});
+									},
+									A2(
+										_elm_lang$core$Task$andThen,
+										function (localData) {
+											return A2(
+												_elm_lang$core$Task$onError,
+												function (nodeError) {
+													var _p14 = nodeError;
+													if (_p14.ctor === 'SystemError') {
+														return A2(
+															_panosoft$elm_utils$Utils_Ops_ops['?'],
+															_elm_lang$core$Native_Utils.eq(_p14._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
+															{
+																ctor: '_Tuple2',
+																_0: _elm_lang$core$Task$succeed(
+																	{ctor: '_Tuple2', _0: localData, _1: _panosoft$elm_grove$Component_Config$defaultConfigFileString}),
+																_1: _elm_lang$core$Task$fail(
+																	{ctor: '_Tuple2', _0: nodeError, _1: _p16})
+															});
+													} else {
+														return _elm_lang$core$Task$fail(
+															{ctor: '_Tuple2', _0: nodeError, _1: _p16});
+													}
+												},
+												A2(
+													_elm_lang$core$Task$andThen,
+													function (globalData) {
+														return _elm_lang$core$Task$succeed(
+															{ctor: '_Tuple2', _0: localData, _1: globalData});
+													},
+													A2(_elm_node$core$Node_FileSystem$readFileAsString, _p16, _elm_node$core$Node_Encoding$Utf8)));
 										},
 										A2(
-											_elm_lang$core$Task$andThen,
-											function (globalData) {
-												return _elm_lang$core$Task$succeed(
-													{ctor: '_Tuple2', _0: localData, _1: globalData});
+											_elm_lang$core$Task$onError,
+											function (nodeError) {
+												var _p15 = nodeError;
+												if (_p15.ctor === 'SystemError') {
+													return A2(
+														_panosoft$elm_utils$Utils_Ops_ops['?'],
+														_elm_lang$core$Native_Utils.eq(_p15._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
+														{
+															ctor: '_Tuple2',
+															_0: _elm_lang$core$Task$succeed(_panosoft$elm_grove$Component_Config$defaultConfigFileString),
+															_1: _elm_lang$core$Task$fail(
+																{ctor: '_Tuple2', _0: nodeError, _1: _p17})
+														});
+												} else {
+													return _elm_lang$core$Task$fail(
+														{ctor: '_Tuple2', _0: nodeError, _1: _p17});
+												}
 											},
-											A2(_elm_node$core$Node_FileSystem$readFileAsString, _p14, _elm_node$core$Node_Encoding$Utf8)));
-								},
-								A2(
-									_elm_lang$core$Task$onError,
-									function (nodeError) {
-										var _p13 = nodeError;
-										if (_p13.ctor === 'SystemError') {
-											return A2(
-												_panosoft$elm_utils$Utils_Ops_ops['?'],
-												_elm_lang$core$Native_Utils.eq(_p13._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
-												{
-													ctor: '_Tuple2',
-													_0: _elm_lang$core$Task$succeed(_panosoft$elm_grove$Component_Config$defaultConfigFileString),
-													_1: _elm_lang$core$Task$fail(
-														{ctor: '_Tuple2', _0: nodeError, _1: _p15})
-												});
-										} else {
-											return _elm_lang$core$Task$fail(
-												{ctor: '_Tuple2', _0: nodeError, _1: _p15});
-										}
-									},
-									A2(_elm_node$core$Node_FileSystem$readFileAsString, _p15, _elm_node$core$Node_Encoding$Utf8)))));
+											A2(_elm_node$core$Node_FileSystem$readFileAsString, _p17, _elm_node$core$Node_Encoding$Utf8))));
+							},
+							_panosoft$elm_utils$Utils_Task$sequence2(
+								{
+									ctor: '_Tuple2',
+									_0: A2(_panosoft$elm_grove$Component_Config$rename, _p9._2, _p17),
+									_1: A2(_panosoft$elm_grove$Component_Config$rename, _p9._3, _p16)
+								})));
 				}(
 					{
-						ctor: '_Tuple2',
+						ctor: '_Tuple4',
 						_0: A2(_panosoft$elm_grove$Component_Config$configPath, config, '.'),
-						_1: A2(_panosoft$elm_grove$Component_Config$configPath, config, _panosoft$elm_grove$Env$homedir)
+						_1: A2(_panosoft$elm_grove$Component_Config$configPath, config, _panosoft$elm_grove$Env$homedir),
+						_2: A2(_panosoft$elm_grove$Component_Config$oldConfigPath, config, '.'),
+						_3: A2(_panosoft$elm_grove$Component_Config$oldConfigPath, config, _panosoft$elm_grove$Env$homedir)
 					}))
 		};
 	});
@@ -14415,7 +15234,7 @@ var _panosoft$elm_grove$Component_Config$operationError = F2(
 					ctor: '::',
 					_0: A2(
 						_elm_lang$core$Task$perform,
-						function (_p16) {
+						function (_p18) {
 							return _panosoft$elm_grove$Component_Config$OperationComplete(-1);
 						},
 						task),
@@ -14435,7 +15254,7 @@ var _panosoft$elm_grove$Component_Config$operationSuccessful = F2(
 					ctor: '::',
 					_0: A2(
 						_elm_lang$core$Task$perform,
-						function (_p17) {
+						function (_p19) {
 							return _panosoft$elm_grove$Component_Config$OperationComplete(0);
 						},
 						task),
@@ -14446,8 +15265,8 @@ var _panosoft$elm_grove$Component_Config$operationSuccessful = F2(
 	});
 var _panosoft$elm_grove$Component_Config$update = F3(
 	function (config, msg, model) {
-		var _p18 = msg;
-		switch (_p18.ctor) {
+		var _p20 = msg;
+		switch (_p20.ctor) {
 			case 'OperationComplete':
 				return {
 					ctor: '_Tuple2',
@@ -14457,12 +15276,12 @@ var _panosoft$elm_grove$Component_Config$update = F3(
 						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
-						_0: config.operationComplete(_p18._0),
+						_0: config.operationComplete(_p20._0),
 						_1: {ctor: '[]'}
 					}
 				};
 			case 'ConfigFileRead':
-				if (_p18._1.ctor === 'Err') {
+				if (_p20._1.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Config$operationError,
 						model,
@@ -14471,26 +15290,26 @@ var _panosoft$elm_grove$Component_Config$update = F3(
 								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 								A2(
 									_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-									A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to read:', _p18._1._0._1),
+									A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to read:', _p20._1._0._1),
 									'Error:'),
-								_p18._1._0._0)));
+								_p20._1._0._0)));
 				} else {
 					return function (decodingError) {
 						return A2(
 							_panosoft$elm_utils$Utils_Ops_ops['|??**>'],
 							{
 								ctor: '_Tuple2',
-								_0: A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$Component_Config$decoder, _p18._1._0._0._0),
-								_1: A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$Component_Config$decoder, _p18._1._0._1._0)
+								_0: A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$Component_Config$decoder, _p20._1._0._0._0),
+								_1: A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$Component_Config$decoder, _p20._1._0._1._0)
 							},
 							{
 								ctor: '_Tuple3',
-								_0: decodingError(_p18._1._0._0._1),
-								_1: decodingError(_p18._1._0._1._1),
-								_2: function (_p19) {
-									var _p20 = _p19;
-									var _p22 = _p20._0;
-									var _p21 = _p20._1;
+								_0: decodingError(_p20._1._0._0._1),
+								_1: decodingError(_p20._1._0._1._1),
+								_2: function (_p21) {
+									var _p22 = _p21;
+									var _p24 = _p22._0;
+									var _p23 = _p22._1;
 									return function (configFile) {
 										return {
 											ctor: '_Tuple2',
@@ -14504,7 +15323,7 @@ var _panosoft$elm_grove$Component_Config$update = F3(
 												{ctor: '[]'}),
 											_1: {
 												ctor: '::',
-												_0: _p18._0,
+												_0: _p20._0,
 												_1: {ctor: '[]'}
 											}
 										};
@@ -14512,12 +15331,12 @@ var _panosoft$elm_grove$Component_Config$update = F3(
 										{
 											safeMode: A2(
 												_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-												_p22.safeMode,
-												{ctor: '_Tuple2', _0: _p21.safeMode, _1: _elm_lang$core$Maybe$Just}),
+												_p24.safeMode,
+												{ctor: '_Tuple2', _0: _p23.safeMode, _1: _elm_lang$core$Maybe$Just}),
 											generateDocs: A2(
 												_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-												_p22.generateDocs,
-												{ctor: '_Tuple2', _0: _p21.generateDocs, _1: _elm_lang$core$Maybe$Just})
+												_p24.generateDocs,
+												{ctor: '_Tuple2', _0: _p23.generateDocs, _1: _elm_lang$core$Maybe$Just})
 										});
 								}
 							});
@@ -14538,7 +15357,7 @@ var _panosoft$elm_grove$Component_Config$update = F3(
 							}));
 				}
 			default:
-				if (_p18._0.ctor === 'Err') {
+				if (_p20._0.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Config$operationError,
 						model,
@@ -14552,7 +15371,7 @@ var _panosoft$elm_grove$Component_Config$update = F3(
 										'Unable to write:',
 										_panosoft$elm_grove$Component_Config$configPath(config)),
 									'Error:'),
-								_p18._0._0)));
+								_p20._0._0)));
 				} else {
 					return A2(
 						_panosoft$elm_grove$Component_Config$operationSuccessful,
@@ -14570,7 +15389,7 @@ const _panosoft$elm_grove$Native_Spawn = (_ => {
 	const exec = (cmdLine, successExitCode, silent) => nativeBinding(callback => {
 		try {
 			const cmdLineParts = cmdLine.split(' ');
-			const cmd = spawn(cmdLineParts[0], cmdLineParts.slice(1, cmdLineParts.length));
+			const cmd = spawn(cmdLineParts[0], cmdLineParts.slice(1, cmdLineParts.length), {shell: true});
 			if (!silent) {
 				cmd.stdout.on('data', data => process.stdout.write(data.toString()));
 				cmd.stderr.on('data', data => process.stderr.write(data.toString()));
@@ -14597,81 +15416,84 @@ var _panosoft$elm_grove$DocGenerator$pathJoin = F2(
 	});
 var _panosoft$elm_grove$DocGenerator$docsJsonFilename = 'documentation.json';
 var _panosoft$elm_grove$DocGenerator$elmDocsPath = 'elm-docs';
+var _panosoft$elm_grove$DocGenerator$Config = F4(
+	function (a, b, c, d) {
+		return {testing: a, cwd: b, pathSep: c, generateDocs: d};
+	});
+var _panosoft$elm_grove$DocGenerator$GeneratePrepInstallPackages = {ctor: 'GeneratePrepInstallPackages'};
+var _panosoft$elm_grove$DocGenerator$generateDocsJsonTask = F3(
+	function (sourcePath, docsJsonPath, generatePrep) {
+		return function (cmd) {
+			return A2(
+				_elm_lang$core$Task$onError,
+				function (error) {
+					return A2(
+						_elm_lang$core$Task$onError,
+						function (_p0) {
+							return _elm_lang$core$Task$fail(error);
+						},
+						A3(_panosoft$elm_grove$Spawn$exec, cmd, 0, false));
+				},
+				A2(
+					_elm_lang$core$Task$mapError,
+					function (error) {
+						return A2(
+							_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+							'Elm compilation failure:',
+							_elm_node$core$Node_Error$message(error));
+					},
+					A3(_panosoft$elm_grove$Spawn$exec, cmd, 0, true)));
+		}(
+			A2(
+				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+				A2(
+					_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+					A2(
+						_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+						A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'cd', sourcePath),
+						A2(
+							_panosoft$elm_utils$Utils_Ops_ops['?'],
+							_elm_lang$core$Native_Utils.eq(generatePrep, _panosoft$elm_grove$DocGenerator$GeneratePrepInstallPackages),
+							{ctor: '_Tuple2', _0: '&& grove install', _1: ''})),
+					'&& elm-make --docs'),
+				docsJsonPath));
+	});
+var _panosoft$elm_grove$DocGenerator$GeneratePrepNothing = {ctor: 'GeneratePrepNothing'};
 var _panosoft$elm_grove$DocGenerator$generateDocs = function (config) {
 	return A2(
 		_elm_lang$core$Task$andThen,
-		function (_p0) {
+		function (_p1) {
 			return A2(
 				_panosoft$elm_utils$Utils_Ops_ops['?'],
 				_elm_lang$core$Native_Utils.eq(config.generateDocs, _panosoft$elm_grove$Component_Config$GenerateDocsOn),
 				{
 					ctor: '_Tuple2',
-					_0: function (docsJsonFilename) {
-						return A2(
-							_elm_lang$core$Task$mapError,
-							function (error) {
-								return A2(_elm_node$core$Node_Error$Error, error, '');
-							},
-							A2(
-								_elm_lang$core$Task$andThen,
-								function (_p1) {
-									return A3(
-										_panosoft$elm_docs$Docs_Generator$generate,
-										config.pathSep,
-										docsJsonFilename,
-										A2(
-											_panosoft$elm_grove$DocGenerator$pathJoin,
-											config,
-											{
-												ctor: '::',
-												_0: '.',
-												_1: {
-													ctor: '::',
-													_0: _panosoft$elm_grove$DocGenerator$elmDocsPath,
-													_1: {ctor: '[]'}
-												}
-											}));
-								},
-								A2(
-									_elm_lang$core$Task$onError,
-									function (error) {
-										return A2(
-											_elm_lang$core$Task$onError,
-											function (_p2) {
-												return _elm_lang$core$Task$fail(error);
-											},
-											A3(
-												_panosoft$elm_grove$Spawn$exec,
-												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'elm-make --docs', docsJsonFilename),
-												0,
-												false));
-									},
-									A2(
-										_elm_lang$core$Task$mapError,
-										function (error) {
-											return A2(
-												_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-												'Elm compilation failure:',
-												_elm_node$core$Node_Error$message(error));
-										},
-										A3(
-											_panosoft$elm_grove$Spawn$exec,
-											A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'elm-make --docs', docsJsonFilename),
-											0,
-											true)))));
-					}(
+					_0: A2(
+						_elm_lang$core$Task$mapError,
+						function (error) {
+							return A2(_elm_node$core$Node_Error$Error, error, '');
+						},
 						A2(
-							_panosoft$elm_grove$DocGenerator$pathJoin,
-							config,
-							{
-								ctor: '::',
-								_0: _panosoft$elm_grove$Env$tmpdir,
-								_1: {
-									ctor: '::',
-									_0: _panosoft$elm_grove$DocGenerator$docsJsonFilename,
-									_1: {ctor: '[]'}
-								}
-							})),
+							_elm_lang$core$Task$andThen,
+							function (_p2) {
+								return A3(
+									_panosoft$elm_docs$Docs_Generator$generate,
+									config.pathSep,
+									_panosoft$elm_grove$DocGenerator$docsJsonFilename,
+									A2(
+										_panosoft$elm_grove$DocGenerator$pathJoin,
+										config,
+										{
+											ctor: '::',
+											_0: '.',
+											_1: {
+												ctor: '::',
+												_0: _panosoft$elm_grove$DocGenerator$elmDocsPath,
+												_1: {ctor: '[]'}
+											}
+										}));
+							},
+							A3(_panosoft$elm_grove$DocGenerator$generateDocsJsonTask, '.', _panosoft$elm_grove$DocGenerator$docsJsonFilename, _panosoft$elm_grove$DocGenerator$GeneratePrepNothing))),
 					_1: _elm_lang$core$Task$succeed(
 						{ctor: '_Tuple0'})
 				});
@@ -14697,10 +15519,6 @@ var _panosoft$elm_grove$DocGenerator$generateDocs = function (config) {
 					}
 				})));
 };
-var _panosoft$elm_grove$DocGenerator$Config = F4(
-	function (a, b, c, d) {
-		return {testing: a, cwd: b, pathSep: c, generateDocs: d};
-	});
 
 const _panosoft$elm_grove$Native_Glob = (_ => {
 	const glob = require('glob');
@@ -14737,6 +15555,114 @@ var _panosoft$elm_grove$Component_Bump$delayUpdateMsg = F2(
 			},
 			_elm_lang$core$Process$sleep(delay));
 	});
+var _panosoft$elm_grove$Component_Bump$failureExitCode = -1;
+var _panosoft$elm_grove$Component_Bump$successExitCode = 0;
+var _panosoft$elm_grove$Component_Bump$getLatestHeadLineageReleaseTagName = F2(
+	function (headLineageVersionStr, tags) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+			_panosoft$elm_grove$Version$versionFromString(headLineageVersionStr),
+			{
+				ctor: '_Tuple2',
+				_0: _panosoft$elm_grove$AppUtils$bug('bad versionStr'),
+				_1: function (headLineageVersion) {
+					return A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+						_elm_lang$core$List$head(
+							A2(
+								_elm_lang$core$List$filter,
+								function (version) {
+									return _elm_lang$core$Native_Utils.eq(version.major, headLineageVersion.major);
+								},
+								_panosoft$elm_grove$AppUtils$sortedVersions(tags))),
+						{ctor: '_Tuple2', _0: _panosoft$elm_grove$Version$initVersionStr, _1: _panosoft$elm_grove$Version$versionToString});
+				}
+			});
+	});
+var _panosoft$elm_grove$Component_Bump$getLatestReleaseTagName = function (tags) {
+	return A2(
+		_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+		_elm_lang$core$List$head(
+			_panosoft$elm_grove$AppUtils$sortedVersions(tags)),
+		{ctor: '_Tuple2', _0: _panosoft$elm_grove$Version$initVersionStr, _1: _panosoft$elm_grove$Version$versionToString});
+};
+var _panosoft$elm_grove$Component_Bump$getLatestAndHeadLineageTags = function (repo) {
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (_p1) {
+			var _p2 = _p1;
+			var _p4 = _p2._2;
+			return _elm_lang$core$Task$succeed(
+				function (headTagName) {
+					return function (latestHeadLineageVersionTagName) {
+						return {
+							ctor: '_Tuple4',
+							_0: _p2._0._0,
+							_1: _panosoft$elm_grove$Component_Bump$getLatestReleaseTagName(_p4),
+							_2: latestHeadLineageVersionTagName,
+							_3: headTagName
+						};
+					}(
+						A2(_panosoft$elm_grove$Component_Bump$getLatestHeadLineageReleaseTagName, headTagName, _p4));
+				}(
+					_panosoft$elm_grove$Component_Bump$getLatestReleaseTagName(
+						_elm_lang$core$Dict$keys(
+							A2(
+								_elm_lang$core$Dict$filter,
+								function (_p3) {
+									return A2(_elm_lang$core$Basics$flip, _elm_lang$core$List$member, _p2._0._1);
+								},
+								_p2._1)))));
+		},
+		_panosoft$elm_utils$Utils_Task$sequence3(
+			{
+				ctor: '_Tuple3',
+				_0: A2(
+					_elm_lang$core$Task$andThen,
+					function (headCommit) {
+						return A2(
+							_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+							_panosoft$elm_grove$Git$getCommitSha(headCommit),
+							{
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Task$fail,
+								_1: function (headSha) {
+									return A2(
+										_elm_lang$core$Task$andThen,
+										function (commits) {
+											return function (shas) {
+												return A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													!_elm_lang$core$Native_Utils.eq(
+														_elm_lang$core$List$length(shas),
+														_elm_lang$core$List$length(commits)),
+													{
+														ctor: '_Tuple2',
+														_0: _elm_lang$core$Task$fail('Unable to get SHAs for commits from getCommitTagHistory'),
+														_1: _elm_lang$core$Task$succeed(
+															{ctor: '_Tuple2', _0: headSha, _1: shas})
+													});
+											}(
+												A2(
+													_elm_lang$core$List$filterMap,
+													_elm_lang$core$Basics$identity,
+													A2(
+														_elm_lang$core$List$map,
+														_elm_lang$core$Result$toMaybe,
+														A2(_elm_lang$core$List$map, _panosoft$elm_grove$Git$getCommitSha, commits))));
+										},
+										A2(_panosoft$elm_grove$Git$getCommitTagHistory, repo, headCommit));
+								}
+							});
+					},
+					_panosoft$elm_grove$Git$getHeadCommit(repo)),
+				_1: A2(
+					_elm_lang$core$Task$andThen,
+					_panosoft$elm_grove$Git$getTagShas(repo),
+					_panosoft$elm_grove$Git$getTags(repo)),
+				_2: _panosoft$elm_grove$Git$getTags(repo)
+			}));
+};
 var _panosoft$elm_grove$Component_Bump$decodeExactDependencies = F2(
 	function (path, exactDependenciesJson) {
 		return A2(
@@ -14769,6 +15695,21 @@ var _panosoft$elm_grove$Component_Bump$pathJoin = F2(
 	function (config, pathParts) {
 		return A3(_panosoft$elm_grove$AppUtils$pathJoin, config.pathSep, config.cwd, pathParts);
 	});
+var _panosoft$elm_grove$Component_Bump$bumpVersionToString = function (bumpVersionType) {
+	var _p5 = bumpVersionType;
+	switch (_p5.ctor) {
+		case 'MajorVersion':
+			return 'Major';
+		case 'MinorVersion':
+			return 'Minor';
+		case 'PatchVersion':
+			return 'Patch';
+		case 'UnknownVersionApp':
+			return 'Unknown (no public interface)';
+		default:
+			return 'Unknown (initial release)';
+	}
+};
 var _panosoft$elm_grove$Component_Bump$Config = function (a) {
 	return function (b) {
 		return function (c) {
@@ -14782,7 +15723,15 @@ var _panosoft$elm_grove$Component_Bump$Config = function (a) {
 										return function (k) {
 											return function (l) {
 												return function (m) {
-													return {testing: a, dryRun: b, major: c, minor: d, patch: e, allowUncommitted: f, allowOldDependencies: g, routeToMe: h, operationComplete: i, elmVersion: j, cwd: k, pathSep: l, generateDocs: m};
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return function (q) {
+																	return {testing: a, dryRun: b, verbose: c, major: d, minor: e, patch: f, allowRebasedRelease: g, allowLegacyRelease: h, allowMajorRebasedRelease: i, allowUncommitted: j, allowOldDependencies: k, routeToMe: l, operationComplete: m, elmVersion: n, cwd: o, pathSep: p, generateDocs: q};
+																};
+															};
+														};
+													};
 												};
 											};
 										};
@@ -14796,208 +15745,1048 @@ var _panosoft$elm_grove$Component_Bump$Config = function (a) {
 		};
 	};
 };
-var _panosoft$elm_grove$Component_Bump$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {exactDependencies: a, elmJson: b, npmJsonStr: c, linkCheckCount: d, linkedPackages: e, newVersionCheckCountDown: f, newVersionCheckFailed: g, elmJsonIndent: h};
+var _panosoft$elm_grove$Component_Bump$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {exactDependencies: a, elmJson: b, npmJsonStr: c, linkCheckCount: d, linkedPackages: e, newVersionCheckCountDown: f, newVersionCheckFailed: g, elmJsonIndent: h, newVersion: i};
 	});
-var _panosoft$elm_grove$Component_Bump$ReadingNpmPackage = function (a) {
-	return {ctor: 'ReadingNpmPackage', _0: a};
-};
-var _panosoft$elm_grove$Component_Bump$ReadingElmPackage = function (a) {
-	return {ctor: 'ReadingElmPackage', _0: a};
-};
-var _panosoft$elm_grove$Component_Bump$ReadingExactDependencies = function (a) {
-	return {ctor: 'ReadingExactDependencies', _0: a};
-};
-var _panosoft$elm_grove$Component_Bump$GettingTags = function (a) {
-	return {ctor: 'GettingTags', _0: a};
-};
-var _panosoft$elm_grove$Component_Bump$BumpComplete = F3(
-	function (a, b, c) {
-		return {ctor: 'BumpComplete', _0: a, _1: b, _2: c};
-	});
-var _panosoft$elm_grove$Component_Bump$doBump = F2(
-	function (config, model) {
-		return function (_p1) {
-			var _p2 = _p1;
-			return A2(
-				_elm_lang$core$Platform_Cmd_ops['!'],
-				model,
-				{
-					ctor: '::',
-					_0: A2(_elm_lang$core$Task$attempt, _p2._0, _p2._1),
-					_1: {ctor: '[]'}
-				});
-		}(
-			function (_p3) {
-				var _p4 = _p3;
+var _panosoft$elm_grove$Component_Bump$InitVersion = {ctor: 'InitVersion'};
+var _panosoft$elm_grove$Component_Bump$UnknownVersionApp = {ctor: 'UnknownVersionApp'};
+var _panosoft$elm_grove$Component_Bump$PatchVersion = {ctor: 'PatchVersion'};
+var _panosoft$elm_grove$Component_Bump$MinorVersion = {ctor: 'MinorVersion'};
+var _panosoft$elm_grove$Component_Bump$MajorVersion = {ctor: 'MajorVersion'};
+var _panosoft$elm_grove$Component_Bump$traverseChangesToDetermineVersion = function (packageApiChanges) {
+	return A3(
+		_elm_lang$core$Dict$foldl,
+		F3(
+			function (moduleName, moduleApiChanges, bumpVersionType) {
 				return A2(
-					F2(
-						function (v0, v1) {
-							return {ctor: '_Tuple2', _0: v0, _1: v1};
-						}),
-					_p4._1,
+					_panosoft$elm_utils$Utils_Ops_ops['?!'],
+					_elm_lang$core$Native_Utils.eq(bumpVersionType, _panosoft$elm_grove$Component_Bump$MajorVersion),
+					{
+						ctor: '_Tuple2',
+						_0: function (_p6) {
+							return _panosoft$elm_grove$Component_Bump$MajorVersion;
+						},
+						_1: function (_p7) {
+							return A3(
+								_elm_lang$core$Dict$foldl,
+								F3(
+									function (name, apiChange, bumpVersionType) {
+										var _p8 = apiChange;
+										switch (_p8.ctor) {
+											case 'Addition':
+												return A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													_elm_lang$core$Native_Utils.eq(bumpVersionType, _panosoft$elm_grove$Component_Bump$PatchVersion),
+													{ctor: '_Tuple2', _0: _panosoft$elm_grove$Component_Bump$MinorVersion, _1: bumpVersionType});
+											case 'Change':
+												return _panosoft$elm_grove$Component_Bump$MajorVersion;
+											default:
+												return _panosoft$elm_grove$Component_Bump$MajorVersion;
+										}
+									}),
+								bumpVersionType,
+								moduleApiChanges);
+						}
+					});
+			}),
+		_panosoft$elm_grove$Component_Bump$PatchVersion,
+		packageApiChanges);
+};
+var _panosoft$elm_grove$Component_Bump$determineVersionTypeBasedOnChanges = F3(
+	function (headFile, latestVersionFile, latestVersionStr) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (headModules) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (latestVersionModules) {
+						return function (packageApiChanges) {
+							return _elm_lang$core$Task$succeed(
+								A2(
+									_panosoft$elm_utils$Utils_Ops_ops['?'],
+									_elm_lang$core$Native_Utils.eq(
+										_elm_lang$core$List$length(headModules),
+										0) && _elm_lang$core$Native_Utils.eq(
+										_elm_lang$core$List$length(latestVersionModules),
+										0),
+									{
+										ctor: '_Tuple2',
+										_0: {ctor: '_Tuple2', _0: _panosoft$elm_grove$Component_Bump$UnknownVersionApp, _1: _elm_lang$core$Maybe$Nothing},
+										_1: {
+											ctor: '_Tuple2',
+											_0: _panosoft$elm_grove$Component_Bump$traverseChangesToDetermineVersion(packageApiChanges),
+											_1: _elm_lang$core$Maybe$Just(packageApiChanges)
+										}
+									}));
+						}(
+							A2(
+								_panosoft$elm_grove$ApiChanges$compareModuleDicts,
+								_panosoft$elm_grove$ApiChanges$moduleListToDict(headModules),
+								_panosoft$elm_grove$ApiChanges$moduleListToDict(latestVersionModules)));
+					},
 					A2(
 						_elm_lang$core$Task$andThen,
-						function (_p5) {
-							return _elm_lang$core$Task$succeed(
-								{ctor: '_Tuple0'});
+						function (latestVersionJson) {
+							return A2(
+								_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+								A2(
+									_elm_lang$core$Json_Decode$decodeString,
+									_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$moduleDecoder),
+									latestVersionJson),
+								{ctor: '_Tuple2', _0: _elm_lang$core$Task$fail, _1: _elm_lang$core$Task$succeed});
 						},
 						A2(
+							_elm_lang$core$Task$mapError,
+							_elm_node$core$Node_Error$message,
+							A2(_elm_node$core$Node_FileSystem$readFileAsString, latestVersionFile, _elm_node$core$Node_Encoding$Utf8))));
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				function (headJson) {
+					return A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+						A2(
+							_elm_lang$core$Json_Decode$decodeString,
+							_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$moduleDecoder),
+							headJson),
+						{ctor: '_Tuple2', _0: _elm_lang$core$Task$fail, _1: _elm_lang$core$Task$succeed});
+				},
+				A2(
+					_elm_lang$core$Task$mapError,
+					_elm_node$core$Node_Error$message,
+					A2(_elm_node$core$Node_FileSystem$readFileAsString, headFile, _elm_node$core$Node_Encoding$Utf8))));
+	});
+var _panosoft$elm_grove$Component_Bump$determineVersionType = F2(
+	function (config, releaseScenario) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p9) {
+				var _p10 = _p9;
+				var _p41 = _p10._0;
+				var _p40 = _p10._1;
+				return A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?'],
+					_elm_lang$core$Native_Utils.eq(_p40, _panosoft$elm_grove$Version$initVersionStr),
+					{
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Task$succeed(
+							{ctor: '_Tuple2', _0: _panosoft$elm_grove$Component_Bump$InitVersion, _1: _elm_lang$core$Maybe$Nothing}),
+						_1: A2(
 							_elm_lang$core$Task$andThen,
-							function (repo) {
+							function (_p11) {
+								var _p12 = _p11;
 								return A2(
-									_panosoft$elm_grove$Git$createLightweightTag,
-									repo,
-									_panosoft$elm_grove$Version$versionToString(_p4._0));
-							},
-							_p4._2)));
-			}(
-				function (_p6) {
-					var _p7 = _p6;
-					var _p19 = _p7._0;
-					var _p18 = _p7._2;
-					return A3(
-						F3(
-							function (v0, v1, v2) {
-								return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
-							}),
-						_p19,
-						_p7._1,
-						function (_p8) {
-							var _p9 = _p8;
-							return A2(
-								_elm_lang$core$Task$andThen,
-								function (repo) {
-									return A2(
-										_elm_lang$core$Task$andThen,
-										function (_p10) {
-											return _elm_lang$core$Task$succeed(repo);
-										},
-										function (filesToAdd) {
-											return A2(
+									_elm_lang$core$Task$map,
+									A2(
+										_elm_lang$core$Basics$flip,
+										F2(
+											function (v0, v1) {
+												return {ctor: '_Tuple2', _0: v0, _1: v1};
+											}),
+										_p12._1),
+									A2(
+										_panosoft$elm_utils$Utils_Ops_ops['?'],
+										!_p12._2,
+										{
+											ctor: '_Tuple2',
+											_0: A2(
 												_elm_lang$core$Task$andThen,
-												function (docFiles) {
-													return function (docFiles) {
-														return A2(
-															_elm_lang$core$Task$andThen,
-															function (_p11) {
-																var _p12 = _p11;
-																return A4(
-																	_panosoft$elm_grove$Git$commit,
-																	repo,
-																	_elm_lang$core$List$concat(
-																		{
-																			ctor: '::',
-																			_0: docFiles,
-																			_1: {
-																				ctor: '::',
-																				_0: filesToAdd,
-																				_1: {ctor: '[]'}
-																			}
-																		}),
-																	_p12.deleted,
-																	A2(
-																		_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-																		'Bumped version to',
-																		_panosoft$elm_grove$Version$versionToString(_p19)));
-															},
-															_panosoft$elm_grove$Git$getFileStatuses(repo));
-													}(
-														A2(
-															_elm_lang$core$List$map,
-															A2(
-																_panosoft$elm_utils$Utils_Regex$replaceFirst,
-																_elm_lang$core$Regex$escape(
-																	A2(_elm_lang$core$Basics_ops['++'], config.cwd, config.pathSep)),
-																''),
-															docFiles));
+												function (_p13) {
+													return _elm_lang$core$Task$succeed(_panosoft$elm_grove$Component_Bump$MajorVersion);
 												},
 												A2(
 													_elm_lang$core$Task$mapError,
-													_elm_node$core$Node_Error$message,
-													A3(
-														_panosoft$elm_grove$Glob$find,
+													function (_p14) {
+														return 'should never get here';
+													},
+													_panosoft$elm_grove$Console$log('Elm Version change forcing Major release!'))),
+											_1: _elm_lang$core$Task$succeed(_p12._0)
+										}));
+							},
+							function (_p15) {
+								var _p16 = _p15;
+								var _p39 = _p16._1;
+								var _p38 = _p16._0;
+								return function (_p17) {
+									var _p18 = _p17;
+									return A2(
+										_elm_lang$core$Task$andThen,
+										function (_p19) {
+											var _p20 = _p19;
+											return A2(
+												_elm_lang$core$Task$andThen,
+												function (headJson) {
+													return A2(
+														_elm_lang$core$Task$andThen,
+														function (latestJsonStr) {
+															return A2(
+																_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+																A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$ElmJson$elmJsonDecoder, latestJsonStr),
+																{
+																	ctor: '_Tuple2',
+																	_0: _elm_lang$core$Task$fail,
+																	_1: function (latestJson) {
+																		return _elm_lang$core$Task$succeed(
+																			{
+																				ctor: '_Tuple3',
+																				_0: _p20._0,
+																				_1: _p20._1,
+																				_2: _elm_lang$core$Native_Utils.eq(headJson.elmVersion, latestJson.elmVersion)
+																			});
+																	}
+																});
+														},
 														A2(
-															_panosoft$elm_grove$Component_Bump$pathJoin,
-															config,
-															{
-																ctor: '::',
-																_0: _panosoft$elm_grove$DocGenerator$elmDocsPath,
-																_1: {
+															_elm_lang$core$Task$mapError,
+															_elm_node$core$Node_Error$message,
+															A2(
+																_elm_node$core$Node_FileSystem$readFileAsString,
+																A2(
+																	_panosoft$elm_grove$Component_Bump$pathJoin,
+																	config,
+																	{
+																		ctor: '::',
+																		_0: _p39,
+																		_1: {
+																			ctor: '::',
+																			_0: _panosoft$elm_grove$Package$elmJsonFilename,
+																			_1: {ctor: '[]'}
+																		}
+																	}),
+																_elm_node$core$Node_Encoding$Utf8)));
+												},
+												A2(
+													_elm_lang$core$Task$andThen,
+													function (headJsonStr) {
+														return A2(
+															_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+															A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_grove$ElmJson$elmJsonDecoder, headJsonStr),
+															{ctor: '_Tuple2', _0: _elm_lang$core$Task$fail, _1: _elm_lang$core$Task$succeed});
+													},
+													A2(
+														_elm_lang$core$Task$mapError,
+														_elm_node$core$Node_Error$message,
+														A2(
+															_elm_node$core$Node_FileSystem$readFileAsString,
+															A2(
+																_panosoft$elm_grove$Component_Bump$pathJoin,
+																config,
+																{
 																	ctor: '::',
-																	_0: '**',
+																	_0: config.cwd,
 																	_1: {
 																		ctor: '::',
-																		_0: '*',
+																		_0: _panosoft$elm_grove$Package$elmJsonFilename,
 																		_1: {ctor: '[]'}
 																	}
-																}
-															}),
-														_elm_lang$core$Maybe$Nothing,
-														false)));
-										}(
+																}),
+															_elm_node$core$Node_Encoding$Utf8))));
+										},
+										A2(
+											_elm_lang$core$Task$andThen,
+											function (_p21) {
+												var _p22 = _p21;
+												var _p25 = _p22._0;
+												return A2(
+													_elm_lang$core$Task$andThen,
+													function (_p23) {
+														return _elm_lang$core$Task$succeed(
+															{ctor: '_Tuple2', _0: _p25, _1: _p22._1});
+													},
+													A2(
+														_elm_lang$core$Task$mapError,
+														function (_p24) {
+															return 'should never get here';
+														},
+														_panosoft$elm_grove$Console$log(
+															A2(
+																_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																'Version Type:',
+																A2(
+																	_panosoft$elm_grove$Output$colorize,
+																	_panosoft$elm_grove$Output$cyan,
+																	_panosoft$elm_grove$Component_Bump$bumpVersionToString(_p25))))));
+											},
 											A2(
-												_panosoft$elm_utils$Utils_Ops_ops['|?!**>'],
-												{ctor: '_Tuple2', _0: model.elmJson, _1: model.npmJsonStr},
-												{
-													ctor: '_Tuple3',
-													_0: _panosoft$elm_grove$AppUtils$bugMissing('elmJsonStr'),
-													_1: _elm_lang$core$Basics$always(
-														{
-															ctor: '::',
-															_0: _panosoft$elm_grove$Package$elmJsonFilename,
-															_1: {ctor: '[]'}
-														}),
-													_2: _elm_lang$core$Basics$always(
-														{
-															ctor: '::',
-															_0: _panosoft$elm_grove$Package$elmJsonFilename,
-															_1: {
-																ctor: '::',
-																_0: _panosoft$elm_grove$Package$npmJsonFilename,
-																_1: {ctor: '[]'}
-															}
-														})
-												})));
-								},
-								A2(
-									_elm_lang$core$Task$andThen,
-									function (_p13) {
-										return _panosoft$elm_grove$Git$getRepo(_p9._0);
-									},
-									_p9._1));
-						}(
-							A2(
-								_panosoft$elm_utils$Utils_Ops_ops['?'],
-								config.testing,
-								{
-									ctor: '_Tuple2',
-									_0: {
+												_elm_lang$core$Task$andThen,
+												function (_p26) {
+													return A3(_panosoft$elm_grove$Component_Bump$determineVersionTypeBasedOnChanges, _p18._0, _p18._1, _p40);
+												},
+												A2(
+													_elm_lang$core$Task$andThen,
+													function (_p27) {
+														return A3(_panosoft$elm_grove$DocGenerator$generateDocsJsonTask, _p39, _panosoft$elm_grove$DocGenerator$docsJsonFilename, _panosoft$elm_grove$DocGenerator$GeneratePrepInstallPackages);
+													},
+													A2(
+														_elm_lang$core$Task$andThen,
+														function (_p28) {
+															return A2(
+																_elm_lang$core$Task$mapError,
+																function (_p29) {
+																	return 'should never get here';
+																},
+																_panosoft$elm_grove$Console$log(
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Installing packages and generating Public Interface JSON for', _p40),
+																		'...')));
+														},
+														A2(
+															_elm_lang$core$Task$andThen,
+															function (_p30) {
+																return A3(_panosoft$elm_grove$DocGenerator$generateDocsJsonTask, _p38, _panosoft$elm_grove$DocGenerator$docsJsonFilename, _panosoft$elm_grove$DocGenerator$GeneratePrepInstallPackages);
+															},
+															A2(
+																_elm_lang$core$Task$andThen,
+																function (_p31) {
+																	return A2(
+																		_elm_lang$core$Task$mapError,
+																		function (_p32) {
+																			return 'should never get here';
+																		},
+																		_panosoft$elm_grove$Console$log('Installing packages and generating Public Interface JSON for HEAD...'));
+																},
+																A2(
+																	_elm_lang$core$Task$andThen,
+																	function (_p33) {
+																		return A3(_panosoft$elm_grove$Git$checkout, _p41, _p40, _p39);
+																	},
+																	A2(
+																		_elm_lang$core$Task$andThen,
+																		function (headCommit) {
+																			return A3(_panosoft$elm_grove$Git$checkoutCommit, _p41, headCommit, _p38);
+																		},
+																		A2(
+																			_elm_lang$core$Task$andThen,
+																			function (_p34) {
+																				return _panosoft$elm_grove$Git$getHeadCommit(_p41);
+																			},
+																			A2(
+																				_elm_lang$core$Task$andThen,
+																				function (_p35) {
+																					return A2(
+																						_elm_lang$core$Task$mapError,
+																						function (_p36) {
+																							return 'should never get here';
+																						},
+																						_panosoft$elm_grove$Console$log(
+																							A2(
+																								_elm_lang$core$Basics_ops['++'],
+																								A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Checking out HEAD and', _p40),
+																								'...')));
+																				},
+																				A2(
+																					_elm_lang$core$Task$andThen,
+																					function (_p37) {
+																						return A2(
+																							_elm_lang$core$Task$mapError,
+																							_elm_node$core$Node_Error$message,
+																							_elm_node$core$Node_FileSystem$remove(_p39));
+																					},
+																					A2(
+																						_elm_lang$core$Task$mapError,
+																						_elm_node$core$Node_Error$message,
+																						_elm_node$core$Node_FileSystem$remove(_p38))))))))))))));
+								}(
+									{
 										ctor: '_Tuple2',
 										_0: A2(
 											_panosoft$elm_grove$Component_Bump$pathJoin,
 											config,
 											{
 												ctor: '::',
-												_0: config.cwd,
+												_0: _p38,
 												_1: {
 													ctor: '::',
-													_0: 'test',
+													_0: _panosoft$elm_grove$DocGenerator$docsJsonFilename,
 													_1: {ctor: '[]'}
 												}
 											}),
 										_1: A2(
-											_elm_lang$core$Task$andThen,
-											function (_p14) {
-												return _elm_lang$core$Task$succeed(
-													{ctor: '_Tuple0'});
-											},
+											_panosoft$elm_grove$Component_Bump$pathJoin,
+											config,
+											{
+												ctor: '::',
+												_0: _p39,
+												_1: {
+													ctor: '::',
+													_0: _panosoft$elm_grove$DocGenerator$docsJsonFilename,
+													_1: {ctor: '[]'}
+												}
+											})
+									});
+							}(
+								{
+									ctor: '_Tuple2',
+									_0: A2(
+										_panosoft$elm_grove$Component_Bump$pathJoin,
+										config,
+										{
+											ctor: '::',
+											_0: _panosoft$elm_grove$Env$tmpdir,
+											_1: {
+												ctor: '::',
+												_0: 'head',
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: A2(
+										_panosoft$elm_grove$Component_Bump$pathJoin,
+										config,
+										{
+											ctor: '::',
+											_0: _panosoft$elm_grove$Env$tmpdir,
+											_1: {
+												ctor: '::',
+												_0: 'latestVersion',
+												_1: {ctor: '[]'}
+											}
+										})
+								}))
+					});
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				function (_p42) {
+					var _p43 = _p42;
+					return _elm_lang$core$Task$succeed(
+						A2(
+							F2(
+								function (v0, v1) {
+									return {ctor: '_Tuple2', _0: v0, _1: v1};
+								}),
+							_p43._0,
+							function () {
+								var _p44 = releaseScenario;
+								if (_p44.ctor === 'LegacyReleaseScenario') {
+									return _panosoft$elm_grove$Version$versionToString(_p44._0);
+								} else {
+									return _p43._1;
+								}
+							}()));
+				},
+				A2(
+					_elm_lang$core$Task$andThen,
+					function (repo) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (tags) {
+								return function (_p45) {
+									return _elm_lang$core$Task$succeed(
+										A2(
+											F2(
+												function (v0, v1) {
+													return {ctor: '_Tuple2', _0: v0, _1: v1};
+												}),
+											repo,
+											_p45));
+								}(
+									A2(
+										_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+										A2(
+											_panosoft$elm_utils$Utils_Ops_ops['!!'],
+											_panosoft$elm_grove$AppUtils$sortedVersions(tags),
+											0),
+										{ctor: '_Tuple2', _0: _panosoft$elm_grove$Version$initVersionStr, _1: _panosoft$elm_grove$Version$versionToString}));
+							},
+							_panosoft$elm_grove$Git$getTags(repo));
+					},
+					_panosoft$elm_grove$Git$getRepo(config.cwd))));
+	});
+var _panosoft$elm_grove$Component_Bump$InitReadingNpmPackage = function (a) {
+	return {ctor: 'InitReadingNpmPackage', _0: a};
+};
+var _panosoft$elm_grove$Component_Bump$InitReadingElmPackage = function (a) {
+	return {ctor: 'InitReadingElmPackage', _0: a};
+};
+var _panosoft$elm_grove$Component_Bump$InitReadingExactDependencies = function (a) {
+	return {ctor: 'InitReadingExactDependencies', _0: a};
+};
+var _panosoft$elm_grove$Component_Bump$InitGettingTags = function (a) {
+	return {ctor: 'InitGettingTags', _0: a};
+};
+var _panosoft$elm_grove$Component_Bump$Complete = function (a) {
+	return {ctor: 'Complete', _0: a};
+};
+var _panosoft$elm_grove$Component_Bump$Continue = function (a) {
+	return {ctor: 'Continue', _0: a};
+};
+var _panosoft$elm_grove$Component_Bump$LegacyReleaseScenario = F2(
+	function (a, b) {
+		return {ctor: 'LegacyReleaseScenario', _0: a, _1: b};
+	});
+var _panosoft$elm_grove$Component_Bump$RebasedReleaseScenario = F2(
+	function (a, b) {
+		return {ctor: 'RebasedReleaseScenario', _0: a, _1: b};
+	});
+var _panosoft$elm_grove$Component_Bump$NormalReleaseScenario = function (a) {
+	return {ctor: 'NormalReleaseScenario', _0: a};
+};
+var _panosoft$elm_grove$Component_Bump$determineReleaseScenario = F2(
+	function (config, repo) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p46) {
+				var _p47 = _p46;
+				var _p62 = _p47._1;
+				var _p61 = _p47._2;
+				var _p60 = _p47._3;
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (releaseScenario) {
+						return function (_p48) {
+							var _p49 = _p48;
+							return A2(
+								_elm_lang$core$Task$andThen,
+								function (_p50) {
+									return _elm_lang$core$Task$succeed(releaseScenario);
+								},
+								A2(
+									_elm_lang$core$Task$mapError,
+									function (_p51) {
+										return 'should never get here';
+									},
+									_panosoft$elm_grove$Console$log(
+										A2(
+											_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 											A2(
-												_elm_lang$core$Task$andThen,
-												function (_p15) {
-													return _panosoft$elm_grove$Git$initRepo(
+												_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+												A2(
+													_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+													'Release Scenario:',
+													A2(_panosoft$elm_grove$Output$colorize, _panosoft$elm_grove$Output$cyan, _p49._0)),
+												_panosoft$elm_grove$Output$parens(
+													A2(
+														_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+														'HEAD based on:',
 														A2(
+															_panosoft$elm_grove$Output$colorize,
+															_panosoft$elm_grove$Output$cyan,
+															_panosoft$elm_grove$Version$versionToString(_p49._3))))),
+											_panosoft$elm_grove$Output$parens(
+												A2(
+													_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+													_p49._1,
+													A2(
+														_panosoft$elm_grove$Output$colorize,
+														_panosoft$elm_grove$Output$cyan,
+														_panosoft$elm_grove$Version$versionToString(_p49._2))))))));
+						}(
+							function () {
+								var _p52 = releaseScenario;
+								switch (_p52.ctor) {
+									case 'NormalReleaseScenario':
+										var _p53 = _p52._0;
+										return {ctor: '_Tuple4', _0: 'Normal', _1: 'Latest release:', _2: _p53, _3: _p53};
+									case 'RebasedReleaseScenario':
+										return {ctor: '_Tuple4', _0: 'Rebased', _1: 'Latest release:', _2: _p52._0, _3: _p52._1};
+									default:
+										var _p54 = _p52._1;
+										return {
+											ctor: '_Tuple4',
+											_0: 'Legacy',
+											_1: A2(
+												_elm_lang$core$Basics_ops['++'],
+												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Latest', _p54.major),
+												'.x.x release:'),
+											_2: _p52._0,
+											_3: _p54
+										};
+								}
+							}());
+					},
+					A2(
+						_elm_lang$core$Task$andThen,
+						function (_p55) {
+							return A2(
+								_panosoft$elm_utils$Utils_Ops_ops['|?!***>'],
+								A2(
+									_panosoft$elm_utils$Utils_Tuple$map3,
+									_panosoft$elm_grove$Version$versionFromString,
+									{ctor: '_Tuple3', _0: _p62, _1: _p61, _2: _p60}),
+								{
+									ctor: '_Tuple4',
+									_0: _panosoft$elm_grove$AppUtils$bug('invalid latestVersionStr'),
+									_1: _panosoft$elm_grove$AppUtils$bug('invalid latestHeadLineageVersionStr'),
+									_2: _panosoft$elm_grove$AppUtils$bug('invalid headLineageVersionStr'),
+									_3: function (_p56) {
+										var _p57 = _p56;
+										var _p59 = _p57._0;
+										var _p58 = _p57._2;
+										return A2(
+											_panosoft$elm_utils$Utils_Ops_ops['?'],
+											_elm_lang$core$Native_Utils.eq(_p62, _p60),
+											{
+												ctor: '_Tuple2',
+												_0: _elm_lang$core$Task$succeed(
+													_panosoft$elm_grove$Component_Bump$NormalReleaseScenario(_p59)),
+												_1: A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													_elm_lang$core$Native_Utils.eq(_p59.major, _p58.major) && ((!_elm_lang$core$Native_Utils.eq(_p59.minor, _p58.minor)) || (!_elm_lang$core$Native_Utils.eq(_p59.patch, _p58.patch))),
+													{
+														ctor: '_Tuple2',
+														_0: A2(
+															_panosoft$elm_utils$Utils_Ops_ops['?'],
+															config.allowRebasedRelease,
+															{
+																ctor: '_Tuple2',
+																_0: _elm_lang$core$Task$succeed(
+																	A2(_panosoft$elm_grove$Component_Bump$RebasedReleaseScenario, _p59, _p58)),
+																_1: _elm_lang$core$Task$fail(
+																	A2(
+																		_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																		A2(
+																			_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																			A2(
+																				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																				A2(
+																					_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																					'HEAD is based on a Previous release',
+																					_panosoft$elm_grove$Output$parens(_p60)),
+																				'which is different than the latest release'),
+																			_panosoft$elm_grove$Output$parens(_p62)),
+																		'If you want to make a Rebased release, you must use --allow-rebased-release'))
+															}),
+														_1: A2(
+															_panosoft$elm_utils$Utils_Ops_ops['?'],
+															config.allowLegacyRelease,
+															{
+																ctor: '_Tuple2',
+																_0: A2(
+																	_panosoft$elm_utils$Utils_Ops_ops['?'],
+																	_elm_lang$core$Native_Utils.eq(_p61, _p60) || config.allowRebasedRelease,
+																	{
+																		ctor: '_Tuple2',
+																		_0: _elm_lang$core$Task$succeed(
+																			A2(_panosoft$elm_grove$Component_Bump$LegacyReleaseScenario, _p57._1, _p58)),
+																		_1: _elm_lang$core$Task$fail(
+																			A2(
+																				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																				A2(
+																					_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																					A2(
+																						_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																						A2(
+																							_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																							A2(
+																								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																								A2(
+																									_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																									'HEAD is based on a Previous release',
+																									_panosoft$elm_grove$Output$parens(_p60)),
+																								'which is different than the Major version of latest release'),
+																							_panosoft$elm_grove$Output$parens(_p62)),
+																						'AND is also different than the latest version of that Legacy release'),
+																					_panosoft$elm_grove$Output$parens(_p61)),
+																				'If you want to make a Rebased release, you must use --allow-rebased-release'))
+																	}),
+																_1: _elm_lang$core$Task$fail(
+																	A2(
+																		_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																		A2(
+																			_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																			A2(
+																				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																				A2(
+																					_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																					'HEAD is based on a Previous release',
+																					_panosoft$elm_grove$Output$parens(_p60)),
+																				'which is different than the Major version of latest release'),
+																			_panosoft$elm_grove$Output$parens(_p62)),
+																		'If you want to make a Legacy release, you must use --allow-legacy-release'))
+															})
+													})
+											});
+									}
+								});
+						},
+						A2(
+							_panosoft$elm_utils$Utils_Ops_ops['?'],
+							_elm_lang$core$Native_Utils.eq(_p62, _panosoft$elm_grove$Version$initVersionStr),
+							{
+								ctor: '_Tuple2',
+								_0: _elm_lang$core$Task$succeed(''),
+								_1: A2(
+									_elm_lang$core$Task$andThen,
+									function (shas) {
+										return A2(
+											_panosoft$elm_utils$Utils_Ops_ops['?'],
+											_elm_lang$core$Native_Utils.eq(
+												A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?!='],
+													A2(
+														_panosoft$elm_utils$Utils_Ops_ops['!!'],
+														_elm_lang$core$Dict$values(shas),
+														0),
+													_panosoft$elm_grove$AppUtils$bugMissing('shas')),
+												_p47._0),
+											{
+												ctor: '_Tuple2',
+												_0: _elm_lang$core$Task$fail('No commits since last Bump'),
+												_1: _elm_lang$core$Task$succeed('')
+											});
+									},
+									A2(
+										_panosoft$elm_grove$Git$getTagShas,
+										repo,
+										{
+											ctor: '::',
+											_0: _p62,
+											_1: {ctor: '[]'}
+										}))
+							})));
+			},
+			_panosoft$elm_grove$Component_Bump$getLatestAndHeadLineageTags(repo));
+	});
+var _panosoft$elm_grove$Component_Bump$getBumpAndOldVersion = F2(
+	function (config, model) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (releaseScenario) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (_p63) {
+						var _p64 = _p63;
+						var _p66 = _p64._0;
+						return A2(
+							_elm_lang$core$Task$map,
+							function (bumpVersionType) {
+								return {ctor: '_Tuple3', _0: bumpVersionType, _1: _p64._1, _2: _p64._2};
+							},
+							function (enforceExplicitBumpVersionType) {
+								var _p65 = _p66;
+								switch (_p65.ctor) {
+									case 'UnknownVersionApp':
+										return enforceExplicitBumpVersionType(
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'This package has NO Public Interface which means you MUST do one of the following:\n\n',
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													'\t1. If the package is an Application, then specify either --major, --minor or --patch\n',
+													A2(_elm_lang$core$Basics_ops['++'], '\t2. If the package is a Library, then add modules to \'exposed-modules\', recompile and test before releasing.\n', '\t   This library should be tested before releasing by installing this library into a Test App using Grove\'s --link option.\n'))));
+									case 'InitVersion':
+										return enforceExplicitBumpVersionType('Since this is the first release for this package, you must specify either --major, --minor or --patch');
+									default:
+										return A2(
+											_panosoft$elm_utils$Utils_Ops_ops['?'],
+											config.major || (config.minor || config.patch),
+											{
+												ctor: '_Tuple2',
+												_0: _elm_lang$core$Task$fail(
+													A2(_elm_lang$core$Basics_ops['++'], 'This package has a Public Interface and therefore you must NOT specify --major, --minor or --patch.\n', 'The type of release (Major/Minor/Patch) will be automatically determined based on the changes made to the public interface and following the rules of semver (http://semver.org/)')),
+												_1: _elm_lang$core$Task$succeed(_p66)
+											});
+								}
+							}(
+								function (msg) {
+									return A2(
+										_panosoft$elm_utils$Utils_Ops_ops['?'],
+										!(config.major || (config.minor || config.patch)),
+										{
+											ctor: '_Tuple2',
+											_0: _elm_lang$core$Task$fail(msg),
+											_1: _elm_lang$core$Task$succeed(
+												A2(
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													config.major,
+													{
+														ctor: '_Tuple2',
+														_0: _panosoft$elm_grove$Component_Bump$MajorVersion,
+														_1: A2(
+															_panosoft$elm_utils$Utils_Ops_ops['?'],
+															config.minor,
+															{ctor: '_Tuple2', _0: _panosoft$elm_grove$Component_Bump$MinorVersion, _1: _panosoft$elm_grove$Component_Bump$PatchVersion})
+													}))
+										});
+								}));
+					},
+					A2(
+						_elm_lang$core$Task$andThen,
+						function (_p67) {
+							var _p68 = _p67;
+							var _p75 = _p68._1;
+							var _p74 = _p68._0;
+							return A2(
+								_elm_lang$core$Task$andThen,
+								function (_p69) {
+									var _p70 = releaseScenario;
+									switch (_p70.ctor) {
+										case 'NormalReleaseScenario':
+											return _elm_lang$core$Task$succeed(
+												{ctor: '_Tuple3', _0: _p74, _1: _p75, _2: _p70._0});
+										case 'RebasedReleaseScenario':
+											return A2(
+												_panosoft$elm_utils$Utils_Ops_ops['?'],
+												_elm_lang$core$Native_Utils.eq(_p74, _panosoft$elm_grove$Component_Bump$MajorVersion) && (!config.allowMajorRebasedRelease),
+												{
+													ctor: '_Tuple2',
+													_0: _elm_lang$core$Task$fail(
+														A2(_elm_lang$core$Basics_ops['++'], 'This release is a Major release but it\'s also based on a release that is NOT the latest, i.e. a Rebased Release.\n', 'If you are sure that you want to do this, then use --allow-major-rebased-release')),
+													_1: _elm_lang$core$Task$succeed(
+														{ctor: '_Tuple3', _0: _p74, _1: _p75, _2: _p70._0})
+												});
+										default:
+											return A2(
+												_panosoft$elm_utils$Utils_Ops_ops['?'],
+												_elm_lang$core$Native_Utils.eq(_p74, _panosoft$elm_grove$Component_Bump$MajorVersion),
+												{
+													ctor: '_Tuple2',
+													_0: _elm_lang$core$Task$fail(
+														A2(_elm_lang$core$Basics_ops['++'], 'This is a Major release but it\'s based on a Legacy release which is NOT possible since bumping the Major version would conflict with an existing release.\n', 'Legacy releases should only be bug fixes (Patch) or additional functionality (Minor).')),
+													_1: _elm_lang$core$Task$succeed(
+														{ctor: '_Tuple3', _0: _p74, _1: _p75, _2: _p70._0})
+												});
+									}
+								},
+								A2(
+									_elm_lang$core$Task$andThen,
+									function (_p71) {
+										return function (headLineageVersion) {
+											return A2(
+												_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+												model.elmJson,
+												{
+													ctor: '_Tuple2',
+													_0: _panosoft$elm_grove$AppUtils$bugMissing('model.elmJson'),
+													_1: function (elmJson) {
+														return A2(
+															_panosoft$elm_utils$Utils_Ops_ops['?'],
+															!_elm_lang$core$Native_Utils.eq(
+																elmJson.version,
+																_panosoft$elm_grove$Version$versionToString(headLineageVersion)),
+															{
+																ctor: '_Tuple2',
+																_0: _elm_lang$core$Task$fail(
+																	A2(
+																		_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																		A2(
+																			_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																			A2(
+																				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																				A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Package version in', _panosoft$elm_grove$Package$elmJsonFilename),
+																				_panosoft$elm_grove$Output$parens(elmJson.version)),
+																			'must match the release that HEAD is based on'),
+																		_panosoft$elm_grove$Output$parens(
+																			_panosoft$elm_grove$Version$versionToString(headLineageVersion)))),
+																_1: _elm_lang$core$Task$succeed(
+																	{ctor: '_Tuple0'})
+															});
+													}
+												});
+										}(
+											function () {
+												var _p72 = releaseScenario;
+												switch (_p72.ctor) {
+													case 'NormalReleaseScenario':
+														return _p72._0;
+													case 'RebasedReleaseScenario':
+														return _p72._1;
+													default:
+														return _p72._1;
+												}
+											}());
+									},
+									A2(
+										_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+										_p75,
+										{
+											ctor: '_Tuple2',
+											_0: _elm_lang$core$Task$succeed(''),
+											_1: function (packageApiChanges) {
+												return A2(
+													_elm_lang$core$Task$mapError,
+													function (_p73) {
+														return 'should never get here';
+													},
+													function (changes) {
+														return A2(
+															_panosoft$elm_utils$Utils_Ops_ops['?'],
+															(!config.verbose) || _elm_lang$core$Native_Utils.eq(changes, ''),
+															{
+																ctor: '_Tuple2',
+																_0: _elm_lang$core$Task$succeed(''),
+																_1: _panosoft$elm_grove$Console$log(changes)
+															});
+													}(
+														_panosoft$elm_grove$ApiChanges$packageApiChangesToString(packageApiChanges)));
+											}
+										})));
+						},
+						A2(_panosoft$elm_grove$Component_Bump$determineVersionType, config, releaseScenario)));
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				_panosoft$elm_grove$Component_Bump$determineReleaseScenario(config),
+				_panosoft$elm_grove$Git$getRepo(config.cwd)));
+	});
+var _panosoft$elm_grove$Component_Bump$BumpComplete = function (a) {
+	return {ctor: 'BumpComplete', _0: a};
+};
+var _panosoft$elm_grove$Component_Bump$doBump = F2(
+	function (config, model) {
+		return function (bumpTask) {
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				model,
+				{
+					ctor: '::',
+					_0: A2(_elm_lang$core$Task$attempt, _panosoft$elm_grove$Component_Bump$BumpComplete, bumpTask),
+					_1: {ctor: '[]'}
+				});
+		}(
+			function (bumpTask) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (_p76) {
+						var _p77 = _p76;
+						var _p91 = _p77._1;
+						return function (newVersion) {
+							return A2(
+								_elm_lang$core$Task$andThen,
+								function (_p78) {
+									return _elm_lang$core$Task$succeed(
+										{ctor: '_Tuple2', _0: _p91, _1: newVersion});
+								},
+								A2(
+									_elm_lang$core$Task$andThen,
+									function (repo) {
+										return A2(
+											_panosoft$elm_grove$Git$createLightweightTag,
+											repo,
+											_panosoft$elm_grove$Version$versionToString(newVersion));
+									},
+									function (bumpTask) {
+										return function (_p79) {
+											var _p80 = _p79;
+											return A2(
+												_elm_lang$core$Task$andThen,
+												function (repo) {
+													return A2(
+														_elm_lang$core$Task$andThen,
+														function (_p81) {
+															return _elm_lang$core$Task$succeed(repo);
+														},
+														function (filesToAdd) {
+															return A2(
+																_elm_lang$core$Task$andThen,
+																function (docFiles) {
+																	return function (docFiles) {
+																		return A2(
+																			_elm_lang$core$Task$andThen,
+																			function (_p82) {
+																				var _p83 = _p82;
+																				return function (toAdd) {
+																					return A4(
+																						_panosoft$elm_grove$Git$commit,
+																						repo,
+																						toAdd,
+																						_p83.deleted,
+																						A2(
+																							_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																							'Bumped version to',
+																							_panosoft$elm_grove$Version$versionToString(newVersion)));
+																				}(
+																					A2(
+																						_elm_lang$core$List$append,
+																						_elm_lang$core$List$concat(
+																							{
+																								ctor: '::',
+																								_0: docFiles,
+																								_1: {
+																									ctor: '::',
+																									_0: filesToAdd,
+																									_1: {ctor: '[]'}
+																								}
+																							}),
+																						A2(
+																							_panosoft$elm_utils$Utils_Ops_ops['?'],
+																							_elm_lang$core$Native_Utils.eq(config.generateDocs, _panosoft$elm_grove$Component_Config$GenerateDocsOn),
+																							{
+																								ctor: '_Tuple2',
+																								_0: {
+																									ctor: '::',
+																									_0: _panosoft$elm_grove$DocGenerator$docsJsonFilename,
+																									_1: {ctor: '[]'}
+																								},
+																								_1: {ctor: '[]'}
+																							})));
+																			},
+																			_panosoft$elm_grove$Git$getFileStatuses(repo));
+																	}(
+																		A2(
+																			_elm_lang$core$List$map,
+																			A2(
+																				_panosoft$elm_utils$Utils_Regex$replaceFirst,
+																				_elm_lang$core$Regex$escape(
+																					A2(_elm_lang$core$Basics_ops['++'], config.cwd, config.pathSep)),
+																				''),
+																			docFiles));
+																},
+																A2(
+																	_elm_lang$core$Task$mapError,
+																	_elm_node$core$Node_Error$message,
+																	A3(
+																		_panosoft$elm_grove$Glob$find,
+																		A2(
+																			_panosoft$elm_grove$Component_Bump$pathJoin,
+																			config,
+																			{
+																				ctor: '::',
+																				_0: _panosoft$elm_grove$DocGenerator$elmDocsPath,
+																				_1: {
+																					ctor: '::',
+																					_0: '**',
+																					_1: {
+																						ctor: '::',
+																						_0: '*',
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}),
+																		_elm_lang$core$Maybe$Nothing,
+																		false)));
+														}(
+															A2(
+																_panosoft$elm_utils$Utils_Ops_ops['|?!**>'],
+																{ctor: '_Tuple2', _0: model.elmJson, _1: model.npmJsonStr},
+																{
+																	ctor: '_Tuple3',
+																	_0: _panosoft$elm_grove$AppUtils$bugMissing('elmJsonStr'),
+																	_1: _elm_lang$core$Basics$always(
+																		{
+																			ctor: '::',
+																			_0: _panosoft$elm_grove$Package$elmJsonFilename,
+																			_1: {ctor: '[]'}
+																		}),
+																	_2: _elm_lang$core$Basics$always(
+																		{
+																			ctor: '::',
+																			_0: _panosoft$elm_grove$Package$elmJsonFilename,
+																			_1: {
+																				ctor: '::',
+																				_0: _panosoft$elm_grove$Package$npmJsonFilename,
+																				_1: {ctor: '[]'}
+																			}
+																		})
+																})));
+												},
+												A2(
+													_elm_lang$core$Task$andThen,
+													function (_p84) {
+														return _panosoft$elm_grove$Git$getRepo(_p80._0);
+													},
+													_p80._1));
+										}(
+											A2(
+												_panosoft$elm_utils$Utils_Ops_ops['?'],
+												config.testing,
+												{
+													ctor: '_Tuple2',
+													_0: {
+														ctor: '_Tuple2',
+														_0: A2(
 															_panosoft$elm_grove$Component_Bump$pathJoin,
 															config,
 															{
@@ -15006,171 +16795,43 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 																_1: {
 																	ctor: '::',
 																	_0: 'test',
-																	_1: {
-																		ctor: '::',
-																		_0: '.git',
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}));
-												},
-												A2(
-													_elm_lang$core$Task$mapError,
-													_elm_node$core$Node_Error$message,
-													A2(
-														_elm_lang$core$Task$andThen,
-														function (_p16) {
-															return _elm_node$core$Node_FileSystem$remove(
-																A2(
-																	_panosoft$elm_grove$Component_Bump$pathJoin,
-																	config,
-																	{
-																		ctor: '::',
-																		_0: config.cwd,
-																		_1: {
-																			ctor: '::',
-																			_0: 'test',
-																			_1: {
-																				ctor: '::',
-																				_0: '.git',
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	}));
-														},
-														_p18))))
-									},
-									_1: {
-										ctor: '_Tuple2',
-										_0: config.cwd,
-										_1: A2(
-											_elm_lang$core$Task$andThen,
-											function (_p17) {
-												return _elm_lang$core$Task$succeed(
-													{ctor: '_Tuple0'});
-											},
-											A2(_elm_lang$core$Task$mapError, _elm_node$core$Node_Error$message, _p18))
-									}
-								})));
-				}(
-					function (_p20) {
-						var _p21 = _p20;
-						var _p23 = _p21._0;
-						return A3(
-							F3(
-								function (v0, v1, v2) {
-									return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
-								}),
-							_p23,
-							_p21._1,
-							A2(
-								_elm_lang$core$Task$andThen,
-								function (_p22) {
-									return A2(
-										_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-										model.npmJsonStr,
-										{
-											ctor: '_Tuple2',
-											_0: _elm_lang$core$Task$succeed(
-												{ctor: '_Tuple0'}),
-											_1: function (npmJsonStr) {
-												return A2(
-													_panosoft$elm_grove$AppUtils$writeFile,
-													A2(
-														_panosoft$elm_grove$Component_Bump$pathJoin,
-														config,
-														{
-															ctor: '::',
-															_0: config.cwd,
-															_1: {
-																ctor: '::',
-																_0: A2(
-																	_panosoft$elm_utils$Utils_Ops_ops['?'],
-																	config.testing,
-																	{ctor: '_Tuple2', _0: 'test', _1: ''}),
-																_1: {
-																	ctor: '::',
-																	_0: _panosoft$elm_grove$Package$npmJsonFilename,
 																	_1: {ctor: '[]'}
 																}
-															}
-														}),
-													A3(
-														_elm_lang$core$Basics$flip,
-														_panosoft$elm_grove$NpmJson$replaceVersion,
-														_panosoft$elm_grove$Version$versionToString(_p23),
-														npmJsonStr));
-											}
-										});
-								},
-								_p21._2));
-					}(
-						function (bumpTask) {
-							return A2(
-								_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-								model.elmJson,
-								{
-									ctor: '_Tuple2',
-									_0: _panosoft$elm_grove$AppUtils$bugMissing('elmJson'),
-									_1: function (elmJson) {
-										return A2(
-											_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-											_panosoft$elm_grove$Version$versionFromString(elmJson.version),
-											{
-												ctor: '_Tuple2',
-												_0: _panosoft$elm_grove$AppUtils$bug(
-													A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'bad version in elmJson:', elmJson.version)),
-												_1: function (oldVersion) {
-													return A2(
-														_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-														_elm_lang$core$List$head(
+															}),
+														_1: A2(
+															_elm_lang$core$Task$andThen,
+															function (_p85) {
+																return _elm_lang$core$Task$succeed(
+																	{ctor: '_Tuple0'});
+															},
 															A2(
-																_elm_lang$core$List$map,
-																_elm_lang$core$Tuple$second,
-																A2(
-																	_elm_lang$core$List$filter,
-																	_elm_lang$core$Tuple$first,
-																	{
-																		ctor: '::',
-																		_0: {
-																			ctor: '_Tuple2',
-																			_0: config.major,
-																			_1: _panosoft$elm_grove$Version$nextMajor(oldVersion)
-																		},
-																		_1: {
-																			ctor: '::',
-																			_0: {
-																				ctor: '_Tuple2',
-																				_0: config.minor,
-																				_1: _panosoft$elm_grove$Version$nextMinor(oldVersion)
-																			},
-																			_1: {
+																_elm_lang$core$Task$andThen,
+																function (_p86) {
+																	return _panosoft$elm_grove$Git$initRepo(
+																		A2(
+																			_panosoft$elm_grove$Component_Bump$pathJoin,
+																			config,
+																			{
 																				ctor: '::',
-																				_0: {
-																					ctor: '_Tuple2',
-																					_0: config.patch,
-																					_1: _panosoft$elm_grove$Version$nextPatch(oldVersion)
-																				},
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	}))),
-														{
-															ctor: '_Tuple2',
-															_0: _panosoft$elm_grove$AppUtils$bug('major/minor/patch are all False'),
-															_1: function (newVersion) {
-																return A3(
-																	F3(
-																		function (v0, v1, v2) {
-																			return {ctor: '_Tuple3', _0: v0, _1: v1, _2: v2};
-																		}),
-																	newVersion,
-																	A2(_panosoft$elm_grove$Component_Bump$BumpComplete, oldVersion, newVersion),
-																	A2(
-																		_elm_lang$core$Task$andThen,
-																		function (_p24) {
-																			return A2(
-																				_panosoft$elm_grove$AppUtils$writeFile,
+																				_0: config.cwd,
+																				_1: {
+																					ctor: '::',
+																					_0: 'test',
+																					_1: {
+																						ctor: '::',
+																						_0: '.git',
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}));
+																},
+																A2(
+																	_elm_lang$core$Task$andThen,
+																	function (_p87) {
+																		return A2(
+																			_elm_lang$core$Task$mapError,
+																			_elm_node$core$Node_Error$message,
+																			_elm_node$core$Node_FileSystem$remove(
 																				A2(
 																					_panosoft$elm_grove$Component_Bump$pathJoin,
 																					config,
@@ -15179,45 +16840,195 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 																						_0: config.cwd,
 																						_1: {
 																							ctor: '::',
-																							_0: A2(
-																								_panosoft$elm_utils$Utils_Ops_ops['?'],
-																								config.testing,
-																								{ctor: '_Tuple2', _0: 'test', _1: ''}),
+																							_0: 'test',
 																							_1: {
 																								ctor: '::',
-																								_0: _panosoft$elm_grove$Package$elmJsonFilename,
+																								_0: '.git',
 																								_1: {ctor: '[]'}
 																							}
 																						}
-																					}),
-																				A2(
-																					_elm_lang$core$Json_Encode$encode,
-																					A2(
-																						_panosoft$elm_utils$Utils_Ops_ops['?!='],
-																						model.elmJsonIndent,
-																						_panosoft$elm_grove$AppUtils$bugMissing('elmJsonIndent')),
-																					_panosoft$elm_grove$ElmJson$elmJsonEncoder(
-																						_elm_lang$core$Native_Utils.update(
-																							elmJson,
-																							{
-																								version: _panosoft$elm_grove$Version$versionToString(newVersion)
-																							}))));
-																		},
-																		bumpTask));
-															}
-														});
-												}
-											});
-									}
-								});
+																					})));
+																	},
+																	bumpTask)))
+													},
+													_1: {
+														ctor: '_Tuple2',
+														_0: config.cwd,
+														_1: A2(
+															_elm_lang$core$Task$andThen,
+															function (_p88) {
+																return _elm_lang$core$Task$succeed(
+																	{ctor: '_Tuple0'});
+															},
+															bumpTask)
+													}
+												}));
+									}(
+										A2(
+											_elm_lang$core$Task$andThen,
+											function (_p89) {
+												return A2(
+													_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+													model.npmJsonStr,
+													{
+														ctor: '_Tuple2',
+														_0: _elm_lang$core$Task$succeed(
+															{ctor: '_Tuple0'}),
+														_1: function (npmJsonStr) {
+															return A2(
+																_elm_lang$core$Task$mapError,
+																_elm_node$core$Node_Error$message,
+																A2(
+																	_panosoft$elm_grove$AppUtils$writeFile,
+																	A2(
+																		_panosoft$elm_grove$Component_Bump$pathJoin,
+																		config,
+																		{
+																			ctor: '::',
+																			_0: config.cwd,
+																			_1: {
+																				ctor: '::',
+																				_0: A2(
+																					_panosoft$elm_utils$Utils_Ops_ops['?'],
+																					config.testing,
+																					{ctor: '_Tuple2', _0: 'test', _1: ''}),
+																				_1: {
+																					ctor: '::',
+																					_0: _panosoft$elm_grove$Package$npmJsonFilename,
+																					_1: {ctor: '[]'}
+																				}
+																			}
+																		}),
+																	A3(
+																		_elm_lang$core$Basics$flip,
+																		_panosoft$elm_grove$NpmJson$replaceVersion,
+																		_panosoft$elm_grove$Version$versionToString(newVersion),
+																		npmJsonStr)));
+														}
+													});
+											},
+											A2(
+												_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+												model.elmJson,
+												{
+													ctor: '_Tuple2',
+													_0: _panosoft$elm_grove$AppUtils$bugMissing('elmJson'),
+													_1: function (elmJson) {
+														return A2(
+															_elm_lang$core$Task$mapError,
+															_elm_node$core$Node_Error$message,
+															A2(
+																_panosoft$elm_grove$AppUtils$writeFile,
+																A2(
+																	_panosoft$elm_grove$Component_Bump$pathJoin,
+																	config,
+																	{
+																		ctor: '::',
+																		_0: config.cwd,
+																		_1: {
+																			ctor: '::',
+																			_0: A2(
+																				_panosoft$elm_utils$Utils_Ops_ops['?'],
+																				config.testing,
+																				{ctor: '_Tuple2', _0: 'test', _1: ''}),
+																			_1: {
+																				ctor: '::',
+																				_0: _panosoft$elm_grove$Package$elmJsonFilename,
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}),
+																A2(
+																	_elm_lang$core$Json_Encode$encode,
+																	A2(
+																		_panosoft$elm_utils$Utils_Ops_ops['?!='],
+																		model.elmJsonIndent,
+																		_panosoft$elm_grove$AppUtils$bugMissing('elmJsonIndent')),
+																	_panosoft$elm_grove$ElmJson$elmJsonEncoder(
+																		_elm_lang$core$Native_Utils.update(
+																			elmJson,
+																			{
+																				version: _panosoft$elm_grove$Version$versionToString(newVersion)
+																			})))));
+													}
+												})))));
 						}(
+							function (nextVersionFromConfig) {
+								var _p90 = _p77._0;
+								switch (_p90.ctor) {
+									case 'MajorVersion':
+										return _panosoft$elm_grove$Version$nextMajor(_p91);
+									case 'MinorVersion':
+										return _panosoft$elm_grove$Version$nextMinor(_p91);
+									case 'PatchVersion':
+										return _panosoft$elm_grove$Version$nextPatch(_p91);
+									case 'UnknownVersionApp':
+										return nextVersionFromConfig(config);
+									default:
+										return nextVersionFromConfig(config);
+								}
+							}(
+								function (config) {
+									return A2(
+										_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+										_elm_lang$core$List$head(
+											A2(
+												_elm_lang$core$List$map,
+												_elm_lang$core$Tuple$second,
+												A2(
+													_elm_lang$core$List$filter,
+													_elm_lang$core$Tuple$first,
+													{
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: config.major,
+															_1: _panosoft$elm_grove$Version$nextMajor(_p91)
+														},
+														_1: {
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: config.minor,
+																_1: _panosoft$elm_grove$Version$nextMinor(_p91)
+															},
+															_1: {
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: config.patch,
+																	_1: _panosoft$elm_grove$Version$nextPatch(_p91)
+																},
+																_1: {ctor: '[]'}
+															}
+														}
+													}))),
+										{
+											ctor: '_Tuple2',
+											_0: _panosoft$elm_grove$AppUtils$bug('major/minor/patch are all False'),
+											_1: _elm_lang$core$Basics$identity
+										});
+								}));
+					},
+					bumpTask);
+			}(
+				A2(
+					_elm_lang$core$Task$andThen,
+					function (_p92) {
+						var _p93 = _p92;
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (_p94) {
+								return _elm_lang$core$Task$succeed(
+									{ctor: '_Tuple2', _0: _p93._0, _1: _p93._2});
+							},
 							A2(
 								_elm_lang$core$Task$andThen,
-								function (_p25) {
+								function (_p95) {
 									return A2(
 										_elm_lang$core$Task$mapError,
-										function (_p26) {
-											return A2(_elm_node$core$Node_Error$Error, 'Should never happen', '');
+										function (_p96) {
+											return 'Should never happen';
 										},
 										A2(
 											_panosoft$elm_utils$Utils_Ops_ops['?'],
@@ -15228,8 +17039,13 @@ var _panosoft$elm_grove$Component_Bump$doBump = F2(
 												_1: _elm_lang$core$Task$succeed('')
 											}));
 								},
-								_panosoft$elm_grove$DocGenerator$generateDocs(
-									{testing: config.testing, cwd: config.cwd, pathSep: config.pathSep, generateDocs: config.generateDocs})))))));
+								A2(
+									_elm_lang$core$Task$mapError,
+									_elm_node$core$Node_Error$message,
+									_panosoft$elm_grove$DocGenerator$generateDocs(
+										{testing: config.testing, cwd: config.cwd, pathSep: config.pathSep, generateDocs: config.generateDocs}))));
+					},
+					A2(_panosoft$elm_grove$Component_Bump$getBumpAndOldVersion, config, model))));
 	});
 var _panosoft$elm_grove$Component_Bump$GitNewerVersionCheckComplete = function (a) {
 	return {ctor: 'GitNewerVersionCheckComplete', _0: a};
@@ -15265,20 +17081,20 @@ var _panosoft$elm_grove$Component_Bump$checkForNewVersions = F2(
 									_panosoft$elm_grove$Component_Bump$GitNewerVersionCheckComplete,
 									A2(
 										_elm_lang$core$Task$andThen,
-										function (_p27) {
-											var _p28 = _p27;
+										function (_p97) {
+											var _p98 = _p97;
 											return _elm_lang$core$Task$succeed(
 												A2(
 													_panosoft$elm_utils$Utils_Ops_ops['|?->'],
 													_elm_lang$core$List$head(
-														_panosoft$elm_grove$AppUtils$sortedVersions(_p28._2)),
+														_panosoft$elm_grove$AppUtils$sortedVersions(_p98._2)),
 													{
 														ctor: '_Tuple2',
 														_0: _elm_lang$core$Result$Err(
 															A2(
 																_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 																A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'no valid versions in repo:', packageName),
-																_panosoft$elm_grove$Output$parens(_p28._0))),
+																_panosoft$elm_grove$Output$parens(_p98._0))),
 														_1: function (latestVersion) {
 															return A2(
 																_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
@@ -15335,7 +17151,7 @@ var _panosoft$elm_grove$Component_Bump$checkForNewVersions = F2(
 														},
 														_panosoft$elm_grove$Git$getTags(repo));
 												},
-												_panosoft$elm_grove$Git$clone(repoLocation));
+												A2(_panosoft$elm_grove$Git$clone, repoLocation, _panosoft$elm_grove$Env$tmpdir));
 										}(
 											A2(_panosoft$elm_grove$Package$getRepoLocation, elmJson.dependencySources, packageName))));
 							},
@@ -15383,15 +17199,15 @@ var _panosoft$elm_grove$Component_Bump$bump = F2(
 		}(
 			A2(
 				_elm_lang$core$List$map,
-				function (_p29) {
-					var _p30 = _p29;
-					var _p32 = _p30._0;
+				function (_p99) {
+					var _p100 = _p99;
+					var _p102 = _p100._0;
 					return function (path) {
 						return A2(
 							_elm_lang$core$Task$attempt,
-							function (_p31) {
+							function (_p101) {
 								return config.routeToMe(
-									A3(_panosoft$elm_grove$Component_Bump$IsSymLinkCheckComplete, _p32, path, _p31));
+									A3(_panosoft$elm_grove$Component_Bump$IsSymLinkCheckComplete, _p102, path, _p101));
 							},
 							A2(
 								_elm_lang$core$Task$mapError,
@@ -15406,10 +17222,10 @@ var _panosoft$elm_grove$Component_Bump$bump = F2(
 								_0: A2(_panosoft$elm_grove$Package$elmPackagesRoot, config.testing, config.pathSep),
 								_1: {
 									ctor: '::',
-									_0: _p32,
+									_0: _p102,
 									_1: {
 										ctor: '::',
-										_0: _p30._1,
+										_0: _p100._1,
 										_1: {ctor: '[]'}
 									}
 								}
@@ -15433,36 +17249,37 @@ var _panosoft$elm_grove$Component_Bump$init = F2(
 				linkedPackages: {ctor: '[]'},
 				newVersionCheckCountDown: 0,
 				newVersionCheckFailed: false,
-				elmJsonIndent: _elm_lang$core$Maybe$Nothing
+				elmJsonIndent: _elm_lang$core$Maybe$Nothing,
+				newVersion: _elm_lang$core$Maybe$Nothing
 			},
 			_1: _elm_lang$core$Maybe$Just(
 				A2(
 					_elm_lang$core$Task$attempt,
-					function (_p33) {
+					function (_p103) {
 						return config.routeToMe(
-							A2(_panosoft$elm_grove$Component_Bump$PackagesRead, initializedMsg, _p33));
+							A2(_panosoft$elm_grove$Component_Bump$PackagesRead, initializedMsg, _p103));
 					},
 					A2(
 						_elm_lang$core$Task$andThen,
-						function (_p34) {
-							var _p35 = _p34;
-							var _p40 = _p35._2;
-							var _p39 = _p35._1;
-							var _p38 = _p35._0;
+						function (_p104) {
+							var _p105 = _p104;
+							var _p110 = _p105._2;
+							var _p109 = _p105._1;
+							var _p108 = _p105._0;
 							return A2(
 								_elm_lang$core$Task$onError,
 								function (initError) {
-									var _p36 = initError;
-									if (_p36.ctor === 'ReadingNpmPackage') {
-										var _p37 = _p36._0;
-										if (_p37.ctor === 'SystemError') {
+									var _p106 = initError;
+									if (_p106.ctor === 'InitReadingNpmPackage') {
+										var _p107 = _p106._0;
+										if (_p107.ctor === 'SystemError') {
 											return A2(
 												_panosoft$elm_utils$Utils_Ops_ops['?'],
-												_elm_lang$core$Native_Utils.eq(_p37._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
+												_elm_lang$core$Native_Utils.eq(_p107._0, _elm_node$core$Node_Error$NoSuchFileOrDirectory),
 												{
 													ctor: '_Tuple2',
 													_0: _elm_lang$core$Task$succeed(
-														{ctor: '_Tuple4', _0: _p40, _1: _p39, _2: _p38, _3: _elm_lang$core$Maybe$Nothing}),
+														{ctor: '_Tuple4', _0: _p110, _1: _p109, _2: _p108, _3: _elm_lang$core$Maybe$Nothing}),
 													_1: _elm_lang$core$Task$fail(initError)
 												});
 										} else {
@@ -15481,15 +17298,15 @@ var _panosoft$elm_grove$Component_Bump$init = F2(
 										return _elm_lang$core$Task$succeed(
 											{
 												ctor: '_Tuple4',
-												_0: _p40,
-												_1: _p39,
-												_2: _p38,
+												_0: _p110,
+												_1: _p109,
+												_2: _p108,
 												_3: _elm_lang$core$Maybe$Just(npm)
 											});
 									},
 									A2(
 										_elm_lang$core$Task$mapError,
-										_panosoft$elm_grove$Component_Bump$ReadingNpmPackage,
+										_panosoft$elm_grove$Component_Bump$InitReadingNpmPackage,
 										A2(_elm_node$core$Node_FileSystem$readFileAsString, _panosoft$elm_grove$Package$npmJsonFilename, _elm_node$core$Node_Encoding$Utf8))));
 						},
 						A2(
@@ -15506,12 +17323,12 @@ var _panosoft$elm_grove$Component_Bump$init = F2(
 											},
 											A2(
 												_elm_lang$core$Task$mapError,
-												_panosoft$elm_grove$Component_Bump$ReadingElmPackage,
+												_panosoft$elm_grove$Component_Bump$InitReadingElmPackage,
 												A2(_elm_node$core$Node_FileSystem$readFileAsString, _panosoft$elm_grove$Package$elmJsonFilename, _elm_node$core$Node_Encoding$Utf8)));
 									},
 									A2(
 										_elm_lang$core$Task$mapError,
-										_panosoft$elm_grove$Component_Bump$ReadingExactDependencies,
+										_panosoft$elm_grove$Component_Bump$InitReadingExactDependencies,
 										A2(
 											_elm_node$core$Node_FileSystem$readFileAsString,
 											A2(
@@ -15530,7 +17347,7 @@ var _panosoft$elm_grove$Component_Bump$init = F2(
 							},
 							A2(
 								_elm_lang$core$Task$mapError,
-								_panosoft$elm_grove$Component_Bump$GettingTags,
+								_panosoft$elm_grove$Component_Bump$InitGettingTags,
 								A2(
 									_elm_lang$core$Task$andThen,
 									_panosoft$elm_grove$Git$getTags,
@@ -15551,8 +17368,8 @@ var _panosoft$elm_grove$Component_Bump$operationError = F2(
 					ctor: '::',
 					_0: A2(
 						_elm_lang$core$Task$perform,
-						function (_p41) {
-							return _panosoft$elm_grove$Component_Bump$OperationComplete(-1);
+						function (_p111) {
+							return _panosoft$elm_grove$Component_Bump$OperationComplete(_panosoft$elm_grove$Component_Bump$failureExitCode);
 						},
 						task),
 					_1: {ctor: '[]'}
@@ -15571,8 +17388,8 @@ var _panosoft$elm_grove$Component_Bump$operationSuccessful = F2(
 					ctor: '::',
 					_0: A2(
 						_elm_lang$core$Task$perform,
-						function (_p42) {
-							return _panosoft$elm_grove$Component_Bump$OperationComplete(0);
+						function (_p112) {
+							return _panosoft$elm_grove$Component_Bump$OperationComplete(_panosoft$elm_grove$Component_Bump$successExitCode);
 						},
 						task),
 					_1: {ctor: '[]'}
@@ -15592,8 +17409,8 @@ var _panosoft$elm_grove$Component_Bump$delayCmd = function (cmd) {
 };
 var _panosoft$elm_grove$Component_Bump$update = F3(
 	function (config, msg, model) {
-		var _p43 = msg;
-		switch (_p43.ctor) {
+		var _p113 = msg;
+		switch (_p113.ctor) {
 			case 'DoCmd':
 				return {
 					ctor: '_Tuple2',
@@ -15602,7 +17419,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 						model,
 						{
 							ctor: '::',
-							_0: _p43._0,
+							_0: _p113._0,
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
@@ -15625,27 +17442,27 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
-						_0: config.operationComplete(_p43._0),
+						_0: config.operationComplete(_p113._0),
 						_1: {ctor: '[]'}
 					}
 				};
 			case 'PackagesRead':
-				if (_p43._1.ctor === 'Err') {
+				if (_p113._1.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
 						_panosoft$elm_grove$Output$errorLog(
 							function (fileError) {
-								var _p44 = _p43._1._0;
-								switch (_p44.ctor) {
-									case 'GettingTags':
-										return A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to get tags in current repo Error:', _p44._0);
-									case 'ReadingExactDependencies':
-										return A2(fileError, _panosoft$elm_grove$Package$exactDependenciesFileName, _p44._0);
-									case 'ReadingElmPackage':
-										return A2(fileError, _panosoft$elm_grove$Package$elmJsonFilename, _p44._0);
+								var _p114 = _p113._1._0;
+								switch (_p114.ctor) {
+									case 'InitGettingTags':
+										return A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to get tags in current repo Error:', _p114._0);
+									case 'InitReadingExactDependencies':
+										return A2(fileError, _panosoft$elm_grove$Package$exactDependenciesFileName, _p114._0);
+									case 'InitReadingElmPackage':
+										return A2(fileError, _panosoft$elm_grove$Package$elmJsonFilename, _p114._0);
 									default:
-										return A2(fileError, _panosoft$elm_grove$Package$npmJsonFilename, _p44._0);
+										return A2(fileError, _panosoft$elm_grove$Package$npmJsonFilename, _p114._0);
 								}
 							}(
 								F2(
@@ -15659,47 +17476,47 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 											_elm_node$core$Node_Error$message(nodeError));
 									}))));
 				} else {
-					var _p57 = _p43._1._0._2;
+					var _p127 = _p113._1._0._2;
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-						A2(_panosoft$elm_grove$Component_Bump$decodeExactDependencies, _panosoft$elm_grove$Package$exactDependenciesFileName, _p43._1._0._1),
+						A2(_panosoft$elm_grove$Component_Bump$decodeExactDependencies, _panosoft$elm_grove$Package$exactDependenciesFileName, _p113._1._0._1),
 						{
 							ctor: '_Tuple2',
-							_0: function (_p45) {
+							_0: function (_p115) {
 								return A2(
 									_panosoft$elm_grove$Component_Bump$operationError,
 									model,
-									_panosoft$elm_grove$Output$errorLog(_p45));
+									_panosoft$elm_grove$Output$errorLog(_p115));
 							},
 							_1: function (exactDependencies) {
-								return function (_p46) {
-									var _p47 = _p46;
+								return function (_p116) {
+									var _p117 = _p116;
 									return A2(
 										_panosoft$elm_utils$Utils_Ops_ops['|??->'],
 										A2(
 											_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-											_p47._1,
+											_p117._1,
 											{
 												ctor: '_Tuple2',
 												_0: _elm_lang$core$Result$Err,
-												_1: function (_p48) {
-													var _p49 = _p48;
-													var _p55 = _p49._0;
-													var _p54 = _p49._2;
+												_1: function (_p118) {
+													var _p119 = _p118;
+													var _p125 = _p119._0;
+													var _p124 = _p119._2;
 													return A2(
 														_panosoft$elm_utils$Utils_Ops_ops['|?->'],
-														_p43._1._0._3,
+														_p113._1._0._3,
 														{
 															ctor: '_Tuple2',
-															_0: _elm_lang$core$Result$Ok(_p55),
+															_0: _elm_lang$core$Result$Ok(_p125),
 															_1: function (npmJsonStr) {
 																return A2(
 																	_panosoft$elm_utils$Utils_Ops_ops['|??->'],
 																	A3(
 																		_panosoft$elm_grove$NpmJson$validateNpmJson,
 																		npmJsonStr,
-																		_panosoft$elm_grove$Version$versionToString(_p54),
-																		_p49._1.repository),
+																		_panosoft$elm_grove$Version$versionToString(_p124),
+																		_p119._1.repository),
 																	{
 																		ctor: '_Tuple2',
 																		_0: function (errors) {
@@ -15710,7 +17527,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																						A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], _panosoft$elm_grove$Package$npmJsonFilename, 'has the following errors:\n\t'),
 																						A2(_elm_lang$core$String$join, '\n\t', errors))));
 																		},
-																		_1: function (_p50) {
+																		_1: function (_p120) {
 																			return A2(
 																				_panosoft$elm_utils$Utils_Ops_ops['|??->'],
 																				_panosoft$elm_grove$NpmJson$decodeNpmJsonVersion(npmJsonStr),
@@ -15727,13 +17544,13 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																										'Error:'),
 																									error)));
 																					},
-																					_1: function (_p51) {
-																						var _p52 = _p51;
-																						var _p53 = _p52._0;
+																					_1: function (_p121) {
+																						var _p122 = _p121;
+																						var _p123 = _p122._0;
 																						return A2(
 																							_panosoft$elm_utils$Utils_Ops_ops['?'],
 																							!_elm_lang$core$Native_Utils.eq(
-																								A2(_panosoft$elm_grove$Version$versionCompare, _p53, _p54),
+																								A2(_panosoft$elm_grove$Version$versionCompare, _p123, _p124),
 																								_elm_lang$core$Basics$EQ),
 																							{
 																								ctor: '_Tuple2',
@@ -15751,17 +17568,17 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																															_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 																															A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], _panosoft$elm_grove$Package$elmJsonFilename, 'version:'),
 																															_panosoft$elm_grove$Output$parens(
-																																_panosoft$elm_grove$Version$versionToString(_p54))),
+																																_panosoft$elm_grove$Version$versionToString(_p124))),
 																														'must equal'),
 																													_panosoft$elm_grove$Package$npmJsonFilename),
 																												'version:'),
 																											_panosoft$elm_grove$Output$parens(
-																												_panosoft$elm_grove$Version$versionToString(_p53))))),
+																												_panosoft$elm_grove$Version$versionToString(_p123))))),
 																								_1: _elm_lang$core$Result$Ok(
 																									_elm_lang$core$Native_Utils.update(
-																										_p55,
+																										_p125,
 																										{
-																											npmJsonStr: _elm_lang$core$Maybe$Just(_p52._1)
+																											npmJsonStr: _elm_lang$core$Maybe$Just(_p122._1)
 																										}))
 																							});
 																					}
@@ -15774,7 +17591,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 											}),
 										{
 											ctor: '_Tuple2',
-											_0: _panosoft$elm_grove$Component_Bump$operationError(_p47._0),
+											_0: _panosoft$elm_grove$Component_Bump$operationError(_p117._0),
 											_1: function (model) {
 												return {
 													ctor: '_Tuple2',
@@ -15784,7 +17601,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 														{ctor: '[]'}),
 													_1: {
 														ctor: '::',
-														_0: _p43._0,
+														_0: _p113._0,
 														_1: {ctor: '[]'}
 													}
 												};
@@ -15800,12 +17617,12 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 											model,
 											A2(
 												_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-												A2(_panosoft$elm_grove$ElmJson$decodeElmJson, _panosoft$elm_grove$Package$elmJsonFilename, _p57),
+												A2(_panosoft$elm_grove$ElmJson$decodeElmJson, _panosoft$elm_grove$Package$elmJsonFilename, _p127),
 												{
 													ctor: '_Tuple2',
-													_0: function (_p56) {
+													_0: function (_p126) {
 														return _elm_lang$core$Result$Err(
-															_panosoft$elm_grove$Output$errorLog(_p56));
+															_panosoft$elm_grove$Output$errorLog(_p126));
 													},
 													_1: function (elmJson) {
 														return A2(
@@ -15814,49 +17631,17 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 																_panosoft$elm_utils$Utils_Ops_ops['|?>'],
 																_panosoft$elm_grove$Version$versionFromString(elmJson.version),
 																function (currentElmVersion) {
-																	return function (currentRepoVersion) {
-																		return A2(
-																			_panosoft$elm_utils$Utils_Ops_ops['?'],
-																			!_elm_lang$core$Native_Utils.eq(
-																				A2(_panosoft$elm_grove$Version$versionCompare, currentRepoVersion, currentElmVersion),
-																				_elm_lang$core$Basics$EQ),
-																			{
-																				ctor: '_Tuple2',
-																				_0: _elm_lang$core$Result$Err(
-																					_panosoft$elm_grove$Output$errorLog(
-																						A2(
-																							_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-																							A2(
-																								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-																								A2(
-																									_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-																									A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], _panosoft$elm_grove$Package$elmJsonFilename, 'version:'),
-																									_panosoft$elm_grove$Output$parens(
-																										_panosoft$elm_grove$Version$versionToString(currentElmVersion))),
-																								'must equal current repo\'s version'),
-																							_panosoft$elm_grove$Output$parens(
-																								_panosoft$elm_grove$Version$versionToString(currentRepoVersion))))),
-																				_1: _elm_lang$core$Result$Ok(
-																					{
-																						ctor: '_Tuple3',
-																						_0: _elm_lang$core$Native_Utils.update(
-																							model,
-																							{
-																								elmJson: _elm_lang$core$Maybe$Just(elmJson)
-																							}),
-																						_1: elmJson,
-																						_2: currentElmVersion
-																					})
-																			});
-																	}(
-																		A2(
-																			_panosoft$elm_utils$Utils_Ops_ops['?='],
-																			_elm_lang$core$List$head(
-																				_panosoft$elm_grove$AppUtils$sortedVersions(_p43._1._0._0)),
-																			A2(
-																				_panosoft$elm_utils$Utils_Ops_ops['?!='],
-																				_panosoft$elm_grove$Version$versionFromString('0.0.0'),
-																				_panosoft$elm_grove$AppUtils$bug('Bad version string'))));
+																	return _elm_lang$core$Result$Ok(
+																		{
+																			ctor: '_Tuple3',
+																			_0: _elm_lang$core$Native_Utils.update(
+																				model,
+																				{
+																					elmJson: _elm_lang$core$Maybe$Just(elmJson)
+																				}),
+																			_1: elmJson,
+																			_2: currentElmVersion
+																		});
 																}),
 															_elm_lang$core$Result$Err(
 																_panosoft$elm_grove$Output$errorLog(
@@ -15869,13 +17654,13 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 											{
 												exactDependencies: exactDependencies,
 												elmJsonIndent: _elm_lang$core$Maybe$Just(
-													_panosoft$elm_grove$AppUtils$determineJsonIndent(_p57))
+													_panosoft$elm_grove$AppUtils$determineJsonIndent(_p127))
 											})));
 							}
 						});
 				}
 			case 'IsSymLinkCheckComplete':
-				if (_p43._2.ctor === 'Err') {
+				if (_p113._2.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
@@ -15883,7 +17668,7 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 							A2(
 								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 								A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check:', 'for symbolic links Error:'),
-								_p43._2._0)));
+								_p113._2._0)));
 				} else {
 					return function (elmJson) {
 						return function (model) {
@@ -15924,13 +17709,13 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 							}(
 								A2(
 									_panosoft$elm_utils$Utils_Ops_ops['?'],
-									_p43._2._0,
+									_p113._2._0,
 									{
 										ctor: '_Tuple2',
 										_0: _elm_lang$core$Native_Utils.update(
 											model,
 											{
-												linkedPackages: {ctor: '::', _0: _p43._0, _1: model.linkedPackages}
+												linkedPackages: {ctor: '::', _0: _p113._0, _1: model.linkedPackages}
 											}),
 										_1: model
 									}));
@@ -15945,175 +17730,264 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 							_panosoft$elm_grove$AppUtils$bugMissing('elmJson')));
 				}
 			case 'GitStatusCheckComplete':
-				if (_p43._0.ctor === 'Err') {
+				if (_p113._0.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
 						_panosoft$elm_grove$Output$errorLog(
-							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check repository git status Error:', _p43._0._0)));
+							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check repository git status Error:', _p113._0._0)));
 				} else {
-					return function (errors) {
-						return A2(
-							_panosoft$elm_utils$Utils_Ops_ops['?'],
-							_elm_lang$core$Native_Utils.eq(
-								errors,
-								{ctor: '[]'}) || config.allowUncommitted,
-							{
-								ctor: '_Tuple2',
-								_0: A2(_panosoft$elm_grove$Component_Bump$checkForNewVersions, config, model),
-								_1: function (errors) {
-									return A2(
-										_panosoft$elm_grove$Component_Bump$operationError,
-										model,
-										_panosoft$elm_grove$Output$errorLog(
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												'Not all files have been checked in to git\n\n',
-												A2(_elm_lang$core$String$join, '\n', errors))));
-								}(
-									A2(
-										_elm_lang$core$List$map,
-										function (_p58) {
-											var _p59 = _p58;
+					return function (requiredCheckins) {
+						return function (errors) {
+							return A2(
+								_panosoft$elm_utils$Utils_Ops_ops['?'],
+								_elm_lang$core$Native_Utils.eq(
+									errors,
+									{ctor: '[]'}),
+								{
+									ctor: '_Tuple2',
+									_0: A2(_panosoft$elm_grove$Component_Bump$checkForNewVersions, config, model),
+									_1: function (errors) {
+										return function (errorReason) {
 											return A2(
-												_elm_lang$core$Basics_ops['++'],
-												A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Status:', _p59._1),
-												A2(
-													_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-													'\n\t',
-													A2(_elm_lang$core$String$join, ', ', _p59._0)));
-										},
-										errors))
-							});
-					}(
-						A2(
-							_elm_lang$core$List$filterMap,
-							function (_p60) {
-								var _p61 = _p60;
-								var _p62 = _p61._0;
-								return A2(
-									_panosoft$elm_utils$Utils_Ops_ops['?'],
-									_elm_lang$core$Native_Utils.eq(
-										_p62,
-										{ctor: '[]'}),
-									{
-										ctor: '_Tuple2',
-										_0: _elm_lang$core$Maybe$Nothing,
-										_1: _elm_lang$core$Maybe$Just(
-											{ctor: '_Tuple2', _0: _p62, _1: _p61._1})
-									});
-							},
+												_panosoft$elm_grove$Component_Bump$operationError,
+												model,
+												_panosoft$elm_grove$Output$errorLog(
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														errorReason,
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															'\n\n',
+															A2(_elm_lang$core$String$join, '\n', errors)))));
+										}(
+											A2(
+												_panosoft$elm_utils$Utils_Ops_ops['?'],
+												config.allowUncommitted,
+												{ctor: '_Tuple2', _0: 'Even though you\'ve used --allow-uncommitted, the following MUST always be checked in prior to a bump. Either check in these files or stash your changes with \'git stash\'', _1: 'Not all files have been checked in to git. Either check in these files, use --allow-uncommitted or stash your changes with \'git stash\''}));
+									}(
+										A2(
+											_elm_lang$core$List$map,
+											function (_p128) {
+												var _p129 = _p128;
+												return A2(
+													_elm_lang$core$Basics_ops['++'],
+													A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Status:', _p129._1),
+													A2(
+														_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+														'\n\t',
+														A2(_elm_lang$core$String$join, ', ', _p129._0)));
+											},
+											errors))
+								});
+						}(
 							A2(
-								_elm_lang$core$List$map,
-								function (accessor) {
-									return {
-										ctor: '_Tuple2',
-										_0: A2(_elm_lang$core$Tuple$first, accessor, _p43._0._0),
-										_1: _elm_lang$core$Tuple$second(accessor)
-									};
+								_elm_lang$core$List$filterMap,
+								function (_p130) {
+									var _p131 = _p130;
+									return function (_p132) {
+										var _p133 = _p132;
+										var _p134 = _p133._0;
+										return A2(
+											_panosoft$elm_utils$Utils_Ops_ops['?'],
+											_elm_lang$core$Native_Utils.eq(
+												_p134,
+												{ctor: '[]'}),
+											{
+												ctor: '_Tuple2',
+												_0: _elm_lang$core$Maybe$Nothing,
+												_1: _elm_lang$core$Maybe$Just(
+													{ctor: '_Tuple2', _0: _p134, _1: _p133._1})
+											});
+									}(
+										A2(
+											_elm_lang$core$Tuple$mapFirst,
+											A2(
+												_panosoft$elm_utils$Utils_Ops_ops['?'],
+												config.allowUncommitted,
+												{
+													ctor: '_Tuple2',
+													_0: _elm_lang$core$List$filter(
+														A2(_elm_lang$core$Basics$flip, _elm_lang$core$List$member, requiredCheckins)),
+													_1: _elm_lang$core$Basics$identity
+												}),
+											{ctor: '_Tuple2', _0: _p131._0, _1: _p131._1}));
 								},
-								_panosoft$elm_grove$Git$fileStatusAccessors)));
+								A2(
+									_elm_lang$core$List$map,
+									function (accessor) {
+										return {
+											ctor: '_Tuple2',
+											_0: A2(_elm_lang$core$Tuple$first, accessor, _p113._0._0),
+											_1: _elm_lang$core$Tuple$second(accessor)
+										};
+									},
+									_panosoft$elm_grove$Git$fileStatusAccessors)));
+					}(
+						{
+							ctor: '::',
+							_0: _panosoft$elm_grove$Package$elmJsonFilename,
+							_1: {
+								ctor: '::',
+								_0: _panosoft$elm_grove$Package$npmJsonFilename,
+								_1: {ctor: '[]'}
+							}
+						});
 				}
 			case 'GitNewerVersionCheckComplete':
-				if (_p43._0.ctor === 'Err') {
+				if (_p113._0.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
 						_panosoft$elm_grove$Output$errorLog(
-							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check for newer versions Error:', _p43._0._0)));
+							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check for newer versions Error:', _p113._0._0)));
 				} else {
-					return function (_p63) {
-						var _p64 = _p63;
-						var _p76 = _p64._0;
+					return function (_p135) {
+						var _p136 = _p135;
+						var _p156 = _p136._0;
 						return A2(
 							_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-							_p43._0._0,
+							_p113._0._0,
 							{
 								ctor: '_Tuple2',
 								_0: function (error) {
 									return A2(
 										_panosoft$elm_grove$Component_Bump$operationError,
-										_p76,
+										_p156,
 										_panosoft$elm_grove$Output$errorLog(error));
 								},
 								_1: function (maybePackageInfo) {
-									return function (_p65) {
-										var _p66 = _p65;
-										var _p71 = _p66._1;
-										var _p70 = _p66._0._0;
-										var _p69 = _p66._0._1;
+									return function (_p137) {
+										var _p138 = _p137;
+										var _p151 = _p138._1;
+										var _p150 = _p138._0._0;
+										var _p149 = _p138._0._1;
 										return A2(
-											_panosoft$elm_utils$Utils_Ops_ops['?'],
-											_elm_lang$core$Native_Utils.eq(_p70.newVersionCheckCountDown, 0),
+											_panosoft$elm_utils$Utils_Ops_ops['?!'],
+											_elm_lang$core$Native_Utils.eq(_p150.newVersionCheckCountDown, 0),
 											{
 												ctor: '_Tuple2',
-												_0: A2(
-													_panosoft$elm_utils$Utils_Ops_ops['?'],
-													_p70.newVersionCheckFailed,
-													{
-														ctor: '_Tuple2',
-														_0: {
+												_0: function (_p139) {
+													return A2(
+														_panosoft$elm_utils$Utils_Ops_ops['?'],
+														_p150.newVersionCheckFailed,
+														{
 															ctor: '_Tuple2',
-															_0: A2(
-																_elm_lang$core$Platform_Cmd_ops['!'],
-																_p70,
-																{
-																	ctor: '::',
-																	_0: _p69,
-																	_1: {
-																		ctor: '::',
-																		_0: _p64._1._0._1,
-																		_1: {ctor: '[]'}
-																	}
-																}),
-															_1: _p71
-														},
-														_1: function (_p67) {
-															var _p68 = _p67;
-															return {
+															_0: {
 																ctor: '_Tuple2',
 																_0: A2(
 																	_elm_lang$core$Platform_Cmd_ops['!'],
-																	_p68._0._0,
+																	_p150,
 																	{
 																		ctor: '::',
-																		_0: _p69,
+																		_0: _p149,
 																		_1: {
 																			ctor: '::',
-																			_0: A2(_panosoft$elm_grove$Component_Bump$delayCmd, _p68._0._1, 100),
+																			_0: _p136._1._0._1,
 																			_1: {ctor: '[]'}
 																		}
 																	}),
-																_1: A2(_elm_lang$core$List$append, _p71, _p68._1)
-															};
-														}(
-															A2(
-																_panosoft$elm_utils$Utils_Ops_ops['?'],
-																config.dryRun,
-																{
+																_1: _p151
+															},
+															_1: function (_p140) {
+																var _p141 = _p140;
+																return {
 																	ctor: '_Tuple2',
 																	_0: A2(
-																		_panosoft$elm_grove$Component_Bump$operationSuccessful,
-																		_p70,
-																		_panosoft$elm_grove$Console$log('Bump validation passed, skipping operation due to --dry-run parameter specified')),
-																	_1: {
+																		_elm_lang$core$Platform_Cmd_ops['!'],
+																		_p141._0._0,
+																		{
+																			ctor: '::',
+																			_0: _p149,
+																			_1: {
+																				ctor: '::',
+																				_0: A2(_panosoft$elm_grove$Component_Bump$delayCmd, _p141._0._1, 100),
+																				_1: {ctor: '[]'}
+																			}
+																		}),
+																	_1: A2(_elm_lang$core$List$append, _p151, _p141._1)
+																};
+															}(
+																A2(
+																	_panosoft$elm_utils$Utils_Ops_ops['?!'],
+																	config.dryRun,
+																	{
 																		ctor: '_Tuple2',
-																		_0: A2(_panosoft$elm_grove$Component_Bump$doBump, config, _p70),
-																		_1: {ctor: '[]'}
-																	}
-																}))
-													}),
-												_1: {
-													ctor: '_Tuple2',
-													_0: A2(
-														_elm_lang$core$Platform_Cmd_ops['!'],
-														_p70,
-														{
-															ctor: '::',
-															_0: _p69,
-															_1: {ctor: '[]'}
-														}),
-													_1: _p71
+																		_0: function (_p142) {
+																			return function (cmd) {
+																				return {
+																					ctor: '_Tuple2',
+																					_0: A2(
+																						_elm_lang$core$Platform_Cmd_ops['!'],
+																						_p150,
+																						{
+																							ctor: '::',
+																							_0: cmd,
+																							_1: {ctor: '[]'}
+																						}),
+																					_1: {ctor: '[]'}
+																				};
+																			}(
+																				A2(
+																					_elm_lang$core$Task$attempt,
+																					function (result) {
+																						return A2(
+																							_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+																							result,
+																							{
+																								ctor: '_Tuple2',
+																								_0: function (error) {
+																									return _panosoft$elm_grove$Component_Bump$DoCmd(
+																										A2(
+																											_elm_lang$core$Task$perform,
+																											function (_p143) {
+																												return _panosoft$elm_grove$Component_Bump$OperationComplete(_panosoft$elm_grove$Component_Bump$failureExitCode);
+																											},
+																											_panosoft$elm_grove$Output$errorLog(error)));
+																								},
+																								_1: _panosoft$elm_grove$Component_Bump$OperationComplete
+																							});
+																					},
+																					A2(
+																						_elm_lang$core$Task$andThen,
+																						function (_p144) {
+																							return A2(
+																								_elm_lang$core$Task$andThen,
+																								function (_p145) {
+																									return _elm_lang$core$Task$succeed(_panosoft$elm_grove$Component_Bump$successExitCode);
+																								},
+																								A2(
+																									_elm_lang$core$Task$mapError,
+																									function (_p146) {
+																										return 'should never get here';
+																									},
+																									_panosoft$elm_grove$Console$log('Bump validation passed, skipping operation due to --dry-run parameter specified')));
+																						},
+																						A2(_panosoft$elm_grove$Component_Bump$getBumpAndOldVersion, config, _p150))));
+																		},
+																		_1: function (_p147) {
+																			return {
+																				ctor: '_Tuple2',
+																				_0: A2(_panosoft$elm_grove$Component_Bump$doBump, config, _p150),
+																				_1: {ctor: '[]'}
+																			};
+																		}
+																	}))
+														});
+												},
+												_1: function (_p148) {
+													return {
+														ctor: '_Tuple2',
+														_0: A2(
+															_elm_lang$core$Platform_Cmd_ops['!'],
+															_p150,
+															{
+																ctor: '::',
+																_0: _p149,
+																_1: {ctor: '[]'}
+															}),
+														_1: _p151
+													};
 												}
 											});
 									}(
@@ -16126,29 +18000,29 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 													ctor: '_Tuple2',
 													_0: A2(
 														_elm_lang$core$Platform_Cmd_ops['!'],
-														_p76,
+														_p156,
 														{ctor: '[]'}),
 													_1: {ctor: '[]'}
 												},
-												_1: function (_p72) {
-													var _p73 = _p72;
-													return function (_p74) {
-														var _p75 = _p74;
+												_1: function (_p152) {
+													var _p153 = _p152;
+													return function (_p154) {
+														var _p155 = _p154;
 														return {
 															ctor: '_Tuple2',
 															_0: A2(
 																_elm_lang$core$Platform_Cmd_ops['!'],
-																_p75._0,
+																_p155._0,
 																{
 																	ctor: '::',
 																	_0: A2(
 																		_elm_lang$core$Task$perform,
 																		_panosoft$elm_grove$Component_Bump$OutputComplete,
-																		_p75._1(
+																		_p155._1(
 																			A2(
 																				_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-																				A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Newer version exists for:', _p73._1),
-																				_panosoft$elm_grove$Output$parens(_p73._0)))),
+																				A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Newer version exists for:', _p153._1),
+																				_panosoft$elm_grove$Output$parens(_p153._0)))),
 																	_1: {ctor: '[]'}
 																}),
 															_1: {ctor: '[]'}
@@ -16159,11 +18033,11 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 															config.allowOldDependencies,
 															{
 																ctor: '_Tuple2',
-																_0: {ctor: '_Tuple2', _0: _p76, _1: _panosoft$elm_grove$Output$warnLog},
+																_0: {ctor: '_Tuple2', _0: _p156, _1: _panosoft$elm_grove$Output$warnLog},
 																_1: {
 																	ctor: '_Tuple2',
 																	_0: _elm_lang$core$Native_Utils.update(
-																		_p76,
+																		_p156,
 																		{newVersionCheckFailed: true}),
 																	_1: _panosoft$elm_grove$Output$errorLog
 																}
@@ -16178,19 +18052,19 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 							_0: _elm_lang$core$Native_Utils.update(
 								model,
 								{newVersionCheckCountDown: model.newVersionCheckCountDown - 1}),
-							_1: function (_p77) {
-								var _p78 = _p77;
+							_1: function (_p157) {
+								var _p158 = _p157;
 								return {
 									ctor: '_Tuple2',
 									_0: A2(
 										_elm_lang$core$Platform_Cmd_ops['!'],
-										_p78._0._0,
+										_p158._0._0,
 										{
 											ctor: '::',
-											_0: A2(_panosoft$elm_grove$Component_Bump$delayCmd, _p78._0._1, 100),
+											_0: A2(_panosoft$elm_grove$Component_Bump$delayCmd, _p158._0._1, 100),
 											_1: {ctor: '[]'}
 										}),
-									_1: _p78._1
+									_1: _p158._1
 								};
 							}(
 								A2(
@@ -16200,12 +18074,12 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 						});
 				}
 			default:
-				if (_p43._2.ctor === 'Err') {
+				if (_p113._0.ctor === 'Err') {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationError,
 						model,
 						_panosoft$elm_grove$Output$errorLog(
-							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to bump Error:', _p43._2._0)));
+							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to bump Error:', _p113._0._0)));
 				} else {
 					return A2(
 						_panosoft$elm_grove$Component_Bump$operationSuccessful,
@@ -16220,9 +18094,9 @@ var _panosoft$elm_grove$Component_Bump$update = F3(
 										A2(
 											_panosoft$elm_string_utils$StringUtils_ops['+-+'],
 											'Bumped version from:',
-											_panosoft$elm_grove$Version$versionToString(_p43._0)),
+											_panosoft$elm_grove$Version$versionToString(_p113._0._0._0)),
 										'to:'),
-									_panosoft$elm_grove$Version$versionToString(_p43._1)),
+									_panosoft$elm_grove$Version$versionToString(_p113._0._0._1)),
 								'\t(use \"git push && git push --tags\" to release package)')));
 				}
 		}
@@ -16301,8 +18175,15 @@ var _panosoft$elm_grove$Component_Init$prompts = {
 				_panosoft$elm_grove$Prompt$defaultPrompt,
 				{
 					prompt: 'Repository name',
-					pattern: _elm_lang$core$Maybe$Just('^([a-zA-Z](?:[-][a-zA-Z]+)*)+/(?:[a-zA-Z](?:[-_][a-zA-Z]+)*)+$'),
-					message: _elm_lang$core$Maybe$Just('Invalid repo name... must be like: your-user-name/your-repo-name')
+					pattern: _elm_lang$core$Maybe$Just('^([a-zA-Z0-9](?:[-][a-zA-Z0-9]+)*)+/[-_a-zA-Z0-9]+$'),
+					message: _elm_lang$core$Maybe$Just(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'Invalid repo name. Must be like: your-user-name/your-repo-name\n',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'  where:\n',
+								A2(_elm_lang$core$Basics_ops['++'], '    your-user-name is alphanumeric and dashes but cannot start or end with a dash\n', '    your-repo-name is alphanumeric, dashes and underlines\n'))))
 				})
 		},
 		_1: {
@@ -16695,7 +18576,7 @@ var _panosoft$elm_grove$Component_Init$update = F3(
 																	_panosoft$elm_utils$Utils_Ops_ops['?!='],
 																	model.repository,
 																	_panosoft$elm_grove$AppUtils$bugMissing('repository'))),
-															version: '0.0.0',
+															version: _panosoft$elm_grove$Version$initVersionStr,
 															license: A2(
 																_panosoft$elm_utils$Utils_Ops_ops['?!='],
 																model.license,
@@ -16733,7 +18614,7 @@ var _panosoft$elm_grove$Component_Init$update = F3(
 										4,
 										_panosoft$elm_grove$ElmJson$elmJsonEncoder(
 											{
-												version: '0.0.0',
+												version: _panosoft$elm_grove$Version$initVersionStr,
 												summary: A2(
 													_panosoft$elm_utils$Utils_Ops_ops['?!='],
 													model.summary,
@@ -17820,11 +19701,10 @@ var _panosoft$elm_grove$Component_Install$getVersions = F4(
 					_2: function (_p2) {
 						var _p3 = _p2;
 						return _elm_lang$core$Result$Ok(
-							{
-								ctor: '_Tuple2',
-								_0: _panosoft$elm_grove$Version$versionToString(_p3._0),
-								_1: _panosoft$elm_grove$Version$versionToString(_p3._1)
-							});
+							A2(
+								_panosoft$elm_utils$Utils_Tuple$map2,
+								_panosoft$elm_grove$Version$versionToString,
+								{ctor: '_Tuple2', _0: _p3._0, _1: _p3._1}));
 					}
 				});
 		}(
@@ -17969,7 +19849,7 @@ var _panosoft$elm_grove$Component_Install$clonePackageTask = F4(
 													},
 													_panosoft$elm_grove$Git$getTags(repo));
 											},
-											_panosoft$elm_grove$Git$clone(repoLocation)));
+											A2(_panosoft$elm_grove$Git$clone, repoLocation, _panosoft$elm_grove$Env$tmpdir)));
 								},
 								A2(
 									_elm_lang$core$Task$mapError,
@@ -19938,7 +21818,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 						});
 				}
 			case 'DependentNpmPackageRead':
-				var _p125 = _p90._0;
+				var _p129 = _p90._0;
 				return function (checkComplete) {
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['??='],
@@ -19947,50 +21827,86 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 							_p90._1,
 							function (npmJsonStr) {
 								return A2(
-									_panosoft$elm_utils$Utils_Ops_ops['?'],
-									_panosoft$elm_grove$NpmJson$hasDependencies(npmJsonStr),
+									_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+									_p129.maybeElmJson,
 									{
 										ctor: '_Tuple2',
-										_0: A2(
-											_panosoft$elm_utils$Utils_Ops_ops['??='],
-											A2(
-												_panosoft$elm_utils$Utils_Ops_ops['|??>'],
-												A3(
-													_panosoft$elm_grove$NpmJson$validateNpmJson,
-													npmJsonStr,
-													A2(
-														_panosoft$elm_utils$Utils_Ops_ops['?!='],
-														_p125.maybeVersionStr,
-														_panosoft$elm_grove$AppUtils$bugMissing('checked out version')),
-													A2(
-														_panosoft$elm_utils$Utils_Ops_ops['?!='],
-														_p125.maybeElmJson,
-														_panosoft$elm_grove$AppUtils$bugMissing('elmJson')).repository),
-												function (_p123) {
-													return A3(
-														checkComplete,
-														_p125,
-														model,
-														_panosoft$elm_grove$Dependency$isDirectDependency(_p125.dependsOn.dependencyPath));
-												}),
-											function (errors) {
+										_0: _panosoft$elm_grove$AppUtils$bugMissing('elmJson'),
+										_1: function (elmJson) {
+											return function (_p123) {
+												var _p124 = _p123;
+												var _p127 = _p124._0._0;
+												var _p126 = _p124._0._1;
 												return A2(
-													_panosoft$elm_grove$Component_Install$operationError,
-													model,
-													_panosoft$elm_grove$Output$errorLog(
-														A2(
-															_elm_lang$core$Basics_ops['++'],
+													_panosoft$elm_utils$Utils_Ops_ops['?'],
+													_panosoft$elm_grove$NpmJson$hasDependencies(npmJsonStr) && (!_elm_lang$core$Native_Utils.eq(elmJson.nativeModules, _elm_lang$core$Maybe$Nothing)),
+													{
+														ctor: '_Tuple2',
+														_0: function (cmd) {
+															return {
+																ctor: '_Tuple2',
+																_0: A2(
+																	_elm_lang$core$Platform_Cmd_ops['!'],
+																	_p127,
+																	{
+																		ctor: '::',
+																		_0: cmd,
+																		_1: {ctor: '[]'}
+																	}),
+																_1: _p124._1
+															};
+														}(
 															A2(
-																_panosoft$elm_string_utils$StringUtils_ops['+-+'],
-																A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Package', _p125.dependsOn.packageName),
-																'has the following errors:\n\t'),
-															A2(_elm_lang$core$String$join, '\n\t', errors))));
-											}),
-										_1: A3(checkComplete, _p125, model, false)
+																_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+																A3(
+																	_panosoft$elm_grove$NpmJson$validateNpmJson,
+																	npmJsonStr,
+																	A2(
+																		_panosoft$elm_utils$Utils_Ops_ops['?!='],
+																		_p129.maybeVersionStr,
+																		_panosoft$elm_grove$AppUtils$bugMissing('checked out version')),
+																	elmJson.repository),
+																{
+																	ctor: '_Tuple2',
+																	_0: function (errors) {
+																		return _elm_lang$core$Platform_Cmd$batch(
+																			{
+																				ctor: '::',
+																				_0: A2(
+																					_elm_lang$core$Task$perform,
+																					_panosoft$elm_grove$Component_Install$OutputComplete,
+																					_panosoft$elm_grove$Output$warnLog(
+																						A2(
+																							_elm_lang$core$Basics_ops['++'],
+																							A2(
+																								_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																								A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Package', _p129.dependsOn.packageName),
+																								'has the following errors:\n\t'),
+																							A2(_elm_lang$core$String$join, '\n\t', errors)))),
+																				_1: {
+																					ctor: '::',
+																					_0: _p126,
+																					_1: {ctor: '[]'}
+																				}
+																			});
+																	},
+																	_1: function (_p125) {
+																		return _p126;
+																	}
+																})),
+														_1: A3(checkComplete, _p129, _p127, false)
+													});
+											}(
+												A3(
+													checkComplete,
+													_p129,
+													model,
+													_panosoft$elm_grove$Dependency$isDirectDependency(_p129.dependsOn.dependencyPath) && (!_elm_lang$core$Native_Utils.eq(elmJson.nativeModules, _elm_lang$core$Maybe$Nothing))));
+										}
 									});
 							}),
-						function (_p124) {
-							return A3(checkComplete, _p125, model, false);
+						function (_p128) {
+							return A3(checkComplete, _p129, model, false);
 						});
 				}(
 					F3(
@@ -20041,22 +21957,22 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 									'Error:'),
 								_p90._3._0)));
 				} else {
-					var _p137 = _p90._2;
-					var _p136 = _p90._0;
+					var _p141 = _p90._2;
+					var _p140 = _p90._0;
 					return function (getGitPrefix) {
-						return function (_p126) {
-							var _p127 = _p126;
-							var _p129 = _p127._1;
+						return function (_p130) {
+							var _p131 = _p130;
+							var _p133 = _p131._1;
 							return function (cmds) {
 								return {
 									ctor: '_Tuple2',
-									_0: A2(_elm_lang$core$Platform_Cmd_ops['!'], _p129, cmds),
+									_0: A2(_elm_lang$core$Platform_Cmd_ops['!'], _p133, cmds),
 									_1: {ctor: '[]'}
 								};
 							}(
 								A2(
 									_panosoft$elm_utils$Utils_Ops_ops['?'],
-									_elm_lang$core$Native_Utils.cmp(_p129.finalCheckoutCount, 0) < 1,
+									_elm_lang$core$Native_Utils.cmp(_p133.finalCheckoutCount, 0) < 1,
 									{
 										ctor: '_Tuple2',
 										_0: {
@@ -20066,12 +21982,12 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 												_panosoft$elm_grove$Component_Install$FinalElmFilesWritten,
 												A2(
 													_elm_lang$core$Task$andThen,
-													function (_p128) {
+													function (_p132) {
 														return A2(
 															_panosoft$elm_utils$Utils_Ops_ops['?='],
 															A2(
 																_panosoft$elm_utils$Utils_Ops_ops['|?>'],
-																_p129.elmJson,
+																_p133.elmJson,
 																function (elmJson) {
 																	return A2(
 																		_panosoft$elm_grove$AppUtils$writeFile,
@@ -20098,7 +22014,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 																			_elm_lang$core$Json_Encode$encode,
 																			A2(
 																				_panosoft$elm_utils$Utils_Ops_ops['?!='],
-																				_p129.elmJsonIndent,
+																				_p133.elmJsonIndent,
 																				_panosoft$elm_grove$AppUtils$bugMissing('elmJsonIndent')),
 																			_panosoft$elm_grove$ElmJson$elmJsonEncoder(elmJson)));
 																}),
@@ -20108,7 +22024,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 													A2(
 														_panosoft$elm_grove$AppUtils$writeFile,
 														_panosoft$elm_grove$Component_Install$exactDependenciesLocation(config),
-														_p127._0(_p129)))),
+														_p131._0(_p133)))),
 											_1: {ctor: '[]'}
 										},
 										_1: {ctor: '[]'}
@@ -20123,12 +22039,12 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 										_elm_lang$core$Json_Encode$object(
 											A2(
 												_elm_lang$core$List$map,
-												function (_p130) {
-													var _p131 = _p130;
+												function (_p134) {
+													var _p135 = _p134;
 													return {
 														ctor: '_Tuple2',
-														_0: _p131._0,
-														_1: _elm_lang$core$Json_Encode$string(_p131._1)
+														_0: _p135._0,
+														_1: _elm_lang$core$Json_Encode$string(_p135._1)
 													};
 												},
 												_elm_lang$core$Dict$toList(
@@ -20137,14 +22053,14 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 														A2(
 															_elm_lang$core$Dict$map,
 															F2(
-																function (_p132, checkedOutPackage) {
+																function (_p136, checkedOutPackage) {
 																	return checkedOutPackage.versionStr;
 																}),
 															model.checkedOut),
 														A2(
 															_elm_lang$core$Dict$map,
 															F2(
-																function (_p133, linkedRepo) {
+																function (_p137, linkedRepo) {
 																	return A2(
 																		_panosoft$elm_utils$Utils_Ops_ops['?!='],
 																		A2(_panosoft$elm_utils$Utils_Ops_ops['|?>'], linkedRepo.maybeVersion, _panosoft$elm_grove$Version$versionToString),
@@ -20153,7 +22069,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 															A2(
 																_elm_lang$core$Dict$filter,
 																F2(
-																	function (_p134, linkedRepo) {
+																	function (_p138, linkedRepo) {
 																		return A2(
 																			_panosoft$elm_utils$Utils_Ops_ops['|?->'],
 																			linkedRepo.maybeVersion,
@@ -20173,10 +22089,10 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 												finalCheckoutCount: model.finalCheckoutCount - 1,
 												installed: A3(
 													_elm_lang$core$Dict$insert,
-													_p136,
+													_p140,
 													{
 														ctor: '_Tuple3',
-														_0: A2(_elm_lang$core$Basics_ops['++'], prefix, _p137),
+														_0: A2(_elm_lang$core$Basics_ops['++'], prefix, _p141),
 														_1: A2(
 															_panosoft$elm_grove$Component_Install$pathJoin,
 															config,
@@ -20185,7 +22101,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 																_0: A2(_panosoft$elm_grove$Package$elmPackagesRoot, config.testing, config.pathSep),
 																_1: {
 																	ctor: '::',
-																	_0: _p136,
+																	_0: _p140,
 																	_1: {
 																		ctor: '::',
 																		_0: versionStr,
@@ -20200,24 +22116,24 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 									}(
 										A2(
 											_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-											A2(_elm_lang$core$Dict$get, _p136, model.checkedOut),
+											A2(_elm_lang$core$Dict$get, _p140, model.checkedOut),
 											{
 												ctor: '_Tuple2',
-												_0: function (_p135) {
+												_0: function (_p139) {
 													return A2(
 														_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-														A2(_elm_lang$core$Dict$get, _p136, model.linkedRepos),
+														A2(_elm_lang$core$Dict$get, _p140, model.linkedRepos),
 														{
 															ctor: '_Tuple2',
 															_0: _panosoft$elm_grove$AppUtils$bugMissing(
-																A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'linked repo entry for package:', _p136)),
+																A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'linked repo entry for package:', _p140)),
 															_1: function (linkedRepo) {
 																return _panosoft$elm_grove$Version$versionToString(
 																	A2(
 																		_panosoft$elm_utils$Utils_Ops_ops['?!='],
 																		linkedRepo.maybeVersion,
 																		_panosoft$elm_grove$AppUtils$bugMissing(
-																			A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'version for linkedRepo:', _p136))));
+																			A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'version for linkedRepo:', _p140))));
 															}
 														});
 												},
@@ -20226,7 +22142,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 												}
 											}));
 								}(
-									A3(getGitPrefix, _p136, _p137, model))
+									A3(getGitPrefix, _p140, _p141, model))
 							});
 					}(
 						F3(
@@ -20308,7 +22224,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 										'does not exist\n')))
 						});
 				} else {
-					var _p145 = _p90._0._0;
+					var _p149 = _p90._0._0;
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
 						model.elmJson,
@@ -20318,7 +22234,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 							_1: function (elmJson) {
 								return A2(
 									_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-									A3(_panosoft$elm_grove$NpmJson$validateNpmJson, _p145, elmJson.version, elmJson.repository),
+									A3(_panosoft$elm_grove$NpmJson$validateNpmJson, _p149, elmJson.version, elmJson.repository),
 									{
 										ctor: '_Tuple2',
 										_0: function (errors) {
@@ -20337,7 +22253,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 															'has the following errors:\n\t'),
 														A2(_elm_lang$core$String$join, '\n\t', errors))));
 										},
-										_1: function (_p138) {
+										_1: function (_p142) {
 											return A2(
 												_panosoft$elm_utils$Utils_Ops_ops['?'],
 												_elm_lang$core$Native_Utils.eq(
@@ -20359,7 +22275,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 													},
 													_1: A2(
 														_panosoft$elm_utils$Utils_Ops_ops['|??->'],
-														_panosoft$elm_grove$NpmJson$decodeNpmJsonDependencies(_p145),
+														_panosoft$elm_grove$NpmJson$decodeNpmJsonDependencies(_p149),
 														{
 															ctor: '_Tuple2',
 															_0: function (error) {
@@ -20368,9 +22284,9 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 																	model,
 																	_panosoft$elm_grove$Output$errorLog(error));
 															},
-															_1: function (_p139) {
-																var _p140 = _p139;
-																var _p144 = _p140._1;
+															_1: function (_p143) {
+																var _p144 = _p143;
+																var _p148 = _p144._1;
 																return function (npmJsonStr) {
 																	return {
 																		ctor: '_Tuple2',
@@ -20411,10 +22327,10 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 																}(
 																	A2(
 																		_panosoft$elm_grove$NpmJson$replaceDependencies,
-																		_p144,
+																		_p148,
 																		A2(
 																			_elm_lang$core$Json_Encode$encode,
-																			2 * _panosoft$elm_grove$AppUtils$determineJsonIndent(_p144),
+																			2 * _panosoft$elm_grove$AppUtils$determineJsonIndent(_p148),
 																			_panosoft$elm_grove$NpmJson$npmDependenciesEncoder(
 																				A2(
 																					_elm_lang$core$Dict$union,
@@ -20428,21 +22344,21 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 																									{
 																										ctor: '_Tuple2',
 																										_0: _elm_lang$core$Maybe$Nothing,
-																										_1: function (_p141) {
-																											var _p142 = _p141;
+																										_1: function (_p145) {
+																											var _p146 = _p145;
 																											return _elm_lang$core$Maybe$Just(
 																												{
 																													ctor: '_Tuple2',
 																													_0: A2(_elm_lang$core$Basics_ops['++'], '@', packageName),
 																													_1: A2(
 																														_elm_lang$core$Basics_ops['++'],
-																														_p142._0,
+																														_p146._0,
 																														A2(
 																															_panosoft$elm_utils$Utils_Ops_ops['|?->'],
 																															A2(_elm_lang$core$Dict$get, packageName, model.linkedRepos),
 																															{
 																																ctor: '_Tuple2',
-																																_0: A2(_elm_lang$core$Basics_ops['++'], '#semver:^', _p142._2),
+																																_0: A2(_elm_lang$core$Basics_ops['++'], '#semver:^', _p146._2),
 																																_1: _elm_lang$core$Basics$always('')
 																															}))
 																												});
@@ -20453,12 +22369,12 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 																					A2(
 																						_elm_lang$core$Dict$filter,
 																						F2(
-																							function (key, _p143) {
+																							function (key, _p147) {
 																								return !_elm_lang$core$Native_Utils.eq(
 																									A2(_elm_lang$core$String$left, 1, key),
 																									'@');
 																							}),
-																						_p140._0))))));
+																						_p144._0))))));
 															}
 														})
 												});
@@ -20534,7 +22450,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 									}(
 										A2(
 											_elm_lang$core$Task$andThen,
-											function (_p146) {
+											function (_p150) {
 												return A2(
 													_elm_lang$core$Task$mapError,
 													_elm_node$core$Node_Error$message,
@@ -20565,7 +22481,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 						_panosoft$elm_grove$Output$errorLog(
 							A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Npm install failed:', _p90._1._0)));
 				} else {
-					var _p151 = _p90._0;
+					var _p155 = _p90._0;
 					return A2(
 						_panosoft$elm_utils$Utils_Ops_ops['?'],
 						config.noRewrite,
@@ -20576,31 +22492,31 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 								model,
 								A2(
 									_elm_lang$core$Task$andThen,
-									function (_p147) {
+									function (_p151) {
 										return _panosoft$elm_grove$Output$warnLog('Native code may use wrong versions of node modules without further processing');
 									},
 									A2(
 										_elm_lang$core$Task$andThen,
-										function (_p148) {
+										function (_p152) {
 											return _panosoft$elm_grove$Output$warnLog('Skipping native code rewrite due to --no-rewrite');
 										},
-										_p151))),
+										_p155))),
 							_1: function (logCmd) {
-								return function (_p149) {
-									var _p150 = _p149;
+								return function (_p153) {
+									var _p154 = _p153;
 									return {
 										ctor: '_Tuple2',
 										_0: A2(
 											_elm_lang$core$Platform_Cmd_ops['!'],
 											_elm_lang$core$Native_Utils.update(
 												model,
-												{rewriterModel: _p150._0}),
+												{rewriterModel: _p154._0}),
 											{
 												ctor: '::',
 												_0: logCmd,
 												_1: {
 													ctor: '::',
-													_0: _p150._1,
+													_0: _p154._1,
 													_1: {ctor: '[]'}
 												}
 											}),
@@ -20617,7 +22533,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 										model.rewriterModel,
 										_elm_lang$core$Set$toList(model.npmPackages)));
 							}(
-								A2(_elm_lang$core$Task$perform, _panosoft$elm_grove$Component_Install$OutputComplete, _p151))
+								A2(_elm_lang$core$Task$perform, _panosoft$elm_grove$Component_Install$OutputComplete, _p155))
 						});
 				}
 			case 'RewritingComplete':
@@ -20670,79 +22586,79 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 									'Error:'),
 								_p90._5._0)));
 				} else {
-					var _p161 = _p90._0;
-					var _p160 = _p90._5._0;
+					var _p165 = _p90._0;
+					var _p164 = _p90._5._0;
 					return function (model) {
 						return function (model) {
 							return A2(
 								_panosoft$elm_utils$Utils_Ops_ops['??='],
 								A2(
 									_panosoft$elm_utils$Utils_Ops_ops['|??>'],
-									A2(_panosoft$elm_grove$ElmJson$decodeElmJson, _p90._1, _p160),
+									A2(_panosoft$elm_grove$ElmJson$decodeElmJson, _p90._1, _p164),
 									function (elmJson) {
-										return function (_p152) {
-											var _p153 = _p152;
-											var _p158 = _p153._1;
-											var _p157 = _p153._0._0;
-											var _p156 = _p153._0._1;
+										return function (_p156) {
+											var _p157 = _p156;
+											var _p162 = _p157._1;
+											var _p161 = _p157._0._0;
+											var _p160 = _p157._0._1;
 											return A2(
 												_panosoft$elm_utils$Utils_Ops_ops['?='],
 												A2(
 													_panosoft$elm_utils$Utils_Ops_ops['|?>'],
 													_p90._4,
-													function (_p154) {
-														var _p155 = _p154;
+													function (_p158) {
+														var _p159 = _p158;
 														return {
 															ctor: '_Tuple2',
 															_0: A2(
 																_elm_lang$core$Platform_Cmd_ops['!'],
-																_p157,
+																_p161,
 																{
 																	ctor: '::',
-																	_0: _p156,
+																	_0: _p160,
 																	_1: {
 																		ctor: '::',
 																		_0: A2(
 																			_elm_lang$core$Task$attempt,
 																			_panosoft$elm_grove$Component_Install$DependentNpmPackageRead(
 																				_elm_lang$core$Native_Utils.update(
-																					_p155._0,
+																					_p159._0,
 																					{
 																						maybeElmJson: _elm_lang$core$Maybe$Just(elmJson)
 																					})),
-																			A2(_elm_node$core$Node_FileSystem$readFileAsString, _p155._1, _elm_node$core$Node_Encoding$Utf8)),
+																			A2(_elm_node$core$Node_FileSystem$readFileAsString, _p159._1, _elm_node$core$Node_Encoding$Utf8)),
 																		_1: {ctor: '[]'}
 																	}
 																}),
-															_1: _p158
+															_1: _p162
 														};
 													}),
 												{
 													ctor: '_Tuple2',
 													_0: A2(
 														_elm_lang$core$Platform_Cmd_ops['!'],
-														_p157,
+														_p161,
 														{
 															ctor: '::',
-															_0: _p156,
+															_0: _p160,
 															_1: {ctor: '[]'}
 														}),
-													_1: _p158
+													_1: _p162
 												});
 										}(
-											A6(_panosoft$elm_grove$Component_Install$processElmJson, config, model, _p161, _p90._2, _p90._3, elmJson));
+											A6(_panosoft$elm_grove$Component_Install$processElmJson, config, model, _p165, _p90._2, _p90._3, elmJson));
 									}),
-								function (_p159) {
+								function (_p163) {
 									return A2(
 										_panosoft$elm_grove$Component_Install$operationError,
 										model,
-										_panosoft$elm_grove$Output$errorLog(_p159));
+										_panosoft$elm_grove$Output$errorLog(_p163));
 								});
 						}(
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									readingElmJson: A2(_elm_lang$core$Set$remove, _p161, model.readingElmJson)
+									readingElmJson: A2(_elm_lang$core$Set$remove, _p165, model.readingElmJson)
 								}));
 					}(
 						_elm_lang$core$Native_Utils.update(
@@ -20752,169 +22668,11 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 									A2(
 										_panosoft$elm_utils$Utils_Ops_ops['?='],
 										model.elmJsonIndent,
-										_panosoft$elm_grove$AppUtils$determineJsonIndent(_p160)))
+										_panosoft$elm_grove$AppUtils$determineJsonIndent(_p164)))
 							}));
 				}
 			default:
 				return A2(updateRewriter, _p90._0, model);
-		}
-	});
-
-var _panosoft$elm_utils$Utils_Task$sequence2 = function (_p0) {
-	var _p1 = _p0;
-	return A2(
-		_elm_lang$core$Task$andThen,
-		function (a) {
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (b) {
-					return _elm_lang$core$Task$succeed(
-						{ctor: '_Tuple2', _0: a, _1: b});
-				},
-				_p1._1);
-		},
-		_p1._0);
-};
-var _panosoft$elm_utils$Utils_Task$sequence3 = function (_p2) {
-	var _p3 = _p2;
-	return A2(
-		_elm_lang$core$Task$andThen,
-		function (_p4) {
-			var _p5 = _p4;
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (c) {
-					return _elm_lang$core$Task$succeed(
-						{ctor: '_Tuple3', _0: _p5._0, _1: _p5._1, _2: c});
-				},
-				_p3._2);
-		},
-		_panosoft$elm_utils$Utils_Task$sequence2(
-			{ctor: '_Tuple2', _0: _p3._0, _1: _p3._1}));
-};
-var _panosoft$elm_utils$Utils_Task$sequence4 = function (_p6) {
-	var _p7 = _p6;
-	return A2(
-		_elm_lang$core$Task$andThen,
-		function (_p8) {
-			var _p9 = _p8;
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (d) {
-					return _elm_lang$core$Task$succeed(
-						{ctor: '_Tuple4', _0: _p9._0, _1: _p9._1, _2: _p9._2, _3: d});
-				},
-				_p7._3);
-		},
-		_panosoft$elm_utils$Utils_Task$sequence3(
-			{ctor: '_Tuple3', _0: _p7._0, _1: _p7._1, _2: _p7._2}));
-};
-var _panosoft$elm_utils$Utils_Task$sequence5 = function (_p10) {
-	var _p11 = _p10;
-	return A2(
-		_elm_lang$core$Task$andThen,
-		function (_p12) {
-			var _p13 = _p12;
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (e) {
-					return _elm_lang$core$Task$succeed(
-						{ctor: '_Tuple5', _0: _p13._0, _1: _p13._1, _2: _p13._2, _3: _p13._3, _4: e});
-				},
-				_p11._4);
-		},
-		_panosoft$elm_utils$Utils_Task$sequence4(
-			{ctor: '_Tuple4', _0: _p11._0, _1: _p11._1, _2: _p11._2, _3: _p11._3}));
-};
-var _panosoft$elm_utils$Utils_Task$sequence6 = function (_p14) {
-	var _p15 = _p14;
-	return A2(
-		_elm_lang$core$Task$andThen,
-		function (_p16) {
-			var _p17 = _p16;
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (f) {
-					return _elm_lang$core$Task$succeed(
-						{ctor: '_Tuple6', _0: _p17._0, _1: _p17._1, _2: _p17._2, _3: _p17._3, _4: _p17._4, _5: f});
-				},
-				_p15._5);
-		},
-		_panosoft$elm_utils$Utils_Task$sequence5(
-			{ctor: '_Tuple5', _0: _p15._0, _1: _p15._1, _2: _p15._2, _3: _p15._3, _4: _p15._4}));
-};
-var _panosoft$elm_utils$Utils_Task$sequence7 = function (_p18) {
-	var _p19 = _p18;
-	return A2(
-		_elm_lang$core$Task$andThen,
-		function (_p20) {
-			var _p21 = _p20;
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (g) {
-					return _elm_lang$core$Task$succeed(
-						{ctor: '_Tuple7', _0: _p21._0, _1: _p21._1, _2: _p21._2, _3: _p21._3, _4: _p21._4, _5: _p21._5, _6: g});
-				},
-				_p19._6);
-		},
-		_panosoft$elm_utils$Utils_Task$sequence6(
-			{ctor: '_Tuple6', _0: _p19._0, _1: _p19._1, _2: _p19._2, _3: _p19._3, _4: _p19._4, _5: _p19._5}));
-};
-var _panosoft$elm_utils$Utils_Task$sequence8 = function (_p22) {
-	var _p23 = _p22;
-	return A2(
-		_elm_lang$core$Task$andThen,
-		function (_p24) {
-			var _p25 = _p24;
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (h) {
-					return _elm_lang$core$Task$succeed(
-						{ctor: '_Tuple8', _0: _p25._0, _1: _p25._1, _2: _p25._2, _3: _p25._3, _4: _p25._4, _5: _p25._5, _6: _p25._6, _7: h});
-				},
-				_p23._7);
-		},
-		_panosoft$elm_utils$Utils_Task$sequence7(
-			{ctor: '_Tuple7', _0: _p23._0, _1: _p23._1, _2: _p23._2, _3: _p23._3, _4: _p23._4, _5: _p23._5, _6: _p23._6}));
-};
-var _panosoft$elm_utils$Utils_Task$sequence9 = function (_p26) {
-	var _p27 = _p26;
-	return A2(
-		_elm_lang$core$Task$andThen,
-		function (_p28) {
-			var _p29 = _p28;
-			return A2(
-				_elm_lang$core$Task$andThen,
-				function (i) {
-					return _elm_lang$core$Task$succeed(
-						{ctor: '_Tuple9', _0: _p29._0, _1: _p29._1, _2: _p29._2, _3: _p29._3, _4: _p29._4, _5: _p29._5, _6: _p29._6, _7: _p29._7, _8: i});
-				},
-				_p27._8);
-		},
-		_panosoft$elm_utils$Utils_Task$sequence8(
-			{ctor: '_Tuple8', _0: _p27._0, _1: _p27._1, _2: _p27._2, _3: _p27._3, _4: _p27._4, _5: _p27._5, _6: _p27._6, _7: _p27._7}));
-};
-var _panosoft$elm_utils$Utils_Task$andThenIf = F2(
-	function (cond, _p30) {
-		var _p31 = _p30;
-		return _elm_lang$core$Task$andThen(
-			A2(
-				_panosoft$elm_utils$Utils_Ops_ops['?'],
-				cond,
-				{ctor: '_Tuple2', _0: _p31._0, _1: _p31._1}));
-	});
-var _panosoft$elm_utils$Utils_Task$untilSuccess = F2(
-	function (failureValue, tasks) {
-		var _p32 = tasks;
-		if (_p32.ctor === '[]') {
-			return _elm_lang$core$Task$fail(failureValue);
-		} else {
-			return A2(
-				_elm_lang$core$Task$onError,
-				function (_p33) {
-					return A2(_panosoft$elm_utils$Utils_Task$untilSuccess, failureValue, _p32._1);
-				},
-				A2(_elm_lang$core$Task$andThen, _elm_lang$core$Task$succeed, _p32._0));
 		}
 	});
 
@@ -21716,8 +23474,8 @@ var _panosoft$elm_grove$Grove_App$parsePackages = function (packages) {
 											return _elm_lang$core$Native_Utils.crashCase(
 												'Grove.App',
 												{
-													start: {line: 105, column: 57},
-													end: {line: 119, column: 105}
+													start: {line: 109, column: 57},
+													end: {line: 123, column: 105}
 												},
 												_p0)('BUG: Should never get here');
 										},
@@ -21766,7 +23524,7 @@ var _panosoft$elm_grove$Grove_App$parsePackages = function (packages) {
 			},
 			packages));
 };
-var _panosoft$elm_grove$Grove_App$configFilename = 'grove-config.json';
+var _panosoft$elm_grove$Grove_App$configFilename = '.grove-config.json';
 var _panosoft$elm_grove$Grove_App$linkedReposFilename = 'grove-links.json';
 var _panosoft$elm_grove$Grove_App$exitApp = _elm_lang$core$Native_Platform.outgoingPort(
 	'exitApp',
@@ -21786,7 +23544,15 @@ var _panosoft$elm_grove$Grove_App$Options = function (a) {
 										return function (k) {
 											return function (l) {
 												return function (m) {
-													return {link: a, dryRun: b, npmProduction: c, npmSilent: d, major: e, minor: f, patch: g, allowUncommitted: h, allowOldDependencies: i, noRewrite: j, local: k, safe: l, docs: m};
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return function (q) {
+																	return {link: a, dryRun: b, verbose: c, major: d, minor: e, patch: f, allowUncommitted: g, allowOldDependencies: h, allowRebasedRelease: i, allowLegacyRelease: j, allowMajorRebasedRelease: k, npmProduction: l, npmSilent: m, noRewrite: n, local: o, safe: p, docs: q};
+																};
+															};
+														};
+													};
 												};
 											};
 										};
@@ -21897,11 +23663,15 @@ var _panosoft$elm_grove$Grove_App$bumpConfig = F2(
 			return {
 				testing: flags.testing,
 				dryRun: flags.options.dryRun,
+				verbose: flags.options.verbose || flags.options.dryRun,
 				major: flags.options.major,
 				minor: flags.options.minor,
 				patch: flags.options.patch,
 				allowUncommitted: flags.options.allowUncommitted,
 				allowOldDependencies: flags.options.allowOldDependencies,
+				allowRebasedRelease: flags.options.allowRebasedRelease,
+				allowLegacyRelease: flags.options.allowLegacyRelease,
+				allowMajorRebasedRelease: flags.options.allowMajorRebasedRelease,
 				routeToMe: _panosoft$elm_grove$Grove_App$BumpMsg,
 				operationComplete: _panosoft$elm_grove$Grove_App$ExitApp,
 				elmVersion: flags.elmVersion,
@@ -22084,8 +23854,8 @@ var _panosoft$elm_grove$Grove_App$initCommand = F2(
 					return _elm_lang$core$Native_Utils.crashCase(
 						'Grove.App',
 						{
-							start: {line: 249, column: 17},
-							end: {line: 291, column: 84}
+							start: {line: 257, column: 17},
+							end: {line: 299, column: 84}
 						},
 						_p10)(
 						A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'BUG: Unsupported command:', flags.command));
@@ -22569,107 +24339,127 @@ var _panosoft$elm_grove$Grove_App$main = _elm_lang$core$Platform$programWithFlag
 									'options',
 									A2(
 										_elm_lang$core$Json_Decode$andThen,
-										function (allowOldDependencies) {
+										function (allowLegacyRelease) {
 											return A2(
 												_elm_lang$core$Json_Decode$andThen,
-												function (allowUncommitted) {
+												function (allowMajorRebasedRelease) {
 													return A2(
 														_elm_lang$core$Json_Decode$andThen,
-														function (docs) {
+														function (allowOldDependencies) {
 															return A2(
 																_elm_lang$core$Json_Decode$andThen,
-																function (dryRun) {
+																function (allowRebasedRelease) {
 																	return A2(
 																		_elm_lang$core$Json_Decode$andThen,
-																		function (link) {
+																		function (allowUncommitted) {
 																			return A2(
 																				_elm_lang$core$Json_Decode$andThen,
-																				function (local) {
+																				function (docs) {
 																					return A2(
 																						_elm_lang$core$Json_Decode$andThen,
-																						function (major) {
+																						function (dryRun) {
 																							return A2(
 																								_elm_lang$core$Json_Decode$andThen,
-																								function (minor) {
+																								function (link) {
 																									return A2(
 																										_elm_lang$core$Json_Decode$andThen,
-																										function (noRewrite) {
+																										function (local) {
 																											return A2(
 																												_elm_lang$core$Json_Decode$andThen,
-																												function (npmProduction) {
+																												function (major) {
 																													return A2(
 																														_elm_lang$core$Json_Decode$andThen,
-																														function (npmSilent) {
+																														function (minor) {
 																															return A2(
 																																_elm_lang$core$Json_Decode$andThen,
-																																function (patch) {
+																																function (noRewrite) {
 																																	return A2(
 																																		_elm_lang$core$Json_Decode$andThen,
-																																		function (safe) {
-																																			return _elm_lang$core$Json_Decode$succeed(
-																																				{allowOldDependencies: allowOldDependencies, allowUncommitted: allowUncommitted, docs: docs, dryRun: dryRun, link: link, local: local, major: major, minor: minor, noRewrite: noRewrite, npmProduction: npmProduction, npmSilent: npmSilent, patch: patch, safe: safe});
+																																		function (npmProduction) {
+																																			return A2(
+																																				_elm_lang$core$Json_Decode$andThen,
+																																				function (npmSilent) {
+																																					return A2(
+																																						_elm_lang$core$Json_Decode$andThen,
+																																						function (patch) {
+																																							return A2(
+																																								_elm_lang$core$Json_Decode$andThen,
+																																								function (safe) {
+																																									return A2(
+																																										_elm_lang$core$Json_Decode$andThen,
+																																										function (verbose) {
+																																											return _elm_lang$core$Json_Decode$succeed(
+																																												{allowLegacyRelease: allowLegacyRelease, allowMajorRebasedRelease: allowMajorRebasedRelease, allowOldDependencies: allowOldDependencies, allowRebasedRelease: allowRebasedRelease, allowUncommitted: allowUncommitted, docs: docs, dryRun: dryRun, link: link, local: local, major: major, minor: minor, noRewrite: noRewrite, npmProduction: npmProduction, npmSilent: npmSilent, patch: patch, safe: safe, verbose: verbose});
+																																										},
+																																										A2(_elm_lang$core$Json_Decode$field, 'verbose', _elm_lang$core$Json_Decode$bool));
+																																								},
+																																								A2(
+																																									_elm_lang$core$Json_Decode$field,
+																																									'safe',
+																																									_elm_lang$core$Json_Decode$oneOf(
+																																										{
+																																											ctor: '::',
+																																											_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+																																											_1: {
+																																												ctor: '::',
+																																												_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
+																																												_1: {ctor: '[]'}
+																																											}
+																																										})));
+																																						},
+																																						A2(_elm_lang$core$Json_Decode$field, 'patch', _elm_lang$core$Json_Decode$bool));
+																																				},
+																																				A2(_elm_lang$core$Json_Decode$field, 'npmSilent', _elm_lang$core$Json_Decode$bool));
 																																		},
-																																		A2(
-																																			_elm_lang$core$Json_Decode$field,
-																																			'safe',
-																																			_elm_lang$core$Json_Decode$oneOf(
-																																				{
-																																					ctor: '::',
-																																					_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
-																																					_1: {
-																																						ctor: '::',
-																																						_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
-																																						_1: {ctor: '[]'}
-																																					}
-																																				})));
+																																		A2(_elm_lang$core$Json_Decode$field, 'npmProduction', _elm_lang$core$Json_Decode$bool));
 																																},
-																																A2(_elm_lang$core$Json_Decode$field, 'patch', _elm_lang$core$Json_Decode$bool));
+																																A2(_elm_lang$core$Json_Decode$field, 'noRewrite', _elm_lang$core$Json_Decode$bool));
 																														},
-																														A2(_elm_lang$core$Json_Decode$field, 'npmSilent', _elm_lang$core$Json_Decode$bool));
+																														A2(_elm_lang$core$Json_Decode$field, 'minor', _elm_lang$core$Json_Decode$bool));
 																												},
-																												A2(_elm_lang$core$Json_Decode$field, 'npmProduction', _elm_lang$core$Json_Decode$bool));
+																												A2(_elm_lang$core$Json_Decode$field, 'major', _elm_lang$core$Json_Decode$bool));
 																										},
-																										A2(_elm_lang$core$Json_Decode$field, 'noRewrite', _elm_lang$core$Json_Decode$bool));
+																										A2(
+																											_elm_lang$core$Json_Decode$field,
+																											'local',
+																											_elm_lang$core$Json_Decode$oneOf(
+																												{
+																													ctor: '::',
+																													_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
+																													_1: {
+																														ctor: '::',
+																														_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$bool),
+																														_1: {ctor: '[]'}
+																													}
+																												})));
 																								},
-																								A2(_elm_lang$core$Json_Decode$field, 'minor', _elm_lang$core$Json_Decode$bool));
+																								A2(_elm_lang$core$Json_Decode$field, 'link', _elm_lang$core$Json_Decode$bool));
 																						},
-																						A2(_elm_lang$core$Json_Decode$field, 'major', _elm_lang$core$Json_Decode$bool));
+																						A2(_elm_lang$core$Json_Decode$field, 'dryRun', _elm_lang$core$Json_Decode$bool));
 																				},
 																				A2(
 																					_elm_lang$core$Json_Decode$field,
-																					'local',
+																					'docs',
 																					_elm_lang$core$Json_Decode$oneOf(
 																						{
 																							ctor: '::',
 																							_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
 																							_1: {
 																								ctor: '::',
-																								_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$bool),
+																								_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
 																								_1: {ctor: '[]'}
 																							}
 																						})));
 																		},
-																		A2(_elm_lang$core$Json_Decode$field, 'link', _elm_lang$core$Json_Decode$bool));
+																		A2(_elm_lang$core$Json_Decode$field, 'allowUncommitted', _elm_lang$core$Json_Decode$bool));
 																},
-																A2(_elm_lang$core$Json_Decode$field, 'dryRun', _elm_lang$core$Json_Decode$bool));
+																A2(_elm_lang$core$Json_Decode$field, 'allowRebasedRelease', _elm_lang$core$Json_Decode$bool));
 														},
-														A2(
-															_elm_lang$core$Json_Decode$field,
-															'docs',
-															_elm_lang$core$Json_Decode$oneOf(
-																{
-																	ctor: '::',
-																	_0: _elm_lang$core$Json_Decode$null(_elm_lang$core$Maybe$Nothing),
-																	_1: {
-																		ctor: '::',
-																		_0: A2(_elm_lang$core$Json_Decode$map, _elm_lang$core$Maybe$Just, _elm_lang$core$Json_Decode$string),
-																		_1: {ctor: '[]'}
-																	}
-																})));
+														A2(_elm_lang$core$Json_Decode$field, 'allowOldDependencies', _elm_lang$core$Json_Decode$bool));
 												},
-												A2(_elm_lang$core$Json_Decode$field, 'allowUncommitted', _elm_lang$core$Json_Decode$bool));
+												A2(_elm_lang$core$Json_Decode$field, 'allowMajorRebasedRelease', _elm_lang$core$Json_Decode$bool));
 										},
-										A2(_elm_lang$core$Json_Decode$field, 'allowOldDependencies', _elm_lang$core$Json_Decode$bool))));
+										A2(_elm_lang$core$Json_Decode$field, 'allowLegacyRelease', _elm_lang$core$Json_Decode$bool))));
 						},
 						A2(_elm_lang$core$Json_Decode$field, 'elmVersion', _elm_lang$core$Json_Decode$int));
 				},

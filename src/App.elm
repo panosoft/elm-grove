@@ -26,13 +26,17 @@ port exitApp : Int -> Cmd msg
 type alias Options =
     { link : Bool
     , dryRun : Bool
-    , npmProduction : Bool
-    , npmSilent : Bool
+    , verbose : Bool
     , major : Bool
     , minor : Bool
     , patch : Bool
     , allowUncommitted : Bool
     , allowOldDependencies : Bool
+    , allowRebasedRelease : Bool
+    , allowLegacyRelease : Bool
+    , allowMajorRebasedRelease : Bool
+    , npmProduction : Bool
+    , npmSilent : Bool
     , noRewrite : Bool
     , local : Maybe Bool
     , safe : Maybe String
@@ -82,7 +86,7 @@ linkedReposFilename =
 
 configFilename : String
 configFilename =
-    "grove-config.json"
+    ".grove-config.json"
 
 
 parsePackages : List PackageName -> Result (List String) PackageSourceDict
@@ -198,11 +202,15 @@ bumpConfig model flags =
         |> \configCfg ->
             { testing = flags.testing
             , dryRun = flags.options.dryRun
+            , verbose = flags.options.verbose || flags.options.dryRun
             , major = flags.options.major
             , minor = flags.options.minor
             , patch = flags.options.patch
             , allowUncommitted = flags.options.allowUncommitted
             , allowOldDependencies = flags.options.allowOldDependencies
+            , allowRebasedRelease = flags.options.allowRebasedRelease
+            , allowLegacyRelease = flags.options.allowLegacyRelease
+            , allowMajorRebasedRelease = flags.options.allowMajorRebasedRelease
             , routeToMe = BumpMsg
             , operationComplete = ExitApp
             , elmVersion = flags.elmVersion

@@ -4,23 +4,25 @@
 
 > **Installs any Elm package from any Git server including both Elm and NPM dependencies**
 
-# WARNING: This is NOT the official [Elm Package Manager](https://guide.elm-lang.org/install.html#elm-package). Grove can install official and non-official packages. If you use Grove to install non-official packages, realize that those packages offer NO GUARANTEES regarding RUNTIME ERRORS.
+**WARNING: This is NOT the [Official Elm Package Manager](https://guide.elm-lang.org/install.html#elm-package). Grove can install official and non-official packages. If you use Grove to install non-official packages, realize that those packages offer NO GUARANTEES regarding RUNTIME ERRORS.**
 
 ## Using Grove Safely
 You can, however, benefit from all of the advanced Grove features AND all the runtime safety of the Official Elm Packages by configuring Grove to operate in safe mode ([see Configure Grove for Safety](#configure-grove-for-safety)).
 
 ### Major features:
 - Written in Elm
+- Enforce Semantic Version
 - Supports Official, Native and Effects Manager packages
 - Install from Github, Gitlab, private Git servers, etc.
 - Install local packages during development (via symbolic links)
 - Manage Elm and NPM dependencies (works without NPM as well)
 - Uninstall packages
 - Bump package version with validations (with git check in)
+- Create documentation markdown from code comments (module & function)
 - Initialize package (create `elm-package.json`)
 
 ### Roadmap:
-- Semantic Version Protection
+- Elm 0.19 support (once released)
 
 ## Install
 Make sure you have the following:
@@ -28,7 +30,11 @@ Make sure you have the following:
 - Elm version 0.18.x
 - npm version 5.3.0
 
+#### NPM 5.x.x issues
+
 **Due to npm 5.x.x bugs, installing AND updating grove globally will have to be done unconventionally, for now.**
+
+Also, if you encounter access denied or permission issues using `npm` you may want to consult [Fixing npm permissions](https://docs.npmjs.com/getting-started/fixing-npm-permissions).
 
 #### Installing grove
 ```bash
@@ -329,7 +335,6 @@ This gives you a chance to debug your documentation before you release your pack
 grove docs
 ```
 
-
 ### Installing a local package
 
 ```bash
@@ -364,10 +369,35 @@ where
 
 ### Releasing a package
 
+There are 3 types of releases:
+
+1. Normal - `HEAD` is based on the most recent release
+2. Rebased - `HEAD` is based on a release that is not the most recent of it's major version
+3. Legacy - `HEAD` is based on an older `major` release number
+
+For details on release scenarios see [Understanding Release Scenarios](#understanding-release-scenarios).
+
+#### Pre-release
+
+The `bump` command performs many validation steps prior to optionally generating documentation and bumping the version.
+
+It is HIGHLY RECOMMENDED that you use the `--dry-run` option to validate and display the differences between `HEAD` and the latest version `HEAD` is based on.
+
+This gives you a chance to see if you **unintentionally** made breaking changes.
+
+Here is an example of what the output looks like:
+
+<p align="center"><img src="images/bump dry-run.png">
+
+#### Release
+
 Releasing a package is a 2-step process.
 
+1. Bump version using `grove bump` command
+2. Pushing repo with `git push && git push --tags` (Without the `git push --tags` command, the latest version of the package will not be recognized by `Grove`.)
 
-#### Bump version (Step 1)
+
+##### Bump version (Step 1)
 
 Package versions are controlled by git tags, e.g. a tag `1.0.2` is a valid version tag whereas tag `1.0.2a`, `test` and `1.2` are not.
 
@@ -380,21 +410,30 @@ where:
 
 - `major`, `minor` and `patch` are numbers
 
+Grove automatically determines the version number based on public interface changes following the [semver rules](http://semver.org/):
+
+* major - breaking change in public interface, NOT backward compatible
+* minor - additional functionality added to public interface
+* patch - no public interface changes
+
 ```bash
-grove bump --patch
+grove bump
 ```
 
-This will bump the version patch number by 1 (other options are `--major` and `--minor`) in both Elm and NPM package Json files (`elm-package.json` and `package.json`) keeping them in lock-step and then check in the Elm and NPM package Json files into git and tag that commit with the bumped version.
+This will bump the version in both Elm and NPM package Json files (`elm-package.json` and `package.json`) keeping them in lock-step and then check in the Elm and NPM package Json files into git and tag that commit with the bumped version.
+
+For details on how the version number is determined see [Version Determination](#version-determination) and [Understanding Release Scenarios](#understanding-release-scenarios).
 
 Numerous validations are performed prior to doing the bump:
 
 - the latest version tag in the repo is the same version in both Elm and NPM package JSON Files
+- the latest version tag in Elm package JSON matches the latest release your code is based on
 - no links installed in `elm-stuff`, i.e. this package, which is about to be released, MUST NOT be using any non-released packages
-- no new versions of packages in `elm-package.json` exist (override with `--allow-old-dependencies`)
+- all packages in `elm-package.json` are the latest versions (override with `--allow-old-dependencies`)
 - no uncommitted changes (override with `--allow-uncommitted`)
 
 
-#### Push repository (Step 2)
+##### Push repository (Step 2)
 
 Next, you must MANUALLY push the repo AND tags via:
 
@@ -403,6 +442,85 @@ git push && git push --tags
 ```
 Without the `git push --tags` command, the latest version of the package will not be recognized by `Grove`.
 
+## Version Determination
+
+There are 2 types of Packages:
+
+1. Library, e.g. `panosoft/elm-utils`
+2. Application, e.g. `panosoft/elm-grove`
+
+#### Libraries
+
+Libraries expose modules via `elm-package.json`. Grove determines the version based on changes to the Public Interface of the package, i.e. the exposed functions of the exposed modules. The logic follows [semver rules](http://semver.org/):
+
+1. Changes to an existing exposed function = Major
+2. Deletion of a previously exposed function = Major
+3. Addition of a new exposed function = Minor
+4. Otherwise = Patch
+
+#### Applications
+
+Applications do NOT have public interfaces, so you must provide the version type via `bump` options `--major`, `--minor`, or `--patch`.
+
+##### False positives
+
+Grove uses the documentation feature that is built-in to the Elm compiler to determine changes to the public interface. It compares `HEAD` with the most recent release that `HEAD` is based on.
+
+There are times where this can produce false positives, i.e. Grove will *think* something has changed when it effectively has not, e.g.:
+
+Version `3.0.1` code:
+
+```elm
+rename : String -> Task Error ()
+rename filename =
+
+```
+
+`HEAD` code (based on `3.0.1`):
+
+```elm
+
+type alias Filename =
+    String
+
+rename : Filename -> Task Error ()
+rename filename =
+
+```
+
+Here we have aliased types that cause a difference in signatures even though they are semantically equivalent.
+
+This is a limitation in the Elm compiler since it doesn't provide additional information regarding the `fully reduced` to a non-aliased type.
+
+At the moment, Grove doesn't try to resolve this. The hope is that, someday, Elm will resolve this issue when generating documentation. As far as I know, the standard Elm package manager also suffers from such a deficiency.
+
+## Understanding Release Scenarios
+
+In order to understand Release Scenarios, let's assume the following `git` history where the smaller circles are releases and the larger circles all the possible `HEAD`s of your repo:
+
+<p align="center"><img src="images/Release Scenarios.svg">
+
+
+#### Normal Release (Typical case)
+
+A `Normal` release occurs when `HEAD` is based on the most recent release, in this example, that is `3.0.1`.
+
+#### Legacy Release (Support multiple major versions)
+
+If you need to support an older version of your package, e.g. to support an older version of Elm, then you are going to be making a `Legacy Release`.
+
+A `Legacy` release is where the `HEAD` is based off of an older `major` release, e.g. `2.1.0` or `1.2.0`.
+
+`Legacy` releases are RESTRICTED to `minor` and `patch`. If your code makes breaking changes, then Grove will exit with an error.
+
+#### Rebased Release (Rare case to revert back to an old codebase)
+
+If for some reason, you decide to base your next release on code from an older release, it is considered a `Rebased` release in Grove.
+
+There are 2 types of rebased releases:
+
+1. (**Rebased**) `HEAD` is based off of an older release that shares the same `major` version as the latest release, in this example, that could only be `3.0.0`.
+2. (**Rebased Legacy**) `HEAD` is based off an older release of a `Legacy` release, e.g. `2.0.0`, `1.2.0` and `1.0.1` would be Rebased Legacy releases. Note that `2.1.0` and `1.2.0` would NOT be a `Rebased` release since they are the latest releases of those `major` versions.
 
 ## Additional Usage
 

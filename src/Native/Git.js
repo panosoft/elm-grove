@@ -8,10 +8,14 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 	/* global _elm_lang$core$Native_Scheduler:false _elm_lang$core$Native_List:false */
 	const { nativeBinding, succeed, fail } = _elm_lang$core$Native_Scheduler;
 	const { toArray, fromArray } = _elm_lang$core$Native_List;
+	/* global _elm_lang$core$Result$Err:false _elm_lang$core$Result$Ok:false */
+	const Err = _elm_lang$core$Result$Err;
+	const Ok = _elm_lang$core$Result$Ok;
 
 	const failure = (callback, prefix) => error => callback(fail(prefix + ' (' + error + ')'));
+	const failureResult = prefix => error => Err(prefix + '(' + error + ')');
 
-	const clone = url => nativeBinding(callback => {
+	const clone = (url, destinationPath) => nativeBinding(callback => {
 		try {
 			const fail = failure(callback, 'Unable to clone: ' + url);
 			const w = '[a-zA-Z0-9]';
@@ -23,7 +27,7 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 			if (!match)
 				match = httpRegex.exec(url);
 			if (match && match[1]) {
-				const cloneLocation = path.join(os.tmpdir(), match[1], match[2]);
+				const cloneLocation = path.join(destinationPath, match[1], match[2]);
 				rm(cloneLocation, err => {
 					if (err)
 						callback(fail(err));
@@ -142,54 +146,107 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 		}
 		catch (error) { fail(error); }
 	});
-
-	// const commit = (Repo, filesToAdd, filesToDelete, message) => nativeBinding(callback => {
-	// 	const fail = failure(callback, 'Unable commit to repo: ' + Repo.url);
-	// 	try {
-	// 		Repo.repo.refreshIndex()
-	// 		.then (index =>
-	// 			toArray(filesToDelete).reduce( (lastFilePromise, path) => lastFilePromise
-	// 			.then(_ => index.removeByPath(path)), Promise.resolve())
-	// 			.then (_ => index.write())
-	// 			.then (_ => index.writeTree())
-	// 		)
-	// 		.then(_ =>
-	// 			Repo.repo.createCommitOnHead(toArray(filesToAdd), git.Signature.default(Repo.repo), git.Signature.default(Repo.repo), message)
-	// 			.then(oid => callback(succeed(oid.tostrS())))
-	// 		)
-	// 		.catch(fail);
-	// 	}
-	// 	catch (error) { fail(error); }
-	// });
-	//
-	const checkout = (Repo, tag, targetDirectory) => nativeBinding(callback => {
-		const fail = failure(callback, 'Unable check out tag: "' + tag + '" for repo: '+ Repo.url);
+	const checkoutInternal = (fail, callback) => (Repo, commit, targetDirectory) =>
+		mkdirp(targetDirectory, err =>
+			err ? fail(err) :
+				git.Checkout.tree(Repo.repo, commit, {
+					checkoutStrategy: git.Checkout.STRATEGY.FORCE | git.Checkout.STRATEGY.DONT_UPDATE_INDEX,
+					targetDirectory
+				}).then(_ => callback(succeed()))
+				.catch(fail)
+		);
+	const checkoutCommit = (Repo, commit, targetDirectory) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable to checkout commit: "' + commit + '" for repo: '+ Repo.url);
 		try {
-			const co = commit =>
-				mkdirp(targetDirectory, err =>
-					err ? fail(err) :
-						git.Checkout.tree(Repo.repo, commit, {
-							checkoutStrategy: git.Checkout.STRATEGY.FORCE,
-							targetDirectory
-						}).then(_ => callback(succeed()))
-						.catch(fail)
-				);
+			checkoutInternal(fail, callback)(Repo, commit, targetDirectory);
+		}
+		catch (error) { fail(error); }
+	});
+	const checkout = (Repo, tag, targetDirectory) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable to checkout tag: "' + tag + '" for repo: '+ Repo.url);
+		try {
+			const co = checkoutInternal(fail, callback);
 			// first treat the tag as an Annotated Tag, if errors then treat as Lightweight Tag
 			Repo.repo.getTagByName(tag)
-			.then(co)
+			.then(commit => co(Repo, commit, targetDirectory))
 			// .then(oid =>  co(oid.id().toString()))
 			.catch(_ =>
 				Repo.repo.getReferenceCommit(tag)
-				.then(co)
+				.then(commit => co(Repo, commit, targetDirectory))
 				.catch(fail)
 			);
+		}
+		catch (error) { fail(error); }
+	});
+	const getMasterCommit = Repo => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get Master commit: for repo: '+ Repo.url);
+		try {
+			Repo.repo.getMasterCommit()
+			.then(commit => callback(succeed(commit)))
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+	const getHeadCommit = Repo => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get Head commit: for repo: '+ Repo.url);
+		try {
+			Repo.repo.getHeadCommit()
+			.then(commit => callback(succeed(commit)))
+			.catch(fail);
+		}
+		catch (error) { fail(error); }
+	});
+	const getCommitTagHistory = (Repo, commit) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get Tag Commit History for Commit: ' + commit + ' for repo: '+ Repo.url);
+		try {
+			if (!commit)
+				callback(succeed(fromArray([])));
+			else {
+				const history = commit.history(git.Revwalk.SORT.Time);
+				history.on('end', commits => {
+					try {
+						callback(succeed(fromArray(commits)));
+					}
+					catch (error) { fail(error); }
+				});
+				history.start();
+			}
+		}
+		catch (error) { fail(error); }
+	});
+	const getCommitSha = commit => {
+		const fail = failureResult('Unable get SHA for Commit: ' + commit);
+		try {
+			return Ok(commit.sha());
+		}
+		catch (error) { return fail(error); }
+	};
+	const getTagShas = (Repo, tagList) => nativeBinding(callback => {
+		const fail = failure(callback, 'Unable get Tag Shas for Tags: ' + toArray(tagList) + ' for repo: '+ Repo.url);
+		try {
+			const tags = toArray(tagList);
+			Promise.all(
+				tags.map(tagName =>
+					git.Reference.lookup(Repo.repo, `refs/tags/${tagName}`)
+					// This resolves the tag (annotated or not) to a commit ref
+					.then(ref => ref.peel(git.Object.TYPE.COMMIT))
+					.then(ref => git.Commit.lookup(Repo.repo, ref.id()))
+					.then(commit => ({
+						tagName: tagName,
+						sha: commit.sha()
+					}))
+					.catch(fail)
+				)
+			)
+			.then (tagCommits => callback(succeed(tagCommits)))
+			.catch(fail);
 		}
 		catch (error) { fail(error); }
 	});
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	/* global F2:false, F3:false, F4:false */
 	return {
-		clone,
+		clone: F2(clone),
 		initRepo,
 		getRepo,
 		createLightweightTag: F2(createLightweightTag),
@@ -197,6 +254,12 @@ const _panosoft$elm_grove$Native_Git = (_ => {
 		getTags,
 		getFileStatuses,
 		commit: F4(commit),
-		checkout: F3(checkout)
+		checkoutCommit: F3(checkoutCommit),
+		checkout: F3(checkout),
+		getMasterCommit,
+		getHeadCommit,
+		getCommitTagHistory: F2(getCommitTagHistory),
+		getCommitSha,
+		getTagShas: F2(getTagShas)
 	};
 })();

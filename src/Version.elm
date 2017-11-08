@@ -3,6 +3,7 @@ module Version
         ( Version
         , VersionStr
         , Range
+        , initVersionStr
         , versionFromString
         , versionToString
         , rangeFromVersion
@@ -35,6 +36,11 @@ type alias VersionStr =
 type Range
     = Range Version Version
     | ExactRange Version
+
+
+initVersionStr : String
+initVersionStr =
+    "0.0.0"
 
 
 get : Int -> List (Maybe String) -> String

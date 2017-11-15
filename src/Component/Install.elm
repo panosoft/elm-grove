@@ -611,7 +611,7 @@ type Msg msg
     | SkipOfficialListRetrieval msg
     | OfficialListRetrieved msg (Result Http.Error (List PackageName))
     | LinkedReposRead msg String (Result Node.Error String)
-    | ElmJsonFileRead PackageName Path ParentPath Occurence (Maybe ( InstallState, Path )) (Result Node.Error String)
+    | ElmJsonFileRead PackageName Path ParentPath Occurence (Maybe ( InstallState, Maybe Path )) (Result Node.Error String)
     | LinkPrepareComplete (Maybe Range) (Result ( DependsOn, Git.Error ) InstallState)
     | CloneComplete (Maybe Range) (Result ( DependsOn, Git.Error ) InstallState)
     | CheckoutComplete (Result ( InstallState, Git.Error ) InstallState)
@@ -779,7 +779,7 @@ update config msg model =
                                                                                                             ( model
                                                                                                                 ! [ cmd
                                                                                                                   , (FileSystem.readFileAsString (pathJoin elmJsonFilename) Utf8)
-                                                                                                                        |> Task.attempt (ElmJsonFileRead installState.dependsOn.packageName (pathJoin elmJsonFilename) installState.dependsOn.dependencyPath Subsequent (Just ( installState, pathJoin npmJsonFilename )))
+                                                                                                                        |> Task.attempt (ElmJsonFileRead installState.dependsOn.packageName (pathJoin elmJsonFilename) installState.dependsOn.dependencyPath Subsequent (Just ( installState, Just <| pathJoin npmJsonFilename )))
                                                                                                                   ]
                                                                                                             , msgs
                                                                                                             )
@@ -855,7 +855,7 @@ update config msg model =
                                                     (installState.dependsOn.packageName == elmCorePackageName)
                                                         ? ( model ! [ msgToCmd <| DependentNpmPackageRead installState (Err <| Node.Error "" "") ]
                                                           , ({ model | readingElmJson = Set.insert packageName model.readingElmJson, checkingNpm = Set.insert packageName model.checkingNpm }
-                                                                ! [ Task.attempt (ElmJsonFileRead installState.dependsOn.packageName (pathJoin elmJsonFilename) installState.dependsOn.dependencyPath Subsequent (Just ( installState, pathJoin npmJsonFilename ))) <| FileSystem.readFileAsString (pathJoin elmJsonFilename) Utf8 ]
+                                                                ! [ Task.attempt (ElmJsonFileRead installState.dependsOn.packageName (pathJoin elmJsonFilename) installState.dependsOn.dependencyPath Subsequent (Just ( installState, Nothing ))) <| FileSystem.readFileAsString (pathJoin elmJsonFilename) Utf8 ]
                                                             )
                                                           )
                                                )
@@ -1114,7 +1114,18 @@ update config msg model =
                                                         |> processElmJson config model packageName parentPath readOccurence
                                                         |> (\( ( model, cmd ), msgs ) ->
                                                                 maybeNpmReadInfo
-                                                                    |?> (\( installState, npmJsonPath ) -> ( model ! [ cmd, Task.attempt (DependentNpmPackageRead { installState | maybeElmJson = Just elmJson }) <| FileSystem.readFileAsString npmJsonPath Utf8 ], msgs ))
+                                                                    |?> (\( installState, maybeLinkedNpmJsonPath ) ->
+                                                                            (maybeLinkedNpmJsonPath ?= (getRepoDetails installState).repo.cloneLocation)
+                                                                                |> (\npmJsonPath ->
+                                                                                        ( model
+                                                                                            ! [ cmd
+                                                                                              , Task.attempt (DependentNpmPackageRead { installState | maybeElmJson = Just elmJson }) <|
+                                                                                                    FileSystem.readFileAsString npmJsonPath Utf8
+                                                                                              ]
+                                                                                        , msgs
+                                                                                        )
+                                                                                   )
+                                                                        )
                                                                     ?= ( model ! [ cmd ], msgs )
                                                            )
                                                 )

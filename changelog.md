@@ -81,7 +81,7 @@
 1.2.1 / 2017-11-15
 ==================
 
-##### fixes
+##### Fixes
 * Fixed issue \#12 where the `package-lock.json` file wasn't being updated during `bump`
 * Fixed bug where `package.json` was being read from the master branch instead the checked out version. This was only an issue when a newer version of a library existed that has Native code
 * Updated to latest version of `panosoft/elm-docs` which fixed bug with Table of Contents generation and duplicate entries

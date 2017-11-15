@@ -20,6 +20,7 @@ import Output exposing (..)
 import Node.Error as Node exposing (Error(..))
 import Node.FileSystem as FileSystem
 import Node.Encoding exposing (..)
+import Node.ChildProcess exposing (..)
 import Utils.Ops exposing (..)
 import Utils.Task as Task exposing (..)
 import Utils.Match exposing (..)
@@ -28,7 +29,6 @@ import ElmJson exposing (..)
 import NpmJson exposing (..)
 import Common exposing (..)
 import Console exposing (..)
-import Spawn
 
 
 type alias Config msg =
@@ -244,8 +244,9 @@ installComplete config model installedElmNpmDependencies =
                                                 )
                                             |> Task.andThen
                                                 (\_ ->
-                                                    Spawn.exec ("npm uninstall" +-+ (config.npmProduction ? ( "-production", "" )) +-+ (String.join " " installedElmNpmDependencies)) 0 config.npmSilent
+                                                    spawn ("npm uninstall" +-+ (config.npmProduction ? ( "-production", "" )) +-+ (String.join " " installedElmNpmDependencies)) (spawnOutput config)
                                                         |> Task.mapError Node.message
+                                                        |> Task.andThen (spawnSuccessCheck 0)
                                                 )
                                             |> Task.andThenIf config.testing
                                                 ( \_ ->

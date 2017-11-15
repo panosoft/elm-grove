@@ -25,8 +25,10 @@ import Utils.Tuple as Tuple
 import ElmJson exposing (..)
 import NpmJson exposing (..)
 import Node.Error as Node exposing (Error(..), Code(..))
-import Node.FileSystem as FileSystem
+import Node.FileSystem as FileSystem exposing (FileType(..))
 import Node.Encoding as Encoding exposing (Encoding(..))
+import Node.OperatingSystem exposing (..)
+import Node.ChildProcess exposing (..)
 import Package exposing (..)
 import Output exposing (..)
 import Git exposing (..)
@@ -38,7 +40,6 @@ import Component.Config exposing (..)
 import Docs.Generator as Docs exposing (..)
 import ApiChanges exposing (..)
 import Glob
-import Env
 
 
 type alias Path =
@@ -202,7 +203,7 @@ checkForNewVersions config model =
                         (\packageName ->
                             getRepoLocation elmJson.dependencySources packageName
                                 |> (\repoLocation ->
-                                        Git.clone repoLocation Env.tmpdir
+                                        Git.clone repoLocation tempDirectory
                                             |> Task.andThen
                                                 (\repo ->
                                                     Git.getTags repo
@@ -485,7 +486,7 @@ determineVersionType config releaseScenario =
             (\( repo, latestVersionStr ) ->
                 (latestVersionStr == initVersionStr)
                     ? ( Task.succeed ( InitVersion, Nothing )
-                      , ( pathJoin config [ Env.tmpdir, "head" ], pathJoin config [ Env.tmpdir, "latestVersion" ] )
+                      , ( pathJoin config [ tempDirectory, "head" ], pathJoin config [ tempDirectory, "latestVersion" ] )
                             |> (\( headPath, latestVersionPath ) ->
                                     ( pathJoin config [ headPath, docsJsonFilename ], pathJoin config [ latestVersionPath, docsJsonFilename ] )
                                         |> (\( headFile, latestVersionFile ) ->
@@ -735,11 +736,10 @@ doBump config model =
                                                     model.npmJsonStr
                                                         |?->
                                                             ( Task.succeed ()
-                                                            , \npmJsonStr ->
-                                                                npmJsonStr
-                                                                    |> flip replaceVersion (versionToString newVersion)
-                                                                    |> writeFile (pathJoin config [ config.cwd, config.testing ? ( "test", "" ), npmJsonFilename ])
+                                                            , \_ ->
+                                                                spawn ("npm --no-git-tag-version version" +-+ (versionToString newVersion)) Silent
                                                                     |> Task.mapError Node.message
+                                                                    |> Task.andThen (spawnSuccessCheck 0)
                                                             )
                                                 )
                                             -- Commit doc JSON, docs & json files to repo
@@ -762,14 +762,22 @@ doBump config model =
                                                           )
                                                         |> (\( repoPath, bumpTask ) ->
                                                                 bumpTask
-                                                                    |> Task.andThen (\_ -> Git.getRepo repoPath)
                                                                     |> Task.andThen
-                                                                        (\repo ->
+                                                                        (\_ ->
+                                                                            ( Git.getRepo repoPath
+                                                                            , (FileSystem.exists npmJsonLockFilename
+                                                                                |> Task.mapError Node.message
+                                                                              )
+                                                                            )
+                                                                                |> Task.sequence2
+                                                                        )
+                                                                    |> Task.andThen
+                                                                        (\( repo, npmJsonLockExists ) ->
                                                                             ( model.elmJson, model.npmJsonStr )
                                                                                 |?!**>
                                                                                     ( bugMissing "elmJsonStr"
                                                                                     , always [ elmJsonFilename ]
-                                                                                    , always [ elmJsonFilename, npmJsonFilename ]
+                                                                                    , always <| List.append [ elmJsonFilename, npmJsonFilename ] (npmJsonLockExists ? ( [ npmJsonLockFilename ], [] ))
                                                                                     )
                                                                                 |> (\filesToAdd ->
                                                                                         Glob.find (pathJoin config [ DocGenerator.elmDocsPath, "**", "*" ]) Nothing False
@@ -1063,8 +1071,9 @@ bump config model =
             (\( packageName, versionStr ) ->
                 pathJoin config [ elmPackagesRoot config.testing config.pathSep, packageName, versionStr ]
                     |> (\path ->
-                            FileSystem.isSymlink path
+                            FileSystem.statistics path
                                 |> Task.mapError Node.message
+                                |> Task.andThen (\stats -> Task.succeed (stats.type_ == SymbolicLink))
                                 |> Task.attempt (config.routeToMe << IsSymLinkCheckComplete packageName path)
                        )
             )

@@ -37,6 +37,11 @@ npmJsonFilename =
     "package.json"
 
 
+npmJsonLockFilename : String
+npmJsonLockFilename =
+    "package-lock.json"
+
+
 elmJsonFilename : String
 elmJsonFilename =
     "elm-package.json"

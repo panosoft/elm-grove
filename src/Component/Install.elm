@@ -23,6 +23,9 @@ import Git exposing (..)
 import Node.Error as Node exposing (Error(..))
 import Node.FileSystem as FileSystem
 import Node.Encoding as Encoding exposing (Encoding(..))
+import Node.OperatingSystem exposing (..)
+import Node.Process exposing (..)
+import Node.ChildProcess as ChildProcess exposing (..)
 import Version exposing (..)
 import Output exposing (..)
 import Console exposing (..)
@@ -31,9 +34,7 @@ import Utils.Regex exposing (..)
 import Utils.Tuple as Tuple
 import Package exposing (..)
 import ElmJson exposing (..)
-import Env exposing (..)
 import NpmJson exposing (..)
-import Spawn
 import AppUtils exposing (..)
 import Common exposing (..)
 import Component.Rewriter as Rewriter
@@ -119,6 +120,11 @@ type alias Model =
     , elmJsonIndent : Maybe Int
     , officialElmPackages : Set PackageName
     }
+
+
+env : Dict String String
+env =
+    environment ??= Debug.crash
 
 
 rewriterConfig : Config msg -> Set PackageName -> Rewriter.Config (Msg msg)
@@ -212,7 +218,7 @@ clonePackageTask elmJson parentPackageName model dependsOn =
                                 |> Task.mapError (\_ -> ( dependsOn, "Should never happen" ))
                                 |> Task.andThen
                                     (\_ ->
-                                        Git.clone repoLocation Env.tmpdir
+                                        Git.clone repoLocation tempDirectory
                                             |> Task.andThen
                                                 (\repo ->
                                                     Git.getTags repo
@@ -460,7 +466,7 @@ installOrLink config model =
                                                                         (\_ ->
                                                                             FileSystem.remove packageRootPath
                                                                                 |> Task.andThen (\_ -> FileSystem.mkdirp packageRootPath)
-                                                                                |> Task.andThen (\_ -> FileSystem.makeSymlink linkedRepo.repoLocation installPath "dir")
+                                                                                |> Task.andThen (\_ -> FileSystem.symbolicLink linkedRepo.repoLocation installPath)
                                                                                 |> Task.mapError Node.message
                                                                         )
                                                                     |> Task.attempt (InstallOrLinkComplete packageName versionStr linkedRepo.repoLocation)
@@ -1056,8 +1062,9 @@ update config msg model =
                                     |> Task.mapError (always "Should never happen")
                                     |> Task.andThen
                                         (\_ ->
-                                            Spawn.exec ("npm install" +-+ (config.npmProduction ? ( "-production", "" ))) 0 config.npmSilent
+                                            spawn ("npm install" +-+ (config.npmProduction ? ( "-production", "" ))) (spawnOutput config)
                                                 |> Task.mapError Node.message
+                                                |> Task.andThen (spawnSuccessCheck 0)
                                         )
                                     |> (\task -> ( model ! [ Task.attempt (NpmOperationComplete <| Console.log "\n\n***** Npm Install Complete *****\n") task ], [] ))
                               )

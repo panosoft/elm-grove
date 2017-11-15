@@ -23,7 +23,7 @@ import Output exposing (..)
 import Node.FileSystem as FileSystem
 import Node.Encoding as Encoding exposing (Encoding(..))
 import Node.Error as Node exposing (Error(..), Code(..))
-import Env exposing (..)
+import Node.OperatingSystem exposing (..)
 import Utils.Ops exposing (..)
 import Utils.Json exposing (..)
 import Utils.Task as Task exposing (..)
@@ -187,7 +187,7 @@ operationSuccessful model task =
 
 localOrGlobalPath : Config msg -> Path
 localOrGlobalPath config =
-    config.local |?-> ( Env.homedir, flip (?) ( ".", Env.homedir ) )
+    config.local |?-> ( homeDirectory, flip (?) ( ".", homeDirectory ) )
 
 
 configPath : Config msg -> Path -> Path
@@ -218,7 +218,7 @@ init : Config msg -> msg -> ( Model, Maybe (Cmd msg) )
 init config initializedMsg =
     ( { configFile = Nothing }
     , Just <|
-        (( configPath config ".", configPath config Env.homedir, oldConfigPath config ".", oldConfigPath config Env.homedir )
+        (( configPath config ".", configPath config homeDirectory, oldConfigPath config ".", oldConfigPath config homeDirectory )
             |> (\( localPath, globalPath, oldLocalPath, oldGlobalPath ) ->
                     -- migrate old config filename
                     ( rename oldLocalPath localPath, rename oldGlobalPath globalPath )

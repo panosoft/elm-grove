@@ -7,6 +7,8 @@ module AppUtils
         , writeFile
         , sortedVersions
         , determineJsonIndent
+        , spawnSuccessCheck
+        , spawnOutput
         )
 
 import Task exposing (Task)
@@ -19,6 +21,7 @@ import Common exposing (..)
 import Node.Error as Node exposing (Error(..))
 import Node.FileSystem as FileSystem
 import Node.Encoding as Encoding exposing (Encoding(..))
+import Node.ChildProcess as ChildProcess exposing (..)
 import Git exposing (..)
 import Version exposing (..)
 
@@ -84,3 +87,18 @@ determineJsonIndent json =
                     |> String.length
               )
             )
+
+
+spawnSuccessCheck : Int -> Exit -> Task String ()
+spawnSuccessCheck successCode exit =
+    case exit of
+        Code code ->
+            (code == successCode) ? ( Task.succeed (), Task.fail ("Exited with error code:" +-+ code) )
+
+        Signal sig ->
+            Task.fail ("Child process was terminated with:" +-+ sig)
+
+
+spawnOutput : { config | npmSilent : Bool } -> ChildProcess.Output
+spawnOutput config =
+    config.npmSilent ? ( ChildProcess.Silent, ChildProcess.Verbose )

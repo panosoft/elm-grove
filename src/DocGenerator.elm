@@ -11,12 +11,12 @@ import Task exposing (Task)
 import StringUtils exposing (..)
 import Node.Error as Node exposing (Error(..), Code(..))
 import Node.FileSystem as FileSystem
+import Node.ChildProcess as ChildProcess exposing (..)
 import AppUtils exposing (..)
 import Common exposing (..)
 import Utils.Ops exposing (..)
 import Component.Config exposing (..)
 import Docs.Generator as Docs
-import Spawn
 
 
 type alias Config =
@@ -51,12 +51,14 @@ generateDocsJsonTask : Path -> Path -> GeneratePrep -> Task String ()
 generateDocsJsonTask sourcePath docsJsonPath generatePrep =
     ("cd" +-+ sourcePath +-+ ((generatePrep == GeneratePrepInstallPackages) ? ( "&& grove install", "" )) +-+ "&& elm-make --docs" +-+ docsJsonPath)
         |> (\cmd ->
-                Spawn.exec cmd 0 True
+                spawn cmd Silent
                     |> Task.mapError (\error -> "Elm compilation failure:" +-+ Node.message error)
+                    |> Task.andThen (spawnSuccessCheck 0)
                     |> Task.onError
                         (\error ->
-                            Spawn.exec cmd 0 False
+                            spawn cmd Verbose
                                 |> Task.onError (\_ -> Task.fail error)
+                                |> Task.andThen (spawnSuccessCheck 0)
                         )
            )
 

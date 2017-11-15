@@ -22002,7 +22002,8 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 																													{
 																														ctor: '_Tuple2',
 																														_0: _p104,
-																														_1: pathJoin(_panosoft$elm_grove$Package$npmJsonFilename)
+																														_1: _elm_lang$core$Maybe$Just(
+																															pathJoin(_panosoft$elm_grove$Package$npmJsonFilename))
 																													})),
 																											A2(
 																												_elm_node$core$Node_FileSystem$readFileAsString,
@@ -22314,11 +22315,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 															_p122.dependsOn.dependencyPath,
 															_panosoft$elm_grove$Component_Install$Subsequent,
 															_elm_lang$core$Maybe$Just(
-																{
-																	ctor: '_Tuple2',
-																	_0: _p122,
-																	_1: pathJoin(_panosoft$elm_grove$Package$npmJsonFilename)
-																})),
+																{ctor: '_Tuple2', _0: _p122, _1: _elm_lang$core$Maybe$Nothing})),
 														A2(
 															_elm_node$core$Node_FileSystem$readFileAsString,
 															pathJoin(_panosoft$elm_grove$Package$elmJsonFilename),
@@ -23127,21 +23124,21 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 									'Error:'),
 								_p90._5._0)));
 				} else {
-					var _p165 = _p90._0;
-					var _p164 = _p90._5._0;
+					var _p166 = _p90._0;
+					var _p165 = _p90._5._0;
 					return function (model) {
 						return function (model) {
 							return A2(
 								_panosoft$elm_utils$Utils_Ops_ops['??='],
 								A2(
 									_panosoft$elm_utils$Utils_Ops_ops['|??>'],
-									A2(_panosoft$elm_grove$ElmJson$decodeElmJson, _p90._1, _p164),
+									A2(_panosoft$elm_grove$ElmJson$decodeElmJson, _p90._1, _p165),
 									function (elmJson) {
 										return function (_p156) {
 											var _p157 = _p156;
-											var _p162 = _p157._1;
-											var _p161 = _p157._0._0;
-											var _p160 = _p157._0._1;
+											var _p163 = _p157._1;
+											var _p162 = _p157._0._0;
+											var _p161 = _p157._0._1;
 											return A2(
 												_panosoft$elm_utils$Utils_Ops_ops['?='],
 												A2(
@@ -23149,57 +23146,64 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 													_p90._4,
 													function (_p158) {
 														var _p159 = _p158;
-														return {
-															ctor: '_Tuple2',
-															_0: A2(
-																_elm_lang$core$Platform_Cmd_ops['!'],
-																_p161,
-																{
-																	ctor: '::',
-																	_0: _p160,
-																	_1: {
+														var _p160 = _p159._0;
+														return function (npmJsonPath) {
+															return {
+																ctor: '_Tuple2',
+																_0: A2(
+																	_elm_lang$core$Platform_Cmd_ops['!'],
+																	_p162,
+																	{
 																		ctor: '::',
-																		_0: A2(
-																			_elm_lang$core$Task$attempt,
-																			_panosoft$elm_grove$Component_Install$DependentNpmPackageRead(
-																				_elm_lang$core$Native_Utils.update(
-																					_p159._0,
-																					{
-																						maybeElmJson: _elm_lang$core$Maybe$Just(elmJson)
-																					})),
-																			A2(_elm_node$core$Node_FileSystem$readFileAsString, _p159._1, _elm_node$core$Node_Encoding$Utf8)),
-																		_1: {ctor: '[]'}
-																	}
-																}),
-															_1: _p162
-														};
+																		_0: _p161,
+																		_1: {
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$core$Task$attempt,
+																				_panosoft$elm_grove$Component_Install$DependentNpmPackageRead(
+																					_elm_lang$core$Native_Utils.update(
+																						_p160,
+																						{
+																							maybeElmJson: _elm_lang$core$Maybe$Just(elmJson)
+																						})),
+																				A2(_elm_node$core$Node_FileSystem$readFileAsString, npmJsonPath, _elm_node$core$Node_Encoding$Utf8)),
+																			_1: {ctor: '[]'}
+																		}
+																	}),
+																_1: _p163
+															};
+														}(
+															A2(
+																_panosoft$elm_utils$Utils_Ops_ops['?='],
+																_p159._1,
+																_panosoft$elm_grove$Component_Install$getRepoDetails(_p160).repo.cloneLocation));
 													}),
 												{
 													ctor: '_Tuple2',
 													_0: A2(
 														_elm_lang$core$Platform_Cmd_ops['!'],
-														_p161,
+														_p162,
 														{
 															ctor: '::',
-															_0: _p160,
+															_0: _p161,
 															_1: {ctor: '[]'}
 														}),
-													_1: _p162
+													_1: _p163
 												});
 										}(
-											A6(_panosoft$elm_grove$Component_Install$processElmJson, config, model, _p165, _p90._2, _p90._3, elmJson));
+											A6(_panosoft$elm_grove$Component_Install$processElmJson, config, model, _p166, _p90._2, _p90._3, elmJson));
 									}),
-								function (_p163) {
+								function (_p164) {
 									return A2(
 										_panosoft$elm_grove$Component_Install$operationError,
 										model,
-										_panosoft$elm_grove$Output$errorLog(_p163));
+										_panosoft$elm_grove$Output$errorLog(_p164));
 								});
 						}(
 							_elm_lang$core$Native_Utils.update(
 								model,
 								{
-									readingElmJson: A2(_elm_lang$core$Set$remove, _p165, model.readingElmJson)
+									readingElmJson: A2(_elm_lang$core$Set$remove, _p166, model.readingElmJson)
 								}));
 					}(
 						_elm_lang$core$Native_Utils.update(
@@ -23209,7 +23213,7 @@ var _panosoft$elm_grove$Component_Install$update = F3(
 									A2(
 										_panosoft$elm_utils$Utils_Ops_ops['?='],
 										model.elmJsonIndent,
-										_panosoft$elm_grove$AppUtils$determineJsonIndent(_p164)))
+										_panosoft$elm_grove$AppUtils$determineJsonIndent(_p165)))
 							}));
 				}
 			default:

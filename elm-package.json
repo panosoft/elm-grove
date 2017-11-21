@@ -12,7 +12,7 @@
         "elm-community/list-extra": "6.0.0 <= v < 7.0.0",
         "elm-lang/core": "5.1.1 <= v < 6.0.0",
         "elm-lang/http": "1.0.0 <= v < 2.0.0",
-        "elm-node/core": "2.2.0 <= v < 3.0.0",
+        "elm-node/core": "3.0.0 <= v < 4.0.0",
         "panosoft/elm-docs": "2.0.0 <= v < 3.0.0",
         "panosoft/elm-parent-child-update": "2.0.0 <= v < 3.0.0",
         "panosoft/elm-string-utils": "2.0.0 <= v < 3.0.0",

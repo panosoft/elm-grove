@@ -11893,6 +11893,715 @@ var _panosoft$elm_utils$Utils_Dict$swap = function (dict) {
 				_elm_lang$core$Dict$toList(dict))));
 };
 
+var _panosoft$elm_utils$Utils_Tuple$map9 = F2(
+	function (f, _p0) {
+		var _p1 = _p0;
+		return {
+			ctor: '_Tuple9',
+			_0: f(_p1._0),
+			_1: f(_p1._1),
+			_2: f(_p1._2),
+			_3: f(_p1._3),
+			_4: f(_p1._4),
+			_5: f(_p1._5),
+			_6: f(_p1._6),
+			_7: f(_p1._7),
+			_8: f(_p1._8)
+		};
+	});
+var _panosoft$elm_utils$Utils_Tuple$map8 = F2(
+	function (f, _p2) {
+		var _p3 = _p2;
+		return {
+			ctor: '_Tuple8',
+			_0: f(_p3._0),
+			_1: f(_p3._1),
+			_2: f(_p3._2),
+			_3: f(_p3._3),
+			_4: f(_p3._4),
+			_5: f(_p3._5),
+			_6: f(_p3._6),
+			_7: f(_p3._7)
+		};
+	});
+var _panosoft$elm_utils$Utils_Tuple$map7 = F2(
+	function (f, _p4) {
+		var _p5 = _p4;
+		return {
+			ctor: '_Tuple7',
+			_0: f(_p5._0),
+			_1: f(_p5._1),
+			_2: f(_p5._2),
+			_3: f(_p5._3),
+			_4: f(_p5._4),
+			_5: f(_p5._5),
+			_6: f(_p5._6)
+		};
+	});
+var _panosoft$elm_utils$Utils_Tuple$map6 = F2(
+	function (f, _p6) {
+		var _p7 = _p6;
+		return {
+			ctor: '_Tuple6',
+			_0: f(_p7._0),
+			_1: f(_p7._1),
+			_2: f(_p7._2),
+			_3: f(_p7._3),
+			_4: f(_p7._4),
+			_5: f(_p7._5)
+		};
+	});
+var _panosoft$elm_utils$Utils_Tuple$map5 = F2(
+	function (f, _p8) {
+		var _p9 = _p8;
+		return {
+			ctor: '_Tuple5',
+			_0: f(_p9._0),
+			_1: f(_p9._1),
+			_2: f(_p9._2),
+			_3: f(_p9._3),
+			_4: f(_p9._4)
+		};
+	});
+var _panosoft$elm_utils$Utils_Tuple$map4 = F2(
+	function (f, _p10) {
+		var _p11 = _p10;
+		return {
+			ctor: '_Tuple4',
+			_0: f(_p11._0),
+			_1: f(_p11._1),
+			_2: f(_p11._2),
+			_3: f(_p11._3)
+		};
+	});
+var _panosoft$elm_utils$Utils_Tuple$map3 = F2(
+	function (f, _p12) {
+		var _p13 = _p12;
+		return {
+			ctor: '_Tuple3',
+			_0: f(_p13._0),
+			_1: f(_p13._1),
+			_2: f(_p13._2)
+		};
+	});
+var _panosoft$elm_utils$Utils_Tuple$map2 = F2(
+	function (f, _p14) {
+		var _p15 = _p14;
+		return {
+			ctor: '_Tuple2',
+			_0: f(_p15._0),
+			_1: f(_p15._1)
+		};
+	});
+var _panosoft$elm_utils$Utils_Tuple$secondMap = function (f) {
+	return _elm_lang$core$List$map(
+		function (_p16) {
+			var _p17 = _p16;
+			return {
+				ctor: '_Tuple2',
+				_0: _p17._0,
+				_1: f(_p17._1)
+			};
+		});
+};
+var _panosoft$elm_utils$Utils_Tuple$firstMap = function (f) {
+	return _elm_lang$core$List$map(
+		function (_p18) {
+			var _p19 = _p18;
+			return {
+				ctor: '_Tuple2',
+				_0: f(_p19._0),
+				_1: _p19._1
+			};
+		});
+};
+
+var _panosoft$elm_utils$Utils_Func$compose = F2(
+	function (f2, f1) {
+		return A2(
+			F2(
+				function (x, y) {
+					return function (_p0) {
+						return x(
+							y(_p0));
+					};
+				}),
+			f2,
+			f1);
+	});
+var _panosoft$elm_utils$Utils_Func$compose2 = F3(
+	function (f2, f1, a) {
+		return A2(
+			_panosoft$elm_utils$Utils_Func$compose,
+			f2,
+			f1(a));
+	});
+var _panosoft$elm_utils$Utils_Func$compose3 = F3(
+	function (f2, f1, a) {
+		return A2(
+			_panosoft$elm_utils$Utils_Func$compose2,
+			f2,
+			f1(a));
+	});
+var _panosoft$elm_utils$Utils_Func$compose4 = F3(
+	function (f2, f1, a) {
+		return A2(
+			_panosoft$elm_utils$Utils_Func$compose3,
+			f2,
+			f1(a));
+	});
+var _panosoft$elm_utils$Utils_Func$compose5 = F3(
+	function (f2, f1, a) {
+		return A2(
+			_panosoft$elm_utils$Utils_Func$compose4,
+			f2,
+			f1(a));
+	});
+var _panosoft$elm_utils$Utils_Func$compose6 = F3(
+	function (f2, f1, a) {
+		return A2(
+			_panosoft$elm_utils$Utils_Func$compose5,
+			f2,
+			f1(a));
+	});
+var _panosoft$elm_utils$Utils_Func$compose7 = F3(
+	function (f2, f1, a) {
+		return A2(
+			_panosoft$elm_utils$Utils_Func$compose6,
+			f2,
+			f1(a));
+	});
+var _panosoft$elm_utils$Utils_Func$compose8 = F3(
+	function (f2, f1, a) {
+		return A2(
+			_panosoft$elm_utils$Utils_Func$compose7,
+			f2,
+			f1(a));
+	});
+var _panosoft$elm_utils$Utils_Func$apply = function (p1) {
+	return F2(
+		function (x, y) {
+			return y(x);
+		})(p1);
+};
+var _panosoft$elm_utils$Utils_Func$apply2 = F2(
+	function (p1, p2) {
+		return function (_p1) {
+			return A2(
+				F2(
+					function (x, y) {
+						return y(x);
+					}),
+				p2,
+				A2(_panosoft$elm_utils$Utils_Func$apply, p1, _p1));
+		};
+	});
+var _panosoft$elm_utils$Utils_Func$apply3 = F3(
+	function (p1, p2, p3) {
+		return function (_p2) {
+			return A2(
+				F2(
+					function (x, y) {
+						return y(x);
+					}),
+				p3,
+				A3(_panosoft$elm_utils$Utils_Func$apply2, p1, p2, _p2));
+		};
+	});
+var _panosoft$elm_utils$Utils_Func$apply4 = F4(
+	function (p1, p2, p3, p4) {
+		return function (_p3) {
+			return A2(
+				F2(
+					function (x, y) {
+						return y(x);
+					}),
+				p4,
+				A4(_panosoft$elm_utils$Utils_Func$apply3, p1, p2, p3, _p3));
+		};
+	});
+
+var _panosoft$elm_utils$Utils_Json$resultDecoder = F2(
+	function (errorDecoder, okayDecoder) {
+		return A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (maybeOkay) {
+				return A2(
+					_panosoft$elm_utils$Utils_Ops_ops['?='],
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['|?>'],
+						maybeOkay,
+						function (_p0) {
+							return _elm_lang$core$Json_Decode$succeed(
+								_elm_lang$core$Result$Ok(_p0));
+						}),
+					A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p1) {
+							return _elm_lang$core$Json_Decode$succeed(
+								_elm_lang$core$Result$Err(_p1));
+						},
+						A2(_elm_lang$core$Json_Decode$field, 'error', errorDecoder)));
+			},
+			_elm_lang$core$Json_Decode$maybe(
+				A2(_elm_lang$core$Json_Decode$field, 'okay', okayDecoder)));
+	});
+var _panosoft$elm_utils$Utils_Json$resultDecode = A2(_panosoft$elm_utils$Utils_Func$compose2, _elm_lang$core$Json_Decode$decodeString, _panosoft$elm_utils$Utils_Json$resultDecoder);
+var _panosoft$elm_utils$Utils_Json$resultEncoder = F3(
+	function (errorEncoder, okayEncoder, result) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['??='],
+			A2(
+				_panosoft$elm_utils$Utils_Ops_ops['|??>'],
+				result,
+				function (okay) {
+					return _elm_lang$core$Json_Encode$object(
+						{
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'okay',
+								_1: okayEncoder(okay)
+							},
+							_1: {ctor: '[]'}
+						});
+				}),
+			function (error) {
+				return _elm_lang$core$Json_Encode$object(
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'error',
+							_1: errorEncoder(error)
+						},
+						_1: {ctor: '[]'}
+					});
+			});
+	});
+var _panosoft$elm_utils$Utils_Json$resultEncode = A2(
+	_panosoft$elm_utils$Utils_Func$compose3,
+	_elm_lang$core$Json_Encode$encode(0),
+	_panosoft$elm_utils$Utils_Json$resultEncoder);
+var _panosoft$elm_utils$Utils_Json$decConvertDict = F3(
+	function (valuesConverter, keyDecoder, valueDecoder) {
+		var makeDict = F2(
+			function (keys, values) {
+				return _elm_lang$core$Dict$fromList(
+					A2(
+						_panosoft$elm_utils$Utils_Tuple$secondMap,
+						valuesConverter,
+						A3(
+							_elm_lang$core$List$map2,
+							F2(
+								function (v0, v1) {
+									return {ctor: '_Tuple2', _0: v0, _1: v1};
+								}),
+							keys,
+							values)));
+			});
+		return A3(
+			_elm_lang$core$Json_Decode$map2,
+			makeDict,
+			A2(
+				_elm_lang$core$Json_Decode$field,
+				'keys',
+				_elm_lang$core$Json_Decode$list(keyDecoder)),
+			A2(
+				_elm_lang$core$Json_Decode$field,
+				'values',
+				_elm_lang$core$Json_Decode$list(valueDecoder)));
+	});
+var _panosoft$elm_utils$Utils_Json$decDict = _panosoft$elm_utils$Utils_Json$decConvertDict(_elm_lang$core$Basics$identity);
+var _panosoft$elm_utils$Utils_Json$encDict = F3(
+	function (keyEncoder, valueEncoder, dict) {
+		return _elm_lang$core$Json_Encode$object(
+			{
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'keys',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(
+							_elm_lang$core$List$map,
+							keyEncoder,
+							_elm_lang$core$Dict$keys(dict)))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'values',
+						_1: _elm_lang$core$Json_Encode$list(
+							A2(
+								_elm_lang$core$List$map,
+								valueEncoder,
+								_elm_lang$core$Dict$values(dict)))
+					},
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _panosoft$elm_utils$Utils_Json$encMaybe = F2(
+	function (encoder, maybe) {
+		return A2(
+			_panosoft$elm_utils$Utils_Ops_ops['?='],
+			A2(
+				_panosoft$elm_utils$Utils_Ops_ops['|?>'],
+				maybe,
+				function (just) {
+					return encoder(just);
+				}),
+			_elm_lang$core$Json_Encode$null);
+	});
+var _panosoft$elm_utils$Utils_Json_ops = _panosoft$elm_utils$Utils_Json_ops || {};
+_panosoft$elm_utils$Utils_Json_ops['///'] = F2(
+	function (decoder, $default) {
+		return A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (maybe) {
+				return _elm_lang$core$Json_Decode$succeed(
+					A2(_panosoft$elm_utils$Utils_Ops_ops['?='], maybe, $default));
+			},
+			_elm_lang$core$Json_Decode$maybe(decoder));
+	});
+var _panosoft$elm_utils$Utils_Json_ops = _panosoft$elm_utils$Utils_Json_ops || {};
+_panosoft$elm_utils$Utils_Json_ops['<||'] = _elm_lang$core$Json_Decode$map2(
+	F2(
+		function (x, y) {
+			return x(y);
+		}));
+
+var _panosoft$elm_docs$Docs_SignatureExtractor$getMatchingBracketsInternal = F3(
+	function (chars, count, str) {
+		getMatchingBracketsInternal:
+		while (true) {
+			var _p0 = chars;
+			if (_p0.ctor === '::') {
+				var _p3 = _p0._1;
+				var _p2 = _p0._0;
+				var _p1 = _p2;
+				switch (_p1) {
+					case '{':
+						var _v2 = _p3,
+							_v3 = count + 1,
+							_v4 = A2(_elm_lang$core$Basics_ops['++'], str, _p2);
+						chars = _v2;
+						count = _v3;
+						str = _v4;
+						continue getMatchingBracketsInternal;
+					case '}':
+						return A2(
+							_panosoft$elm_utils$Utils_Ops_ops['?'],
+							_elm_lang$core$Native_Utils.eq(count - 1, 0),
+							{
+								ctor: '_Tuple2',
+								_0: A2(_elm_lang$core$Basics_ops['++'], str, _p2),
+								_1: A3(
+									_panosoft$elm_docs$Docs_SignatureExtractor$getMatchingBracketsInternal,
+									_p3,
+									count - 1,
+									A2(_elm_lang$core$Basics_ops['++'], str, _p2))
+							});
+					default:
+						var _v5 = _p3,
+							_v6 = count,
+							_v7 = A2(_elm_lang$core$Basics_ops['++'], str, _p1);
+						chars = _v5;
+						count = _v6;
+						str = _v7;
+						continue getMatchingBracketsInternal;
+				}
+			} else {
+				return str;
+			}
+		}
+	});
+var _panosoft$elm_docs$Docs_SignatureExtractor$getMatchingBrackets = function (s) {
+	return A3(
+		_panosoft$elm_docs$Docs_SignatureExtractor$getMatchingBracketsInternal,
+		A2(_elm_lang$core$String$split, '', s),
+		0,
+		'');
+};
+var _panosoft$elm_docs$Docs_SignatureExtractor$getSignatures = function (path) {
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (code) {
+			return function (code) {
+				return _elm_lang$core$Task$succeed(
+					A2(
+						_elm_lang$core$Dict$union,
+						_elm_lang$core$Dict$fromList(
+							A2(
+								_elm_lang$core$List$map,
+								function (_p4) {
+									var _p5 = _p4;
+									return A2(
+										F2(
+											function (v0, v1) {
+												return {ctor: '_Tuple2', _0: v0, _1: v1};
+											}),
+										_p5._0,
+										A3(
+											_panosoft$elm_utils$Utils_Regex$replaceAll,
+											'†',
+											'\n',
+											A3(
+												_panosoft$elm_utils$Utils_Regex$replaceFirst,
+												'†+[^†]+$',
+												'†',
+												A3(_panosoft$elm_utils$Utils_Regex$replaceFirst, '†\\s*[a-z][_A-Za-z0-9]*\\s*:.+?†\\s*[a-z][_A-Za-z0-9]*\\s*=', '', _p5._1))));
+								},
+								A2(
+									_elm_lang$core$List$map,
+									_panosoft$elm_utils$Utils_Match$getSubmatches2,
+									A3(
+										_elm_lang$core$Regex$find,
+										_elm_lang$core$Regex$All,
+										_elm_lang$core$Regex$regex('†type\\s([A-Z][_A-Za-z0-9]*)\\s.+?(\\s*=.+?)(?:$|(?=†\\s*[a-z][_A-Za-z0-9]*\\s*=)|(?=†\\s*type\\s+(?:alias\\s+)?[A-Z]))'),
+										code)))),
+						A2(
+							_elm_lang$core$Dict$union,
+							_elm_lang$core$Dict$fromList(
+								A2(
+									_elm_lang$core$List$map,
+									function (_p6) {
+										var _p7 = _p6;
+										return A2(
+											F2(
+												function (v0, v1) {
+													return {ctor: '_Tuple2', _0: v0, _1: v1};
+												}),
+											_p7._0,
+											A3(
+												_panosoft$elm_utils$Utils_Regex$replaceAll,
+												'†',
+												'\n',
+												_panosoft$elm_docs$Docs_SignatureExtractor$getMatchingBrackets(_p7._1)));
+									},
+									A2(
+										_elm_lang$core$List$map,
+										_panosoft$elm_utils$Utils_Match$getSubmatches2,
+										A3(
+											_elm_lang$core$Regex$find,
+											_elm_lang$core$Regex$All,
+											_elm_lang$core$Regex$regex('†type\\s+alias\\s+([A-Z][_A-Za-z0-9]*)\\s.+?=(.+?\\{.+?)(?:[=$]|(?=†\\s*type\\s+alias\\s+[A-Z]))'),
+											code)))),
+							function (valueNames) {
+								return _elm_lang$core$Dict$fromList(
+									A2(
+										_elm_lang$core$List$map,
+										function (_p8) {
+											var _p9 = _p8;
+											return {
+												ctor: '_Tuple2',
+												_0: _p9._0,
+												_1: A3(
+													_panosoft$elm_utils$Utils_Regex$replaceAll,
+													'†',
+													'\n',
+													A2(_panosoft$elm_utils$Utils_Ops_ops['?='], _p9._1, 'should never happen'))
+											};
+										},
+										A2(
+											_elm_lang$core$List$filter,
+											function (_p10) {
+												var _p11 = _p10;
+												return !_elm_lang$core$Native_Utils.eq(_p11._1, _elm_lang$core$Maybe$Nothing);
+											},
+											A2(
+												_elm_lang$core$List$map,
+												function (valueName) {
+													return {
+														ctor: '_Tuple2',
+														_0: valueName,
+														_1: A2(
+															_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+															_elm_lang$core$List$head(
+																A3(
+																	_elm_lang$core$Regex$find,
+																	_elm_lang$core$Regex$AtMost(1),
+																	_elm_lang$core$Regex$regex(
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			valueName,
+																			A2(_elm_lang$core$Basics_ops['++'], '\\s?:\\s?(.+?)', valueName))),
+																	code)),
+															{
+																ctor: '_Tuple2',
+																_0: _elm_lang$core$Maybe$Nothing,
+																_1: function (_p12) {
+																	return _elm_lang$core$Maybe$Just(
+																		_panosoft$elm_utils$Utils_Match$getSubmatches1(_p12));
+																}
+															})
+													};
+												},
+												valueNames))));
+							}(
+								A2(
+									_elm_lang$core$List$map,
+									_panosoft$elm_utils$Utils_Match$getSubmatches1,
+									A3(
+										_elm_lang$core$Regex$find,
+										_elm_lang$core$Regex$All,
+										_elm_lang$core$Regex$regex('†([a-z][_A-Za-z0-9]*)\\s?:'),
+										code))))));
+			}(
+				A3(
+					_panosoft$elm_utils$Utils_Regex$replaceAll,
+					'{-.+?-}',
+					'',
+					A3(
+						_panosoft$elm_utils$Utils_Regex$replaceAll,
+						'//.+?†',
+						'',
+						A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\n', '†', code))));
+		},
+		A2(
+			_elm_lang$core$Task$mapError,
+			_elm_node$core$Node_Error$message,
+			A2(_elm_node$core$Node_FileSystem$readFileAsString, path, _elm_node$core$Node_Encoding$Utf8)));
+};
+var _panosoft$elm_docs$Docs_SignatureExtractor$getModuleSignatures = F2(
+	function (modulePaths, moduleName) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (signatures) {
+				return _elm_lang$core$Task$succeed(
+					A3(_elm_lang$core$Dict$insert, moduleName, signatures, _elm_lang$core$Dict$empty));
+			},
+			A2(
+				_panosoft$elm_utils$Utils_Ops_ops['|?->'],
+				A2(_elm_lang$core$Dict$get, moduleName, modulePaths),
+				{
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty),
+					_1: _panosoft$elm_docs$Docs_SignatureExtractor$getSignatures
+				}));
+	});
+var _panosoft$elm_docs$Docs_SignatureExtractor$SourceInfo = F2(
+	function (a, b) {
+		return {directories: a, moduleNames: b};
+	});
+var _panosoft$elm_docs$Docs_SignatureExtractor$sourceInfoDecoder = A2(
+	_panosoft$elm_utils$Utils_Json_ops['<||'],
+	A2(
+		_panosoft$elm_utils$Utils_Json_ops['<||'],
+		_elm_lang$core$Json_Decode$succeed(_panosoft$elm_docs$Docs_SignatureExtractor$SourceInfo),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'source-directories',
+			_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string))),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'exposed-modules',
+		_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)));
+var _panosoft$elm_docs$Docs_SignatureExtractor$getSourceCodeFilenames = function (path) {
+	return A2(
+		_elm_lang$core$Task$andThen,
+		function (json) {
+			return A2(
+				_panosoft$elm_utils$Utils_Ops_ops['|??->'],
+				A2(_elm_lang$core$Json_Decode$decodeString, _panosoft$elm_docs$Docs_SignatureExtractor$sourceInfoDecoder, json),
+				{
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Task$fail,
+					_1: function (sourceInfo) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (_p13) {
+								return _elm_lang$core$Task$succeed(
+									_elm_lang$core$Dict$fromList(
+										A2(_elm_lang$core$List$filterMap, _elm_lang$core$Basics$identity, _p13)));
+							},
+							_elm_lang$core$Task$sequence(
+								_elm_lang$core$List$concat(
+									A2(
+										_elm_lang$core$List$map,
+										function (directory) {
+											return A2(
+												_elm_lang$core$List$map,
+												function (moduleName) {
+													return function (path) {
+														return A2(
+															_elm_lang$core$Task$andThen,
+															function (exists) {
+																return _elm_lang$core$Task$succeed(
+																	A2(
+																		_panosoft$elm_utils$Utils_Ops_ops['?'],
+																		exists,
+																		{
+																			ctor: '_Tuple2',
+																			_0: _elm_lang$core$Maybe$Just(
+																				{ctor: '_Tuple2', _0: moduleName, _1: path}),
+																			_1: _elm_lang$core$Maybe$Nothing
+																		}));
+															},
+															A2(
+																_elm_lang$core$Task$mapError,
+																function (error) {
+																	return A2(
+																		_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																		A2(
+																			_panosoft$elm_string_utils$StringUtils_ops['+-+'],
+																			A2(_panosoft$elm_string_utils$StringUtils_ops['+-+'], 'Unable to check existence of', path),
+																			'Error:'),
+																		_elm_node$core$Node_Error$message(error));
+																},
+																_elm_node$core$Node_FileSystem$exists(path)));
+													}(
+														_elm_node$core$Node_Path$join(
+															_elm_lang$core$List$reverse(
+																A3(
+																	_elm_lang$core$Basics$flip,
+																	F2(
+																		function (x, y) {
+																			return {ctor: '::', _0: x, _1: y};
+																		}),
+																	{
+																		ctor: '::',
+																		_0: directory,
+																		_1: {
+																			ctor: '::',
+																			_0: path,
+																			_1: {ctor: '[]'}
+																		}
+																	},
+																	A3(
+																		_elm_lang$core$Basics$flip,
+																		F2(
+																			function (x, y) {
+																				return A2(_elm_lang$core$Basics_ops['++'], x, y);
+																			}),
+																		'.elm',
+																		A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\.', _elm_node$core$Node_Path$separator, moduleName))))));
+												},
+												sourceInfo.moduleNames);
+										},
+										sourceInfo.directories))));
+					}
+				});
+		},
+		A2(
+			_elm_lang$core$Task$mapError,
+			_elm_node$core$Node_Error$message,
+			A2(
+				_elm_node$core$Node_FileSystem$readFileAsString,
+				_elm_node$core$Node_Path$join(
+					{
+						ctor: '::',
+						_0: path,
+						_1: {
+							ctor: '::',
+							_0: 'elm-package.json',
+							_1: {ctor: '[]'}
+						}
+					}),
+				_elm_node$core$Node_Encoding$Utf8)));
+};
+
 var _panosoft$elm_docs$Docs_Generator$space = function (number) {
 	return A2(
 		_elm_lang$core$String$join,
@@ -11967,8 +12676,8 @@ var _panosoft$elm_docs$Docs_Generator$makeTableOfContents = F3(
 					return _elm_lang$core$Native_Utils.crash(
 						'Docs.Generator',
 						{
-							start: {line: 173, column: 21},
-							end: {line: 173, column: 32}
+							start: {line: 192, column: 21},
+							end: {line: 192, column: 32}
 						})('BUG: non-unique name');
 				},
 				_1: function (dict) {
@@ -12107,164 +12816,167 @@ var _panosoft$elm_docs$Docs_Generator$bold = function (s) {
 			A3(_panosoft$elm_utils$Utils_Regex$replaceAll, '\\*', '\\*', s),
 			'**'));
 };
-var _panosoft$elm_docs$Docs_Generator$aliasSignature = function (alias_) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		function (_p14) {
-			return _panosoft$elm_docs$Docs_Generator$definitionHeader(
-				_panosoft$elm_docs$Docs_Generator$bold(_p14));
-		}(
-			A2(_elm_lang$core$Basics_ops['++'], 'type alias ', alias_.name)),
-		_panosoft$elm_docs$Docs_Generator$elmCode(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
+var _panosoft$elm_docs$Docs_Generator$aliasSignature = F2(
+	function (signatures, alias_) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			function (_p14) {
+				return _panosoft$elm_docs$Docs_Generator$definitionHeader(
+					_panosoft$elm_docs$Docs_Generator$bold(_p14));
+			}(
+				A2(_elm_lang$core$Basics_ops['++'], 'type alias ', alias_.name)),
+			_panosoft$elm_docs$Docs_Generator$elmCode(
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					'type alias ',
 					A2(
 						_elm_lang$core$Basics_ops['++'],
-						alias_.name,
+						'type alias ',
 						A2(
 							_elm_lang$core$Basics_ops['++'],
-							' ',
+							alias_.name,
 							A2(
 								_elm_lang$core$Basics_ops['++'],
-								A2(_elm_lang$core$String$join, ' ', alias_.args),
-								A2(_elm_lang$core$Basics_ops['++'], ' =', _panosoft$elm_docs$Docs_Generator$newLine))))),
-				A2(_elm_lang$core$Basics_ops['++'], _panosoft$elm_docs$Docs_Generator$tab, alias_.type_))));
-};
-var _panosoft$elm_docs$Docs_Generator$aliasToMarkdown = function (alias_) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_panosoft$elm_docs$Docs_Generator$aliasSignature(alias_),
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'\n\n',
-			_elm_lang$core$String$trim(alias_.comment)));
-};
-var _panosoft$elm_docs$Docs_Generator$unionSignature = function (union) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		function (_p15) {
-			return _panosoft$elm_docs$Docs_Generator$definitionHeader(
-				_panosoft$elm_docs$Docs_Generator$bold(_p15));
-		}(
-			A2(_elm_lang$core$Basics_ops['++'], 'type ', union.name)),
-		_panosoft$elm_docs$Docs_Generator$elmCode(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'type ',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						union.name,
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							' ',
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								A2(_elm_lang$core$String$join, ' ', union.args),
-								_panosoft$elm_docs$Docs_Generator$newLine)))),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_panosoft$elm_docs$Docs_Generator$tab,
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						'= ',
-						A2(
-							_elm_lang$core$String$join,
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_panosoft$elm_docs$Docs_Generator$newLine,
-								A2(_elm_lang$core$Basics_ops['++'], _panosoft$elm_docs$Docs_Generator$tab, '| ')),
-							A2(_elm_lang$core$List$map, _panosoft$elm_docs$Docs_Generator$caseToMarkdown, union.tags)))))));
-};
-var _panosoft$elm_docs$Docs_Generator$unionToMarkdown = function (union) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_panosoft$elm_docs$Docs_Generator$unionSignature(union),
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'\n\n',
-			_elm_lang$core$String$trim(union.comment)));
-};
-var _panosoft$elm_docs$Docs_Generator$valueSignature = function (value) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		function (_p16) {
-			return _panosoft$elm_docs$Docs_Generator$definitionHeader(
-				_panosoft$elm_docs$Docs_Generator$bold(_p16));
-		}(
-			_panosoft$elm_docs$Docs_Generator$operatorize(value.name)),
-		_panosoft$elm_docs$Docs_Generator$elmCode(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_panosoft$elm_docs$Docs_Generator$operatorize(value.name),
-				A2(_elm_lang$core$Basics_ops['++'], ' : ', value.type_))));
-};
-var _panosoft$elm_docs$Docs_Generator$valueToMarkdown = function (value) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_panosoft$elm_docs$Docs_Generator$valueSignature(value),
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'\n\n',
-			_elm_lang$core$String$trim(value.comment)));
-};
-var _panosoft$elm_docs$Docs_Generator$processComments = function (_p17) {
-	var _p18 = _p17;
-	var _p23 = _p18.comment;
-	return function (pageDict) {
-		return A4(
-			_elm_lang$core$Regex$replace,
-			_elm_lang$core$Regex$All,
-			_panosoft$elm_docs$Docs_Generator$docsRegex,
-			function (match) {
-				return function (names) {
-					return function (tableOfContents) {
-						return A2(
-							_elm_lang$core$Basics_ops['++'],
-							tableOfContents,
-							A2(
-								_elm_lang$core$String$join,
-								'\n\n---\n\n',
+								' ',
 								A2(
-									_elm_lang$core$List$map,
-									function (name) {
-										return function (name) {
-											return A2(
-												_elm_lang$core$Maybe$withDefault,
-												A2(_elm_lang$core$Basics_ops['++'], name, ' : Not Found!!!'),
-												_elm_lang$core$List$head(
-													_elm_community$maybe_extra$Maybe_Extra$values(
-														{
-															ctor: '::',
-															_0: A2(
-																_elm_lang$core$Maybe$map,
-																_panosoft$elm_docs$Docs_Generator$aliasToMarkdown,
-																A2(
-																	_elm_community$list_extra$List_Extra$find,
-																	function (_p19) {
-																		return A2(
-																			F2(
-																				function (x, y) {
-																					return _elm_lang$core$Native_Utils.eq(x, y);
-																				}),
-																			name,
-																			function (_) {
-																				return _.name;
-																			}(_p19));
-																	},
-																	_p18.aliases)),
-															_1: {
+									_elm_lang$core$Basics_ops['++'],
+									A2(_elm_lang$core$String$join, ' ', alias_.args),
+									' =')))),
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?='],
+						A2(_elm_lang$core$Dict$get, alias_.name, signatures),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_panosoft$elm_docs$Docs_Generator$newLine,
+							A2(_elm_lang$core$Basics_ops['++'], _panosoft$elm_docs$Docs_Generator$tab, alias_.type_))))));
+	});
+var _panosoft$elm_docs$Docs_Generator$aliasToMarkdown = F2(
+	function (signatures, alias_) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(_panosoft$elm_docs$Docs_Generator$aliasSignature, signatures, alias_),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'\n\n',
+				_elm_lang$core$String$trim(alias_.comment)));
+	});
+var _panosoft$elm_docs$Docs_Generator$unionSignature = F2(
+	function (signatures, union) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			function (_p15) {
+				return _panosoft$elm_docs$Docs_Generator$definitionHeader(
+					_panosoft$elm_docs$Docs_Generator$bold(_p15));
+			}(
+				A2(_elm_lang$core$Basics_ops['++'], 'type ', union.name)),
+			_panosoft$elm_docs$Docs_Generator$elmCode(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'type ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							union.name,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								' ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									A2(_elm_lang$core$String$join, ' ', union.args),
+									_panosoft$elm_docs$Docs_Generator$newLine)))),
+					A2(
+						_panosoft$elm_utils$Utils_Ops_ops['?='],
+						A2(_elm_lang$core$Dict$get, union.name, signatures),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_panosoft$elm_docs$Docs_Generator$tab,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'= ',
+								A2(
+									_elm_lang$core$String$join,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_panosoft$elm_docs$Docs_Generator$newLine,
+										A2(_elm_lang$core$Basics_ops['++'], _panosoft$elm_docs$Docs_Generator$tab, '| ')),
+									A2(_elm_lang$core$List$map, _panosoft$elm_docs$Docs_Generator$caseToMarkdown, union.tags))))))));
+	});
+var _panosoft$elm_docs$Docs_Generator$unionToMarkdown = F2(
+	function (signatures, union) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(_panosoft$elm_docs$Docs_Generator$unionSignature, signatures, union),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'\n\n',
+				_elm_lang$core$String$trim(union.comment)));
+	});
+var _panosoft$elm_docs$Docs_Generator$valueSignature = F2(
+	function (signatures, value) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			function (_p16) {
+				return _panosoft$elm_docs$Docs_Generator$definitionHeader(
+					_panosoft$elm_docs$Docs_Generator$bold(_p16));
+			}(
+				_panosoft$elm_docs$Docs_Generator$operatorize(value.name)),
+			_panosoft$elm_docs$Docs_Generator$elmCode(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_panosoft$elm_docs$Docs_Generator$operatorize(value.name),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						' : ',
+						A2(
+							_panosoft$elm_utils$Utils_Ops_ops['?='],
+							A2(_elm_lang$core$Dict$get, value.name, signatures),
+							value.type_)))));
+	});
+var _panosoft$elm_docs$Docs_Generator$valueToMarkdown = F2(
+	function (signatures, value) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(_panosoft$elm_docs$Docs_Generator$valueSignature, signatures, value),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'\n\n',
+				_elm_lang$core$String$trim(value.comment)));
+	});
+var _panosoft$elm_docs$Docs_Generator$processComments = F2(
+	function (signatures, _p17) {
+		var _p18 = _p17;
+		var _p23 = _p18.comment;
+		return function (pageDict) {
+			return A4(
+				_elm_lang$core$Regex$replace,
+				_elm_lang$core$Regex$All,
+				_panosoft$elm_docs$Docs_Generator$docsRegex,
+				function (match) {
+					return function (names) {
+						return function (tableOfContents) {
+							return A2(
+								_elm_lang$core$Basics_ops['++'],
+								tableOfContents,
+								A2(
+									_elm_lang$core$String$join,
+									'\n\n---\n\n',
+									A2(
+										_elm_lang$core$List$map,
+										function (name) {
+											return function (name) {
+												return A2(
+													_elm_lang$core$Maybe$withDefault,
+													A2(_elm_lang$core$Basics_ops['++'], name, ' : Not Found!!!'),
+													_elm_lang$core$List$head(
+														_elm_community$maybe_extra$Maybe_Extra$values(
+															{
 																ctor: '::',
 																_0: A2(
 																	_elm_lang$core$Maybe$map,
-																	_panosoft$elm_docs$Docs_Generator$unionToMarkdown,
+																	_panosoft$elm_docs$Docs_Generator$aliasToMarkdown(signatures),
 																	A2(
 																		_elm_community$list_extra$List_Extra$find,
-																		function (_p20) {
+																		function (_p19) {
 																			return A2(
 																				F2(
 																					function (x, y) {
@@ -12273,17 +12985,17 @@ var _panosoft$elm_docs$Docs_Generator$processComments = function (_p17) {
 																				name,
 																				function (_) {
 																					return _.name;
-																				}(_p20));
+																				}(_p19));
 																		},
-																		_p18.unions)),
+																		_p18.aliases)),
 																_1: {
 																	ctor: '::',
 																	_0: A2(
 																		_elm_lang$core$Maybe$map,
-																		_panosoft$elm_docs$Docs_Generator$valueToMarkdown,
+																		_panosoft$elm_docs$Docs_Generator$unionToMarkdown(signatures),
 																		A2(
 																			_elm_community$list_extra$List_Extra$find,
-																			function (_p21) {
+																			function (_p20) {
 																				return A2(
 																					F2(
 																						function (x, y) {
@@ -12292,114 +13004,140 @@ var _panosoft$elm_docs$Docs_Generator$processComments = function (_p17) {
 																					name,
 																					function (_) {
 																						return _.name;
-																					}(_p21));
+																					}(_p20));
 																			},
-																			_p18.values)),
-																	_1: {ctor: '[]'}
+																			_p18.unions)),
+																	_1: {
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$core$Maybe$map,
+																			_panosoft$elm_docs$Docs_Generator$valueToMarkdown(signatures),
+																			A2(
+																				_elm_community$list_extra$List_Extra$find,
+																				function (_p21) {
+																					return A2(
+																						F2(
+																							function (x, y) {
+																								return _elm_lang$core$Native_Utils.eq(x, y);
+																							}),
+																						name,
+																						function (_) {
+																							return _.name;
+																						}(_p21));
+																				},
+																				_p18.values)),
+																		_1: {ctor: '[]'}
+																	}
 																}
-															}
-														})));
-										}(
-											A3(
-												_panosoft$elm_utils$Utils_Regex$replaceFirst,
-												'\\)$',
-												'',
-												A3(_panosoft$elm_utils$Utils_Regex$replaceFirst, '^\\(', '', name)));
-									},
-									names)));
-					}(
-						A3(_panosoft$elm_docs$Docs_Generator$makeTableOfContents, pageDict, match.index, names));
-				}(
-					_elm_community$list_extra$List_Extra$unique(
-						A3(
-							_elm_lang$core$Regex$split,
-							_elm_lang$core$Regex$All,
-							_elm_lang$core$Regex$regex('\\s*,\\s*'),
-							A4(
-								_elm_lang$core$Regex$replace,
-								_elm_lang$core$Regex$All,
-								_elm_lang$core$Regex$regex('\\@docs\\s*'),
-								_elm_lang$core$Basics$always(''),
-								match.match))));
-			},
-			_elm_lang$core$String$trim(_p23));
-	}(
-		A3(
-			_elm_lang$core$List$foldl,
-			F2(
-				function (match, dict) {
-					return A2(
-						_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
-						_panosoft$elm_utils$Utils_Match$extract1(match),
-						{
-							ctor: '_Tuple2',
-							_0: function (_p22) {
-								return _elm_lang$core$Native_Utils.crash(
-									'Docs.Generator',
-									{
-										start: {line: 199, column: 33},
-										end: {line: 199, column: 44}
-									})('BUG: bad regex');
-							},
-							_1: A2(
-								_elm_lang$core$Basics$flip,
-								F2(
-									function (x, y) {
-										return A2(_panosoft$elm_utils$Utils_Ops_ops['|?->'], x, y);
-									}),
-								{
-									ctor: '_Tuple2',
-									_0: dict,
-									_1: function (matchStr) {
-										return A3(
-											_elm_lang$core$List$foldl,
-											F2(
-												function (name, dict) {
-													return A3(
-														_elm_lang$core$Dict$insert,
-														A2(_panosoft$elm_docs$Docs_Generator$makeLinkName, dict, name),
-														{ctor: '_Tuple2', _0: name, _1: match.index},
-														dict);
-												}),
-											dict,
-											_elm_community$list_extra$List_Extra$unique(
+															})));
+											}(
 												A3(
-													_elm_lang$core$Regex$split,
-													_elm_lang$core$Regex$All,
-													_elm_lang$core$Regex$regex('\\s*,\\s*'),
-													A4(
-														_elm_lang$core$Regex$replace,
-														_elm_lang$core$Regex$All,
-														_elm_lang$core$Regex$regex('\\@docs\\s*'),
-														_elm_lang$core$Basics$always(''),
-														matchStr))));
-									}
-								})
-						});
-				}),
-			_elm_lang$core$Dict$empty,
+													_panosoft$elm_utils$Utils_Regex$replaceFirst,
+													'\\)$',
+													'',
+													A3(_panosoft$elm_utils$Utils_Regex$replaceFirst, '^\\(', '', name)));
+										},
+										names)));
+						}(
+							A3(_panosoft$elm_docs$Docs_Generator$makeTableOfContents, pageDict, match.index, names));
+					}(
+						_elm_community$list_extra$List_Extra$unique(
+							A3(
+								_elm_lang$core$Regex$split,
+								_elm_lang$core$Regex$All,
+								_elm_lang$core$Regex$regex('\\s*,\\s*'),
+								A4(
+									_elm_lang$core$Regex$replace,
+									_elm_lang$core$Regex$All,
+									_elm_lang$core$Regex$regex('\\@docs\\s*'),
+									_elm_lang$core$Basics$always(''),
+									match.match))));
+				},
+				_elm_lang$core$String$trim(_p23));
+		}(
 			A3(
-				_elm_lang$core$Regex$find,
-				_elm_lang$core$Regex$All,
-				_panosoft$elm_docs$Docs_Generator$docsRegex,
-				_elm_lang$core$String$trim(_p23))));
-};
-var _panosoft$elm_docs$Docs_Generator$moduleToMarkdown = function (module_) {
-	return {
-		ctor: '_Tuple2',
-		_0: module_.name,
-		_1: A2(
-			_elm_lang$core$Basics_ops['++'],
-			A2(
+				_elm_lang$core$List$foldl,
+				F2(
+					function (match, dict) {
+						return A2(
+							_panosoft$elm_utils$Utils_Ops_ops['|?!->'],
+							_panosoft$elm_utils$Utils_Match$extract1(match),
+							{
+								ctor: '_Tuple2',
+								_0: function (_p22) {
+									return _elm_lang$core$Native_Utils.crash(
+										'Docs.Generator',
+										{
+											start: {line: 218, column: 33},
+											end: {line: 218, column: 44}
+										})('BUG: bad regex');
+								},
+								_1: A2(
+									_elm_lang$core$Basics$flip,
+									F2(
+										function (x, y) {
+											return A2(_panosoft$elm_utils$Utils_Ops_ops['|?->'], x, y);
+										}),
+									{
+										ctor: '_Tuple2',
+										_0: dict,
+										_1: function (matchStr) {
+											return A3(
+												_elm_lang$core$List$foldl,
+												F2(
+													function (name, dict) {
+														return A3(
+															_elm_lang$core$Dict$insert,
+															A2(_panosoft$elm_docs$Docs_Generator$makeLinkName, dict, name),
+															{ctor: '_Tuple2', _0: name, _1: match.index},
+															dict);
+													}),
+												dict,
+												_elm_community$list_extra$List_Extra$unique(
+													A3(
+														_elm_lang$core$Regex$split,
+														_elm_lang$core$Regex$All,
+														_elm_lang$core$Regex$regex('\\s*,\\s*'),
+														A4(
+															_elm_lang$core$Regex$replace,
+															_elm_lang$core$Regex$All,
+															_elm_lang$core$Regex$regex('\\@docs\\s*'),
+															_elm_lang$core$Basics$always(''),
+															matchStr))));
+										}
+									})
+							});
+					}),
+				_elm_lang$core$Dict$empty,
+				A3(
+					_elm_lang$core$Regex$find,
+					_elm_lang$core$Regex$All,
+					_panosoft$elm_docs$Docs_Generator$docsRegex,
+					_elm_lang$core$String$trim(_p23))));
+	});
+var _panosoft$elm_docs$Docs_Generator$moduleToMarkdown = F2(
+	function (signatures, module_) {
+		return {
+			ctor: '_Tuple2',
+			_0: module_.name,
+			_1: A2(
 				_elm_lang$core$Basics_ops['++'],
-				'# ',
-				A2(_elm_lang$core$Basics_ops['++'], module_.name, '\n\n')),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_panosoft$elm_docs$Docs_Generator$processComments(module_),
-				'\n\n'))
-	};
-};
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'# ',
+					A2(_elm_lang$core$Basics_ops['++'], module_.name, '\n\n')),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					A2(
+						_panosoft$elm_docs$Docs_Generator$processComments,
+						A2(
+							_panosoft$elm_utils$Utils_Ops_ops['?='],
+							A2(_elm_lang$core$Dict$get, module_.name, signatures),
+							_elm_lang$core$Dict$empty),
+						module_),
+					'\n\n'))
+		};
+	});
 var _panosoft$elm_docs$Docs_Generator$Alias = F4(
 	function (a, b, c, d) {
 		return {name: a, comment: b, args: c, type_: d};
@@ -12672,59 +13410,78 @@ var _panosoft$elm_docs$Docs_Generator$generate = F3(
 	function (pathSep, source, destination) {
 		return A2(
 			_elm_lang$core$Task$andThen,
-			function (files) {
+			function (sourcePaths) {
 				return A2(
 					_elm_lang$core$Task$andThen,
 					function (_p35) {
 						return _elm_lang$core$Task$succeed(
 							{ctor: '_Tuple0'});
 					},
-					_elm_lang$core$Task$sequence(
-						A2(
-							_elm_lang$core$List$map,
-							function (file) {
-								return A2(
-									_elm_lang$core$Task$mapError,
-									function (_p36) {
-										return 'File write error';
-									},
-									A4(
-										_elm_node$core$Node_FileSystem$writeFileFromString,
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											destination,
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												pathSep,
+					A2(
+						_elm_lang$core$Task$andThen,
+						function (files) {
+							return _elm_lang$core$Task$sequence(
+								A2(
+									_elm_lang$core$List$map,
+									function (file) {
+										return A2(
+											_elm_lang$core$Task$mapError,
+											function (_p36) {
+												return 'File write error';
+											},
+											A4(
+												_elm_node$core$Node_FileSystem$writeFileFromString,
 												A2(
 													_elm_lang$core$Basics_ops['++'],
-													_elm_lang$core$Tuple$first(file),
-													'.md'))),
-										_elm_node$core$Node_FileSystem$defaultMode,
-										_elm_node$core$Node_FileSystem$defaultEncoding,
-										_elm_lang$core$Tuple$second(file)));
-							},
-							files)));
-			},
-			A2(
-				_elm_lang$core$Task$andThen,
-				function (content) {
-					return A3(
-						_elm_community$result_extra$Result_Extra$unpack,
-						_elm_lang$core$Task$fail,
-						_elm_lang$core$Task$succeed,
+													destination,
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														pathSep,
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															_elm_lang$core$Tuple$first(file),
+															'.md'))),
+												_elm_node$core$Node_FileSystem$defaultMode,
+												_elm_node$core$Node_FileSystem$defaultEncoding,
+												_elm_lang$core$Tuple$second(file)));
+									},
+									files));
+						},
 						A2(
-							_elm_lang$core$Result$map,
-							_elm_lang$core$List$map(_panosoft$elm_docs$Docs_Generator$moduleToMarkdown),
+							_elm_lang$core$Task$andThen,
+							function (content) {
+								return A3(
+									_elm_community$result_extra$Result_Extra$unpack,
+									_elm_lang$core$Task$fail,
+									_elm_lang$core$Task$sequence,
+									A2(
+										_elm_lang$core$Result$map,
+										function (modules) {
+											return A2(
+												_elm_lang$core$List$map,
+												function (module_) {
+													return A2(
+														_elm_lang$core$Task$andThen,
+														function (moduleSignatures) {
+															return _elm_lang$core$Task$succeed(
+																A2(_panosoft$elm_docs$Docs_Generator$moduleToMarkdown, moduleSignatures, module_));
+														},
+														A2(_panosoft$elm_docs$Docs_SignatureExtractor$getModuleSignatures, sourcePaths, module_.name));
+												},
+												modules);
+										},
+										A2(
+											_elm_lang$core$Json_Decode$decodeString,
+											_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$moduleDecoder),
+											content)));
+							},
 							A2(
-								_elm_lang$core$Json_Decode$decodeString,
-								_elm_lang$core$Json_Decode$list(_panosoft$elm_docs$Docs_Generator$moduleDecoder),
-								content)));
-				},
-				A2(
-					_elm_lang$core$Task$mapError,
-					_elm_node$core$Node_Error$message,
-					A2(_elm_node$core$Node_FileSystem$readFileAsString, source, _elm_node$core$Node_Encoding$Utf8))));
+								_elm_lang$core$Task$mapError,
+								_elm_node$core$Node_Error$message,
+								A2(_elm_node$core$Node_FileSystem$readFileAsString, source, _elm_node$core$Node_Encoding$Utf8)))));
+			},
+			_panosoft$elm_docs$Docs_SignatureExtractor$getSourceCodeFilenames(
+				_elm_node$core$Node_Path$dirname(source)));
 	});
 
 const _panosoft$elm_grove$Native_Console = (_ => {
@@ -13282,385 +14039,6 @@ var _panosoft$elm_grove$ApiChanges$compareModuleDicts = F2(
 				previousModules));
 	});
 
-
-var _panosoft$elm_utils$Utils_Tuple$map9 = F2(
-	function (f, _p0) {
-		var _p1 = _p0;
-		return {
-			ctor: '_Tuple9',
-			_0: f(_p1._0),
-			_1: f(_p1._1),
-			_2: f(_p1._2),
-			_3: f(_p1._3),
-			_4: f(_p1._4),
-			_5: f(_p1._5),
-			_6: f(_p1._6),
-			_7: f(_p1._7),
-			_8: f(_p1._8)
-		};
-	});
-var _panosoft$elm_utils$Utils_Tuple$map8 = F2(
-	function (f, _p2) {
-		var _p3 = _p2;
-		return {
-			ctor: '_Tuple8',
-			_0: f(_p3._0),
-			_1: f(_p3._1),
-			_2: f(_p3._2),
-			_3: f(_p3._3),
-			_4: f(_p3._4),
-			_5: f(_p3._5),
-			_6: f(_p3._6),
-			_7: f(_p3._7)
-		};
-	});
-var _panosoft$elm_utils$Utils_Tuple$map7 = F2(
-	function (f, _p4) {
-		var _p5 = _p4;
-		return {
-			ctor: '_Tuple7',
-			_0: f(_p5._0),
-			_1: f(_p5._1),
-			_2: f(_p5._2),
-			_3: f(_p5._3),
-			_4: f(_p5._4),
-			_5: f(_p5._5),
-			_6: f(_p5._6)
-		};
-	});
-var _panosoft$elm_utils$Utils_Tuple$map6 = F2(
-	function (f, _p6) {
-		var _p7 = _p6;
-		return {
-			ctor: '_Tuple6',
-			_0: f(_p7._0),
-			_1: f(_p7._1),
-			_2: f(_p7._2),
-			_3: f(_p7._3),
-			_4: f(_p7._4),
-			_5: f(_p7._5)
-		};
-	});
-var _panosoft$elm_utils$Utils_Tuple$map5 = F2(
-	function (f, _p8) {
-		var _p9 = _p8;
-		return {
-			ctor: '_Tuple5',
-			_0: f(_p9._0),
-			_1: f(_p9._1),
-			_2: f(_p9._2),
-			_3: f(_p9._3),
-			_4: f(_p9._4)
-		};
-	});
-var _panosoft$elm_utils$Utils_Tuple$map4 = F2(
-	function (f, _p10) {
-		var _p11 = _p10;
-		return {
-			ctor: '_Tuple4',
-			_0: f(_p11._0),
-			_1: f(_p11._1),
-			_2: f(_p11._2),
-			_3: f(_p11._3)
-		};
-	});
-var _panosoft$elm_utils$Utils_Tuple$map3 = F2(
-	function (f, _p12) {
-		var _p13 = _p12;
-		return {
-			ctor: '_Tuple3',
-			_0: f(_p13._0),
-			_1: f(_p13._1),
-			_2: f(_p13._2)
-		};
-	});
-var _panosoft$elm_utils$Utils_Tuple$map2 = F2(
-	function (f, _p14) {
-		var _p15 = _p14;
-		return {
-			ctor: '_Tuple2',
-			_0: f(_p15._0),
-			_1: f(_p15._1)
-		};
-	});
-var _panosoft$elm_utils$Utils_Tuple$secondMap = function (f) {
-	return _elm_lang$core$List$map(
-		function (_p16) {
-			var _p17 = _p16;
-			return {
-				ctor: '_Tuple2',
-				_0: _p17._0,
-				_1: f(_p17._1)
-			};
-		});
-};
-var _panosoft$elm_utils$Utils_Tuple$firstMap = function (f) {
-	return _elm_lang$core$List$map(
-		function (_p18) {
-			var _p19 = _p18;
-			return {
-				ctor: '_Tuple2',
-				_0: f(_p19._0),
-				_1: _p19._1
-			};
-		});
-};
-
-var _panosoft$elm_utils$Utils_Func$compose = F2(
-	function (f2, f1) {
-		return A2(
-			F2(
-				function (x, y) {
-					return function (_p0) {
-						return x(
-							y(_p0));
-					};
-				}),
-			f2,
-			f1);
-	});
-var _panosoft$elm_utils$Utils_Func$compose2 = F3(
-	function (f2, f1, a) {
-		return A2(
-			_panosoft$elm_utils$Utils_Func$compose,
-			f2,
-			f1(a));
-	});
-var _panosoft$elm_utils$Utils_Func$compose3 = F3(
-	function (f2, f1, a) {
-		return A2(
-			_panosoft$elm_utils$Utils_Func$compose2,
-			f2,
-			f1(a));
-	});
-var _panosoft$elm_utils$Utils_Func$compose4 = F3(
-	function (f2, f1, a) {
-		return A2(
-			_panosoft$elm_utils$Utils_Func$compose3,
-			f2,
-			f1(a));
-	});
-var _panosoft$elm_utils$Utils_Func$compose5 = F3(
-	function (f2, f1, a) {
-		return A2(
-			_panosoft$elm_utils$Utils_Func$compose4,
-			f2,
-			f1(a));
-	});
-var _panosoft$elm_utils$Utils_Func$compose6 = F3(
-	function (f2, f1, a) {
-		return A2(
-			_panosoft$elm_utils$Utils_Func$compose5,
-			f2,
-			f1(a));
-	});
-var _panosoft$elm_utils$Utils_Func$compose7 = F3(
-	function (f2, f1, a) {
-		return A2(
-			_panosoft$elm_utils$Utils_Func$compose6,
-			f2,
-			f1(a));
-	});
-var _panosoft$elm_utils$Utils_Func$compose8 = F3(
-	function (f2, f1, a) {
-		return A2(
-			_panosoft$elm_utils$Utils_Func$compose7,
-			f2,
-			f1(a));
-	});
-var _panosoft$elm_utils$Utils_Func$apply = function (p1) {
-	return F2(
-		function (x, y) {
-			return y(x);
-		})(p1);
-};
-var _panosoft$elm_utils$Utils_Func$apply2 = F2(
-	function (p1, p2) {
-		return function (_p1) {
-			return A2(
-				F2(
-					function (x, y) {
-						return y(x);
-					}),
-				p2,
-				A2(_panosoft$elm_utils$Utils_Func$apply, p1, _p1));
-		};
-	});
-var _panosoft$elm_utils$Utils_Func$apply3 = F3(
-	function (p1, p2, p3) {
-		return function (_p2) {
-			return A2(
-				F2(
-					function (x, y) {
-						return y(x);
-					}),
-				p3,
-				A3(_panosoft$elm_utils$Utils_Func$apply2, p1, p2, _p2));
-		};
-	});
-var _panosoft$elm_utils$Utils_Func$apply4 = F4(
-	function (p1, p2, p3, p4) {
-		return function (_p3) {
-			return A2(
-				F2(
-					function (x, y) {
-						return y(x);
-					}),
-				p4,
-				A4(_panosoft$elm_utils$Utils_Func$apply3, p1, p2, p3, _p3));
-		};
-	});
-
-var _panosoft$elm_utils$Utils_Json$resultDecoder = F2(
-	function (errorDecoder, okayDecoder) {
-		return A2(
-			_elm_lang$core$Json_Decode$andThen,
-			function (maybeOkay) {
-				return A2(
-					_panosoft$elm_utils$Utils_Ops_ops['?='],
-					A2(
-						_panosoft$elm_utils$Utils_Ops_ops['|?>'],
-						maybeOkay,
-						function (_p0) {
-							return _elm_lang$core$Json_Decode$succeed(
-								_elm_lang$core$Result$Ok(_p0));
-						}),
-					A2(
-						_elm_lang$core$Json_Decode$andThen,
-						function (_p1) {
-							return _elm_lang$core$Json_Decode$succeed(
-								_elm_lang$core$Result$Err(_p1));
-						},
-						A2(_elm_lang$core$Json_Decode$field, 'error', errorDecoder)));
-			},
-			_elm_lang$core$Json_Decode$maybe(
-				A2(_elm_lang$core$Json_Decode$field, 'okay', okayDecoder)));
-	});
-var _panosoft$elm_utils$Utils_Json$resultDecode = A2(_panosoft$elm_utils$Utils_Func$compose2, _elm_lang$core$Json_Decode$decodeString, _panosoft$elm_utils$Utils_Json$resultDecoder);
-var _panosoft$elm_utils$Utils_Json$resultEncoder = F3(
-	function (errorEncoder, okayEncoder, result) {
-		return A2(
-			_panosoft$elm_utils$Utils_Ops_ops['??='],
-			A2(
-				_panosoft$elm_utils$Utils_Ops_ops['|??>'],
-				result,
-				function (okay) {
-					return _elm_lang$core$Json_Encode$object(
-						{
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'okay',
-								_1: okayEncoder(okay)
-							},
-							_1: {ctor: '[]'}
-						});
-				}),
-			function (error) {
-				return _elm_lang$core$Json_Encode$object(
-					{
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'error',
-							_1: errorEncoder(error)
-						},
-						_1: {ctor: '[]'}
-					});
-			});
-	});
-var _panosoft$elm_utils$Utils_Json$resultEncode = A2(
-	_panosoft$elm_utils$Utils_Func$compose3,
-	_elm_lang$core$Json_Encode$encode(0),
-	_panosoft$elm_utils$Utils_Json$resultEncoder);
-var _panosoft$elm_utils$Utils_Json$decConvertDict = F3(
-	function (valuesConverter, keyDecoder, valueDecoder) {
-		var makeDict = F2(
-			function (keys, values) {
-				return _elm_lang$core$Dict$fromList(
-					A2(
-						_panosoft$elm_utils$Utils_Tuple$secondMap,
-						valuesConverter,
-						A3(
-							_elm_lang$core$List$map2,
-							F2(
-								function (v0, v1) {
-									return {ctor: '_Tuple2', _0: v0, _1: v1};
-								}),
-							keys,
-							values)));
-			});
-		return A3(
-			_elm_lang$core$Json_Decode$map2,
-			makeDict,
-			A2(
-				_elm_lang$core$Json_Decode$field,
-				'keys',
-				_elm_lang$core$Json_Decode$list(keyDecoder)),
-			A2(
-				_elm_lang$core$Json_Decode$field,
-				'values',
-				_elm_lang$core$Json_Decode$list(valueDecoder)));
-	});
-var _panosoft$elm_utils$Utils_Json$decDict = _panosoft$elm_utils$Utils_Json$decConvertDict(_elm_lang$core$Basics$identity);
-var _panosoft$elm_utils$Utils_Json$encDict = F3(
-	function (keyEncoder, valueEncoder, dict) {
-		return _elm_lang$core$Json_Encode$object(
-			{
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'keys',
-					_1: _elm_lang$core$Json_Encode$list(
-						A2(
-							_elm_lang$core$List$map,
-							keyEncoder,
-							_elm_lang$core$Dict$keys(dict)))
-				},
-				_1: {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'values',
-						_1: _elm_lang$core$Json_Encode$list(
-							A2(
-								_elm_lang$core$List$map,
-								valueEncoder,
-								_elm_lang$core$Dict$values(dict)))
-					},
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _panosoft$elm_utils$Utils_Json$encMaybe = F2(
-	function (encoder, maybe) {
-		return A2(
-			_panosoft$elm_utils$Utils_Ops_ops['?='],
-			A2(
-				_panosoft$elm_utils$Utils_Ops_ops['|?>'],
-				maybe,
-				function (just) {
-					return encoder(just);
-				}),
-			_elm_lang$core$Json_Encode$null);
-	});
-var _panosoft$elm_utils$Utils_Json_ops = _panosoft$elm_utils$Utils_Json_ops || {};
-_panosoft$elm_utils$Utils_Json_ops['///'] = F2(
-	function (decoder, $default) {
-		return A2(
-			_elm_lang$core$Json_Decode$andThen,
-			function (maybe) {
-				return _elm_lang$core$Json_Decode$succeed(
-					A2(_panosoft$elm_utils$Utils_Ops_ops['?='], maybe, $default));
-			},
-			_elm_lang$core$Json_Decode$maybe(decoder));
-	});
-var _panosoft$elm_utils$Utils_Json_ops = _panosoft$elm_utils$Utils_Json_ops || {};
-_panosoft$elm_utils$Utils_Json_ops['<||'] = _elm_lang$core$Json_Decode$map2(
-	F2(
-		function (x, y) {
-			return x(y);
-		}));
 
 const _panosoft$elm_grove$Native_Git = (_ => {
 	const os = require('os');

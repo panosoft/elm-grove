@@ -13285,7 +13285,8 @@ var _panosoft$elm_docs$Docs_Generator$fixCodeBlocks = function (comment) {
 					0,
 					_elm_lang$core$String$length(_p30));
 			},
-			_1: _elm_lang$core$String$startsWith('    '),
+			_1: _elm_lang$core$Regex$contains(
+				_elm_lang$core$Regex$regex('^    [^ ]')),
 			_2: F2(
 				function (x, y) {
 					return _elm_lang$core$Native_Utils.eq(x, y);

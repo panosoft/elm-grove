@@ -309,7 +309,7 @@ While the other formats are supported, it's easiest to just use the `<repo>`.
 
 ### Creating documentation
 
-Both Module and Function Comments, which are just markdown, will be used to create documentation in a directory called `elm-docs`. Grove uses the `panosoft/elm-docs` package to generate documentation.
+Both Module and Function Comments, which are just markdown, will be used to create documentation in a directory called `docs`. Grove uses the `panosoft/elm-docs` package to generate documentation.
 
 Please see [panosoft/elm-docs](https://github.com/panosoft/elm-docs) for documentation on how to comment your code for documentation generation.
 

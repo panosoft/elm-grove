@@ -29,7 +29,7 @@ type alias Config =
 
 elmDocsPath : Path
 elmDocsPath =
-    "elm-docs"
+    "docs"
 
 
 docsJsonFilename : Path
